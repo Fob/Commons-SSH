@@ -1,0 +1,27 @@
+<project name="Commons-SSH" default="build">
+    <target name="init">
+		<mkdir dir="./bin/jdk-${java.version}"/>
+        <delete file="./bin/jdk-${java.version}/commons-ssh.jar"/>
+        <mkdir dir="./out"/>
+    </target>
+    <target name="compile">
+        <javac srcdir="./src" destdir="./out">
+            <classpath>
+                <fileset dir="./lib"/>
+            </classpath>
+        </javac>
+    </target>
+    <target name="meta">
+        <mkdir dir="./out/META-INF"/>
+        <manifest file="./out/META-INF/MANIFEST">
+                <attribute name="Implementation-Version" value="1.5.1"/>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Java" value="${java.version}"/>
+        </manifest>
+    </target>
+    <target name="build" depends="init,compile,meta">
+        <jar destfile="./bin/jdk-${java.version}/commons-ssh.jar">
+            <fileset dir="./out"/>
+        </jar>
+    </target>
+</project>
