@@ -15,14 +15,16 @@
  */
 package net.sf.commons.ssh;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketOptions;
 import java.net.SocketTimeoutException;
-import java.util.Collections;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.sf.commons.ssh.options.*;
+import net.sf.commons.ssh.utils.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Sergey Vidyuk (svidyuk at gmail dot com)
  * @since 1.0
  */
-public abstract class ConnectionFactory
+public abstract class ConnectionFactory implements Closeable
 {
 
     /**
@@ -54,66 +56,12 @@ public abstract class ConnectionFactory
     }
 
     /**
-     * The timeout value for the key exchange
-     * <p/>
-     * When this time limit is reached the transport protocol will initiate a
-     * key re-exchange. The default value is one hour with the minimum timeout
-     * being 60 seconds.
-     *
-     * @since 1.0
-     */
-    private int kexTimeout = 3600;
-
-    /**
      * Factory logger
      */
     protected final Log log = LogFactory.getLog(this.getClass());
 
-    /**
-     * The port to connect to on the remote host
-     *
-     * @since 1.0
-     */
-    private int port = 22;
 
-    /**
-     * The send ignore flag to send random data packets
-     * <p/>
-     * If this flag is set to true, then the transport protocol will send
-     * additional SSH_MSG_IGNORE packets with random data.
-     *
-     * @since 1.0
-     */
-    private boolean sendIgnore = false;
-
-    /**
-     * Enable/disable {@link SocketOptions#SO_TIMEOUT} with the specified
-     * timeout, in milliseconds. With this option set to a non-zero timeout, a
-     * {@link InputStream#read()} will block for only this amount of time.
-     * <p/>
-     * If the timeout expires, a {@link SocketTimeoutException} is raised,
-     * though the Socket is still valid.
-     * <p/>
-     * The timeout must be &gt; 0. A timeout of zero is interpreted as an
-     * infinite timeout.
-     *
-     * @since 1.0
-     */
-    private int soTimeout = 0;
-
-    /**
-     * Enable/disable connectTimeout with a specified timeout value, in millisecond.
-     * With this options set to a non-zero timeout, socket will connect to the server
-     * for only this amount of time. A timeout of zero is interpreted as an infinite
-     * timeout. The connection will then block until established or an error occurs.
-     * <p/>
-     * If the timeout expires, a {@link SocketTimeoutException} is raised.
-     *
-     * @since 1.4
-     */
-    private int connectTimeout = 0;
-
-    private Set supporteFeatures = null;
+    private Set supportedFeatures = null;
 
     private Properties properties=new Properties();
 
@@ -123,36 +71,40 @@ public abstract class ConnectionFactory
      * @return the timeout value for the key exchange
      * @since 1.0
      */
+    @Deprecated
     public int getKexTimeout()
     {
-        return kexTimeout;
+        return ConnectionOptionsBuilder.getKexTimeout(getFactoryOptions());
     }
 
     /**
      * @return the port to connect to on the remote host
      * @since 1.0
      */
+    @Deprecated
     public int getPort()
     {
-        return port;
+        return ConnectionOptionsBuilder.getPort(getFactoryOptions());
     }
 
     /**
      * @return the soTimeout
      * @since 1.0
      */
+    @Deprecated
     public int getSoTimeout()
     {
-        return soTimeout;
+        return ConnectionOptionsBuilder.getSoTimeout(getFactoryOptions());
     }
 
     /**
      * @return the connectTimeout
      * @since 1.4
      */
+    @Deprecated
     public int getConnectTimeout()
     {
-        return connectTimeout;
+        return ConnectionOptionsBuilder.getConnectTimeout(getFactoryOptions());
     }
 
     /**
@@ -168,13 +120,13 @@ public abstract class ConnectionFactory
     {
         synchronized (this)
         {
-            if (supporteFeatures == null)
+            if (supportedFeatures == null)
             {
-                supporteFeatures = Collections
+                supportedFeatures = Collections
                         .unmodifiableSet(getSupportedFeaturesImpl());
             }
 
-            return supporteFeatures;
+            return supportedFeatures;
         }
     }
 
@@ -219,9 +171,10 @@ public abstract class ConnectionFactory
     /**
      * @return the send ignore flag to send random data packets
      */
+    @Deprecated
     public boolean isSendIgnore()
     {
-        return sendIgnore;
+        return ConnectionOptionsBuilder.isSendIgnore(getFactoryOptions());
     }
 
     /**
@@ -234,6 +187,7 @@ public abstract class ConnectionFactory
      * @throws IOException if I/O exception occurs
      * @since 1.0
      */
+    @Deprecated
     public Connection openConnection(String host,
                                      AuthenticationOptions authOptions) throws IOException
     {
@@ -251,6 +205,7 @@ public abstract class ConnectionFactory
      * @throws IOException if I/O exception occurs
      * @since 1.0
      */
+    @Deprecated
     public abstract Connection openConnection(String host, int port,
                                               AuthenticationOptions authOptions) throws IOException;
 
@@ -258,27 +213,30 @@ public abstract class ConnectionFactory
      * @param kexTimeout the kexTimeout to set
      * @since 1.0
      */
+    @Deprecated
     public void setKexTimeout(int kexTimeout)
     {
-        this.kexTimeout = kexTimeout;
+        ConnectionOptionsBuilder.setKexTimeout(getFactoryOptions(), kexTimeout);
     }
 
     /**
      * @param port the port to connect to on the remote host
      * @since 1.0
      */
+    @Deprecated
     public void setPort(int port)
     {
-        this.port = port;
+        ConnectionOptionsBuilder.setPort(getFactoryOptions(), port);
     }
 
     /**
      * @param sendIgnore the send ignore flag to send random data packets
      * @since 1.0
      */
+    @Deprecated
     public void setSendIgnore(boolean sendIgnore)
     {
-        this.sendIgnore = sendIgnore;
+        ConnectionOptionsBuilder.setSendIgnore(getFactoryOptions(), sendIgnore);
     }
 
     /**
@@ -295,9 +253,10 @@ public abstract class ConnectionFactory
      * @param soTimeout the soTimeout to set
      * @since 1.0
      */
+    @Deprecated
     public void setSoTimeout(int soTimeout)
     {
-        this.soTimeout = soTimeout;
+        ConnectionOptionsBuilder.setSoTimeout(getFactoryOptions(), soTimeout);
     }
 
     /**
@@ -311,9 +270,10 @@ public abstract class ConnectionFactory
      * @param connectTimeout the connectTimeout to set
      * @since 1.4
      */
+    @Deprecated
     public void setConnectTimeout(int connectTimeout)
     {
-        this.connectTimeout = connectTimeout;
+        ConnectionOptionsBuilder.setConnectTimeout(getFactoryOptions(), connectTimeout);
     }
 
     public String getProperty(String key)
@@ -333,5 +293,85 @@ public abstract class ConnectionFactory
     public void setProperty(String key,String value)
     {
         properties.setProperty(key,value);
+    }
+
+
+
+    protected List<Connection> connections = new ArrayList<Connection>();
+    protected Options options;
+
+    protected AtomicBoolean isClosed = new AtomicBoolean(false);
+
+    protected ConnectionFactory()
+    {
+        options = new Options();
+        ConnectionOptionsBuilder.initDefault(options);
+        FactoryOptionsBuilder.initDefault(options);
+        ShellSessionOptionsBuilder.initDefault(options);
+        SftpSessionOptionsBuilder.initDefault(options);
+    }
+
+    public  boolean isClosed()
+    {
+        return isClosed.get();
+    }
+
+    public void close() throws IOException
+    {
+        for(Connection conection: connections)
+        {
+            if(!conection.isClosed())
+                conection.close();
+        }
+        isClosed.set(true);
+    }
+
+    @Override
+    protected void finalize() throws Throwable
+    {
+        super.finalize();
+        IOUtils.close(this);
+    }
+
+    protected abstract Connection initConnection(Options options);
+
+    public Connection createConnection()
+    {
+        return initConnection(options);
+    }
+
+
+    public void clearClosedConnections()
+    {
+        for(Connection conection: connections)
+        {
+            if(conection.isClosed())
+                connections.remove(conection);
+        }
+    }
+
+    public List<Connection> getManagedConnections()
+    {
+        return connections;
+    }
+
+    public Options getFactoryOptions()
+    {
+        return options;
+    }
+
+    public void setFactoryOptions(Options factoryOptions)
+    {
+        this.options = factoryOptions;
+    }
+
+    public FactoryOptionsBuilder getFactoryOptionsBuilder()
+    {
+        return new FactoryOptionsBuilder(options);
+    }
+
+    public ConnectionOptionsBuilder getConnectionOptionsBuilder()
+    {
+        return new ConnectionOptionsBuilder(options);
     }
 }
