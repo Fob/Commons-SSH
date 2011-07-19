@@ -19,6 +19,7 @@ package net.sf.commons.ssh;
  * @since 1.2
  * @author Egor Ivanov (crackcraft at gmail dot com)
  */
+@Deprecated
 public class SftpSessionOptions {
     public int defaultPermissions;
     public String localCurrentDirectory;
