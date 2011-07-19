@@ -1,17 +1,13 @@
 package net.sf.commons.ssh.options;
 
 
-public class FactoryOptionsBuilder extends PropertiesBuilder
+public class FactoryPropertiesBuilder extends PropertiesBuilder
 {
     public static final String KEY_ASYNC="net.sf.commons.ssh.options.ConnectionFactoryOptions.async";
 
-    public FactoryOptionsBuilder(AbstractConfigurable options)
+    public FactoryPropertiesBuilder(ConfigurableProperties options)
     {
         super(options);
-    }
-
-    public FactoryOptionsBuilder()
-    {
     }
 
     @Override
@@ -31,17 +27,17 @@ public class FactoryOptionsBuilder extends PropertiesBuilder
     }
 
     //static operations
-    public static boolean isAsync(AbstractConfigurable options)
+    public static boolean isAsync(ConfigurableProperties options)
     {
         return (Boolean)options.getProperty(KEY_ASYNC);
     }
 
-    public static void setAsync(AbstractConfigurable options,boolean async)
+    public static void setAsync(ConfigurableProperties options,boolean async)
     {
         options.setProperty(KEY_ASYNC,async);
     }
 
-    public static void initDefault(AbstractConfigurable options)
+    public static void setupDefault(ConfigurableProperties options)
     {
         setAsync(options,false);
     }

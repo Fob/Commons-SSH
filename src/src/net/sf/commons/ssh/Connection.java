@@ -15,6 +15,7 @@
  */
 package net.sf.commons.ssh;
 
+import net.sf.commons.ssh.auth.AuthenticationOptions;
 import net.sf.commons.ssh.options.*;
 
 
@@ -32,14 +33,7 @@ import java.util.List;
 public abstract class Connection extends AbstractConfigurable implements Closeable
 {
     protected List<Session> sessions = new ArrayList<Session>();
-    protected AbstractConfigurable options;
-    protected ConnectionPropertiesBuilder connectionOptionsBuilder;
 
-    protected Connection(AbstractConfigurable options)
-    {
-        this.options = new AbstractConfigurable(options);
-        connectionOptionsBuilder = new ConnectionPropertiesBuilder(options);
-    }
 
     /**
      * Closes this connection
@@ -64,7 +58,6 @@ public abstract class Connection extends AbstractConfigurable implements Closeab
      * @return new session
      * @throws IOException if I/O occurs
      */
-    @Deprecated
     public ExecSession openExecSession(ExecSessionOptions execSessionOptions)
             throws IOException
     {
@@ -80,7 +73,6 @@ public abstract class Connection extends AbstractConfigurable implements Closeab
      * @throws IOException if I/O occurs
      * @since 1.2
      */
-    @Deprecated
     public SftpSession openSftpSession(SftpSessionOptions sftpSessionOptions)
             throws IOException
     {
@@ -95,7 +87,6 @@ public abstract class Connection extends AbstractConfigurable implements Closeab
      * @return new session
      * @throws IOException if I/O occurs
      */
-    @Deprecated
     public ShellSession openShellSession(ShellSessionOptions shellSessionOptions)
             throws IOException
     {
@@ -103,46 +94,57 @@ public abstract class Connection extends AbstractConfigurable implements Closeab
                 + this.getClass().getName() + " doesn't support this feature");
     }
 
-
-    public Session createSession(SessionType type) throws SessionType.UnknownSessionType
+    protected ShellSession initShellSession() throws IOException
     {
-        Session result;
-        switch (type)
-        {
-            case EXEC:
-                result = initExecSession(options);
-                break;
-            case SFTP:
-                result=initSftpSession(options);
-                break;
-            case SHELL:
-                result=initShellSession(options);
-                break;
-            default:
-                throw new SessionType.UnknownSessionType(type);
-        }
+        throw new UnsupportedOperationException("Connection factory "
+                + this.getClass().getName() + " doesn't support this feature");
+    }
 
+    protected ExecSession initExecSession() throws IOException
+    {
+        throw new UnsupportedOperationException("Connection factory "
+                + this.getClass().getName() + " doesn't support this feature");
+    }
+
+    protected SftpSession initSftpSession() throws IOException
+    {
+        throw new UnsupportedOperationException("Connection factory "
+                + this.getClass().getName() + " doesn't support this feature");
+    }
+
+
+    public ShellSession createShellSession() throws IOException {
+        ShellSession result = initShellSession();
+        result.include(this);
+        ShellSessionPropertiesBuilder.setupDefault(result);
+        sessions.add(result);
         return result;
     }
 
-    public AbstractConfigurable getOptions()
-    {
-        return options;
+    public ExecSession createExecSession() throws IOException {
+        ExecSession result = initExecSession();
+        result.include(this);
+        sessions.add(result);
+        return result;
     }
 
-    public void setOptions(AbstractConfigurable options)
-    {
-        this.options = options;
+    public SftpSession createSftpSession() throws IOException {
+        SftpSession result = initSftpSession();
+        result.include(this);
+        SftpSessionPropertiesBuilder.setupDefault(result);
+        sessions.add(result);
+        return result;
     }
 
 
-
-    public abstract ExecSession initExecSession(AbstractConfigurable options);
-    public abstract SftpSession initSftpSession(AbstractConfigurable options);
-    public abstract ShellSession initShellSession(AbstractConfigurable options);
-
-    public ConnectionPropertiesBuilder getConnectionOptionsBuilder()
+    public ConnectionPropertiesBuilder getConnectionPropertiesBuilder()
     {
-        return connectionOptionsBuilder;
+        return new ConnectionPropertiesBuilder(this);
     }
+
+    public abstract void connect();
+    public abstract boolean isConnected();
+    public abstract void authenticate(AuthenticationOptions auth);
+    public abstract boolean isAuthenticated();
+
 }

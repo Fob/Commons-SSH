@@ -10,10 +10,18 @@ public abstract class PropertiesBuilder
         setupDefault();
     }
 
-    protected abstract void setupDefault();
+    protected void setupDefault()
+    {
+
+    }
 
     public ConfigurableProperties getProperties()
     {
         return options;
+    }
+
+    public void verify() throws IllegalPropertyException
+    {
+
     }
 }

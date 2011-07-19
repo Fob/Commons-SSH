@@ -1,6 +1,8 @@
 package net.sf.commons.ssh.ussh;
 
 import net.sf.commons.ssh.*;
+import net.sf.commons.ssh.auth.AuthenticationOptions;
+import net.sf.commons.ssh.auth.PasswordAuthenticationOptions;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;

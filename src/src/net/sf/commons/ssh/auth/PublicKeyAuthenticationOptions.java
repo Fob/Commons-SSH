@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.sf.commons.ssh;
+package net.sf.commons.ssh.auth;
 
 import java.io.File;
 
@@ -41,7 +41,7 @@ public class PublicKeyAuthenticationOptions implements AuthenticationOptions {
 
     /**
      * Creates new instance of
-     * {@link net.sf.commons.ssh.PublicKeyAuthenticationOptions}
+     * {@link PublicKeyAuthenticationOptions}
      * 
      * @param login
      *            user name
@@ -77,7 +77,7 @@ public class PublicKeyAuthenticationOptions implements AuthenticationOptions {
 
     /**
      * Creates new instance of
-     * {@link net.sf.commons.ssh.PublicKeyAuthenticationOptions}
+     * {@link PublicKeyAuthenticationOptions}
      * 
      * @param login
      *            user name

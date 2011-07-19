@@ -29,6 +29,9 @@ import com.sshtools.j2ssh.authentication.PasswordAuthenticationClient;
 import com.sshtools.j2ssh.authentication.PublicKeyAuthenticationClient;
 import com.sshtools.j2ssh.transport.IgnoreHostKeyVerification;
 import com.sshtools.j2ssh.transport.publickey.SshPrivateKeyFile;
+import net.sf.commons.ssh.auth.AuthenticationOptions;
+import net.sf.commons.ssh.auth.PasswordAuthenticationOptions;
+import net.sf.commons.ssh.auth.PublicKeyAuthenticationOptions;
 
 /**
  * @author Sergey Vidyuk (svidyuk at gmail dot com)

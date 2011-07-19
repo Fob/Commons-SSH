@@ -15,6 +15,9 @@
  */
 package net.sf.commons.ssh;
 
+import net.sf.commons.ssh.auth.PasswordAuthenticationOptions;
+import net.sf.commons.ssh.auth.PublicKeyAuthenticationOptions;
+
 /**
  * @since 1.0
  * @see ConnectionFactory#isFeatureSupported(String)

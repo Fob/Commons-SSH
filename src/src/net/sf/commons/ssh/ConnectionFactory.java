@@ -23,6 +23,7 @@ import java.net.SocketTimeoutException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.sf.commons.ssh.auth.AuthenticationOptions;
 import net.sf.commons.ssh.options.*;
 import net.sf.commons.ssh.utils.IOUtils;
 import org.apache.commons.logging.Log;
@@ -271,10 +272,9 @@ public abstract class ConnectionFactory extends AbstractConfigurable implements 
 
     protected ConnectionFactory()
     {
-        ConnectionPropertiesBuilder.initDefault(this);
-        FactoryOptionsBuilder.initDefault(this);
-        ShellSessionOptionsBuilder.initDefault(this);
-        SftpSessionOptionsBuilder.initDefault(this);
+        include(new SystemConfigurable());
+        ConnectionPropertiesBuilder.setupDefault(this);
+        FactoryPropertiesBuilder.setupDefault(this);
     }
 
     public  boolean isClosed()
@@ -323,9 +323,9 @@ public abstract class ConnectionFactory extends AbstractConfigurable implements 
     }
 
 
-    public FactoryOptionsBuilder getFactoryPropertiesBuilder()
+    public FactoryPropertiesBuilder getFactoryPropertiesBuilder()
     {
-        return new FactoryOptionsBuilder(this);
+        return new FactoryPropertiesBuilder(this);
     }
 
     public ConnectionPropertiesBuilder getConnectionPropertiesBuilder()

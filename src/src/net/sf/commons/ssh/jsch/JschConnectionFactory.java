@@ -26,6 +26,9 @@ import net.sf.commons.ssh.*;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import net.sf.commons.ssh.auth.AuthenticationOptions;
+import net.sf.commons.ssh.auth.PasswordAuthenticationOptions;
+import net.sf.commons.ssh.auth.PublicKeyAuthenticationOptions;
 
 /**
  * @since 1.0

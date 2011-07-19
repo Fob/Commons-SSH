@@ -21,6 +21,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.sf.commons.ssh.*;
+import net.sf.commons.ssh.auth.AuthenticationOptions;
+import net.sf.commons.ssh.auth.PasswordAuthenticationOptions;
+import net.sf.commons.ssh.auth.PublicKeyAuthenticationOptions;
 
 /**
  * @since 1.0

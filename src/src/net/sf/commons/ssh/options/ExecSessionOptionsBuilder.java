@@ -5,19 +5,9 @@ public class ExecSessionOptionsBuilder extends PropertiesBuilder
 {
     public static final String KEY_COMMAND="net.sf.commons.ssh.options.ExecSessionOptionsBuilder.command";
 
-    public ExecSessionOptionsBuilder(AbstractConfigurable options)
+    public ExecSessionOptionsBuilder(ConfigurableProperties options)
     {
         super(options);
-    }
-
-    public ExecSessionOptionsBuilder()
-    {
-    }
-
-    @Override
-    protected void setupDefault()
-    {
-
     }
 
     public String getCommand()
@@ -32,12 +22,12 @@ public class ExecSessionOptionsBuilder extends PropertiesBuilder
 
     //static
 
-    public static String getCommand(AbstractConfigurable options)
+    public static String getCommand(ConfigurableProperties options)
     {
         return (String) options.getProperty(KEY_COMMAND);
     }
 
-    public static void setCommand(AbstractConfigurable options,String command)
+    public static void setCommand(ConfigurableProperties options,String command)
     {
         options.setProperty(KEY_COMMAND,command);
     }

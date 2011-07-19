@@ -2,6 +2,8 @@ package net.sf.commons.ssh.sshj;
 
 
 import net.sf.commons.ssh.*;
+import net.sf.commons.ssh.auth.AuthenticationOptions;
+import net.sf.commons.ssh.auth.PasswordAuthenticationOptions;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

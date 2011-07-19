@@ -23,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 import net.sf.commons.ssh.*;
 
+import net.sf.commons.ssh.auth.AuthenticationOptions;
+import net.sf.commons.ssh.auth.PasswordAuthenticationOptions;
 import org.apache.sshd.ClientSession;
 import org.apache.sshd.SshClient;
 import org.apache.sshd.client.future.ConnectFuture;

@@ -15,13 +15,16 @@
  */
 package net.sf.commons.ssh;
 
+import net.sf.commons.ssh.options.ConfigurableProperties;
+
+import java.io.Closeable;
 import java.io.IOException;
 
 /**
  * @author Sergey Vidyuk (svidyuk at gmail dot com)
  * 
  */
-public interface Session {
+public interface Session extends Closeable,ConfigurableProperties {
 
     /**
      * Closes this session.

@@ -1,12 +1,7 @@
 package net.sf.commons.ssh.options;
 
-public class ShellSessionOptionsBuilder extends PropertiesBuilder
+public class ShellSessionPropertiesBuilder extends PropertiesBuilder
 {
-/*    public int terminalCols = 80;
-    public int terminalHeight = 0;
-    public int terminalRows = 24;
-    public String terminalType = "ansi"; //$NON-NLS-1$
-    public int terminalWidth = 0;*/
 
     public static final String KEY_TERMINAL_COLS="net.sf.commons.ssh.options.ShellSessionOptionsBuilder.terminalCols";
     public static final String KEY_TERMINAL_HEIGHT="net.sf.commons.ssh.options.ShellSessionOptionsBuilder.terminalHeight";
@@ -14,11 +9,8 @@ public class ShellSessionOptionsBuilder extends PropertiesBuilder
     public static final String KEY_TERMINAL_TYPE="net.sf.commons.ssh.options.ShellSessionOptionsBuilder.terminalType";
     public static final String KEY_TERMINAL_WIDTH="net.sf.commons.ssh.options.ShellSessionOptionsBuilder.terminalWidth";
 
-    public ShellSessionOptionsBuilder()
-    {
-    }
 
-    public ShellSessionOptionsBuilder(AbstractConfigurable options)
+    public ShellSessionPropertiesBuilder(ConfigurableProperties options)
     {
         super(options);
     }
@@ -83,7 +75,7 @@ public class ShellSessionOptionsBuilder extends PropertiesBuilder
         options.setProperty(KEY_TERMINAL_WIDTH,terminalWidth);
     }
     //static
-    public static void initDefault(AbstractConfigurable options)
+    public static void setupDefault(ConfigurableProperties options)
     {
         setTerminalCols(options,80);
         setTerminalHeight(options,0);
@@ -92,52 +84,52 @@ public class ShellSessionOptionsBuilder extends PropertiesBuilder
         setTerminalWidth(options,0);
     }
 
-    public static int getTerminalCols(AbstractConfigurable options)
+    public static int getTerminalCols(ConfigurableProperties options)
     {
         return (Integer)options.getProperty(KEY_TERMINAL_COLS);
     }
 
-    public static void setTerminalCols(AbstractConfigurable options,int terminalCols)
+    public static void setTerminalCols(ConfigurableProperties options,int terminalCols)
     {
         options.setProperty(KEY_TERMINAL_COLS,terminalCols);
     }
 
-    public static int getTerminalHeight(AbstractConfigurable options)
+    public static int getTerminalHeight(ConfigurableProperties options)
     {
         return (Integer) options.getProperty(KEY_TERMINAL_HEIGHT);
     }
 
-    public static void setTerminalHeight(AbstractConfigurable options,int terminalHeight)
+    public static void setTerminalHeight(ConfigurableProperties options,int terminalHeight)
     {
         options.setProperty(KEY_TERMINAL_HEIGHT,terminalHeight);
     }
 
-    public static int getTerminalRows(AbstractConfigurable options)
+    public static int getTerminalRows(ConfigurableProperties options)
     {
         return (Integer)options.getProperty(KEY_TERMINAL_ROWS);
     }
 
-    public static void setTerminalRows(AbstractConfigurable options,int terminalRows)
+    public static void setTerminalRows(ConfigurableProperties options,int terminalRows)
     {
         options.setProperty(KEY_TERMINAL_ROWS,terminalRows);
     }
 
-    public static String getTerminalType(AbstractConfigurable options)
+    public static String getTerminalType(ConfigurableProperties options)
     {
         return (String) options.getProperty(KEY_TERMINAL_TYPE);
     }
 
-    public static void setTerminalType(AbstractConfigurable options,String terminalType)
+    public static void setTerminalType(ConfigurableProperties options,String terminalType)
     {
         options.setProperty(KEY_TERMINAL_TYPE,terminalType);
     }
 
-    public static int getTerminalWidth(AbstractConfigurable options)
+    public static int getTerminalWidth(ConfigurableProperties options)
     {
         return (Integer)options.getProperty(KEY_TERMINAL_WIDTH);
     }
 
-    public static void setTerminalWidth(AbstractConfigurable options,int terminalWidth)
+    public static void setTerminalWidth(ConfigurableProperties options,int terminalWidth)
     {
         options.setProperty(KEY_TERMINAL_WIDTH,terminalWidth);
     }
