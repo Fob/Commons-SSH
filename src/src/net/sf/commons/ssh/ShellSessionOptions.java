@@ -19,7 +19,7 @@ package net.sf.commons.ssh;
  * @since 1.0
  * @author Sergey Vidyuk (svidyuk at gmail dot com)
  */
-
+     @Deprecated
 public class ShellSessionOptions {
     /**
      * @since 1.0

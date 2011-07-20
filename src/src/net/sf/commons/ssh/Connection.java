@@ -17,6 +17,7 @@ package net.sf.commons.ssh;
 
 import net.sf.commons.ssh.auth.AuthenticationOptions;
 import net.sf.commons.ssh.options.*;
+import net.sf.commons.ssh.session.SFTPSession;
 
 
 import java.io.Closeable;
@@ -30,6 +31,7 @@ import java.util.List;
  * @author Sergey Vidyuk (svidyuk at gmail dot com)
  * @since 1.0
  */
+@Deprecated
 public abstract class Connection extends AbstractConfigurable implements Closeable
 {
     protected List<Session> sessions = new ArrayList<Session>();
@@ -73,7 +75,7 @@ public abstract class Connection extends AbstractConfigurable implements Closeab
      * @throws IOException if I/O occurs
      * @since 1.2
      */
-    public SftpSession openSftpSession(SftpSessionOptions sftpSessionOptions)
+    public SFTPSession openSftpSession(SftpSessionOptions sftpSessionOptions)
             throws IOException
     {
         throw new UnsupportedOperationException("Connection factory "
@@ -106,7 +108,7 @@ public abstract class Connection extends AbstractConfigurable implements Closeab
                 + this.getClass().getName() + " doesn't support this feature");
     }
 
-    protected SftpSession initSftpSession() throws IOException
+    protected SFTPSession initSftpSession() throws IOException
     {
         throw new UnsupportedOperationException("Connection factory "
                 + this.getClass().getName() + " doesn't support this feature");
@@ -128,8 +130,8 @@ public abstract class Connection extends AbstractConfigurable implements Closeab
         return result;
     }
 
-    public SftpSession createSftpSession() throws IOException {
-        SftpSession result = initSftpSession();
+    public SFTPSession createSftpSession() throws IOException {
+        SFTPSession result = initSftpSession();
         result.include(this);
         SftpSessionPropertiesBuilder.setupDefault(result);
         sessions.add(result);

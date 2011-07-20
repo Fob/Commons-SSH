@@ -2,8 +2,8 @@ package net.sf.commons.ssh.options;
 
 
 import java.util.*;
-
-public class AbstractConfigurable implements ConfigurableProperties
+@Deprecated
+public class AbstractConfigurable implements Configurable
 {
     protected Map<String,Object> properties = new HashMap<String,Object>();
     protected List<Properties> parentProperties = new ArrayList<Properties>();

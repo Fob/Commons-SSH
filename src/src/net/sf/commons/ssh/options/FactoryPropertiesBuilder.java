@@ -1,11 +1,11 @@
 package net.sf.commons.ssh.options;
 
-
-public class FactoryPropertiesBuilder extends PropertiesBuilder
+@Deprecated
+public class FactoryPropertiesBuilder// extends PropertiesBuilder
 {
-    public static final String KEY_ASYNC="net.sf.commons.ssh.options.ConnectionFactoryOptions.async";
+/*    public static final String KEY_ASYNC="net.sf.commons.ssh.options.ConnectionFactoryOptions.async";
 
-    public FactoryPropertiesBuilder(ConfigurableProperties options)
+    public FactoryPropertiesBuilder(Configurable options)
     {
         super(options);
     }
@@ -27,18 +27,18 @@ public class FactoryPropertiesBuilder extends PropertiesBuilder
     }
 
     //static operations
-    public static boolean isAsync(ConfigurableProperties options)
+    public static boolean isAsync(Configurable options)
     {
         return (Boolean)options.getProperty(KEY_ASYNC);
     }
 
-    public static void setAsync(ConfigurableProperties options,boolean async)
+    public static void setAsync(Configurable options,boolean async)
     {
         options.setProperty(KEY_ASYNC,async);
     }
 
-    public static void setupDefault(ConfigurableProperties options)
+    public static void setupDefault(Configurable options)
     {
         setAsync(options,false);
-    }
+    }*/
 }

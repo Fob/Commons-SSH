@@ -1,11 +1,11 @@
 package net.sf.commons.ssh.options;
 
-
-public class ExecSessionOptionsBuilder extends PropertiesBuilder
+@Deprecated
+public class ExecSessionOptionsBuilder //extends PropertiesBuilder
 {
-    public static final String KEY_COMMAND="net.sf.commons.ssh.options.ExecSessionOptionsBuilder.command";
+/*    public static final String KEY_COMMAND="net.sf.commons.ssh.options.ExecSessionOptionsBuilder.command";
 
-    public ExecSessionOptionsBuilder(ConfigurableProperties options)
+    public ExecSessionOptionsBuilder(Configurable options)
     {
         super(options);
     }
@@ -22,13 +22,13 @@ public class ExecSessionOptionsBuilder extends PropertiesBuilder
 
     //static
 
-    public static String getCommand(ConfigurableProperties options)
+    public static String getCommand(Configurable options)
     {
         return (String) options.getProperty(KEY_COMMAND);
     }
 
-    public static void setCommand(ConfigurableProperties options,String command)
+    public static void setCommand(Configurable options,String command)
     {
         options.setProperty(KEY_COMMAND,command);
-    }
+    }*/
 }

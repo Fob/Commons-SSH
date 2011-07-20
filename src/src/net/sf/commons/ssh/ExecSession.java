@@ -18,8 +18,9 @@ package net.sf.commons.ssh;
 /**
  * @author Sergey Vidyuk (svidyuk at gmail dot com)
  * @since 1.0
- * @see Features#SESSION_EXEC
+ * @see Feature#SESSION_EXEC
  */
+@Deprecated
 public interface ExecSession extends ShellSession {
 
     /**

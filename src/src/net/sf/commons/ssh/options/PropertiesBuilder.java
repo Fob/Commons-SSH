@@ -1,27 +1,35 @@
 package net.sf.commons.ssh.options;
 
+import java.lang.reflect.Field;
+
 public abstract class PropertiesBuilder
 {
-    protected ConfigurableProperties options;
+    private Configurable config;
 
-    public PropertiesBuilder(ConfigurableProperties options)
+    public static final String ASYNC="net.sf.commons.ssh.options.PropertiesBuilder.async";
+    public static final String ="net.sf.commons.ssh.options.PropertiesBuilder.async";
+
+    protected PropertiesBuilder(Configurable config)
     {
-        this.options = options;
-        setupDefault();
-    }
-
-    protected void setupDefault()
-    {
-
-    }
-
-    public ConfigurableProperties getProperties()
-    {
-        return options;
+        this.config = config;
     }
 
     public void verify() throws IllegalPropertyException
     {
-
+        Field[] fields = this.getClass().getDeclaredFields();
+        for(Field field:fields)
+        {
+            Required annotation = field.getAnnotation(Required.class);
+            if(annotation!=null)
+            {
+                if(!(field.getClass().equals(String.class)))
+                {
+                    throw new UnsupportedOperationException("Annotation Required can be aplied only to String field");
+                }
+                String key = field.toString();
+                if(config.getProperty(key)==null)
+                    throw new IllegalPropertyException(key,null);
+            }
+        }
     }
 }

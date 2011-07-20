@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Sergey Vidyuk (svidyuk at gmail dot com)
  * @since 1.0
  */
+@Deprecated
 public abstract class ConnectionFactory extends AbstractConfigurable implements Closeable
 {
 
@@ -111,7 +112,7 @@ public abstract class ConnectionFactory extends AbstractConfigurable implements 
      * @return {@link Set} of {@link String} � the set of supported features
      *         codes.
      * @see #isFeatureSupported(String)
-     * @see Features
+     * @see Feature
      */
     public final Set getSupportedFeatures()
     {
@@ -134,7 +135,7 @@ public abstract class ConnectionFactory extends AbstractConfigurable implements 
      * @return {@link Set} of {@link String} � the set of supported features
      *         codes.
      * @see #isFeatureSupported(String)
-     * @see Features
+     * @see Feature
      */
     protected abstract Set getSupportedFeaturesImpl();
 
@@ -146,7 +147,7 @@ public abstract class ConnectionFactory extends AbstractConfigurable implements 
      * @return <code>true</code> if specified feature is supported by
      *         {@link ConnectionFactory}, <code>false</code> otherwise.
      * @see #getSupportedFeatures()
-     * @see Features
+     * @see Feature
      */
     public boolean isFeatureSupported(String feature)
     {
@@ -272,7 +273,7 @@ public abstract class ConnectionFactory extends AbstractConfigurable implements 
 
     protected ConnectionFactory()
     {
-        include(new SystemConfigurable());
+        include(new SystemConfig());
         ConnectionPropertiesBuilder.setupDefault(this);
         FactoryPropertiesBuilder.setupDefault(this);
     }

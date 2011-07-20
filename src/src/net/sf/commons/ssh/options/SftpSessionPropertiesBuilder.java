@@ -1,14 +1,15 @@
 package net.sf.commons.ssh.options;
 
-
-public class SftpSessionPropertiesBuilder extends PropertiesBuilder
+ @Deprecated
+public class SftpSessionPropertiesBuilder// extends PropertiesBuilder
 {
+/*
     public static final String KEY_DEFAULT_PERMISSION="net.sf.commons.ssh.options.SftpSessionOptionsBuilder.defaultPermissions";
     public static final String KEY_LOCAL_DIRECTORY="net.sf.commons.ssh.options.SftpSessionOptionsBuilder.localCurrentDirectory";
     public static final String KEY_REMOTE_DIRECTORY="net.sf.commons.ssh.options.SftpSessionOptionsBuilder.remoteCurrentDirectory";
 
 
-    public SftpSessionPropertiesBuilder(ConfigurableProperties options)
+    public SftpSessionPropertiesBuilder(Configurable options)
     {
         super(options);
     }
@@ -51,39 +52,40 @@ public class SftpSessionPropertiesBuilder extends PropertiesBuilder
 
     //static
 
-    public static void setupDefault(ConfigurableProperties options)
+    public static void setupDefault(Configurable options)
     {
         setDefaultPermissions(options,0022);
     }
 
-    public static int getDefaultPermissions(ConfigurableProperties options)
+    public static int getDefaultPermissions(Configurable options)
     {
         return (Integer)options.getProperty(KEY_DEFAULT_PERMISSION);
     }
 
-    public static void setDefaultPermissions(ConfigurableProperties options,int defaultPermissions)
+    public static void setDefaultPermissions(Configurable options,int defaultPermissions)
     {
         options.setProperty(KEY_DEFAULT_PERMISSION,defaultPermissions);
     }
 
-    public static String getLocalCurrentDirectory(ConfigurableProperties options)
+    public static String getLocalCurrentDirectory(Configurable options)
     {
         return (String) options.getProperty(KEY_LOCAL_DIRECTORY);
     }
 
-    public static void setLocalCurrentDirectory(ConfigurableProperties options,String localCurrentDirectory)
+    public static void setLocalCurrentDirectory(Configurable options,String localCurrentDirectory)
     {
         options.setProperty(KEY_LOCAL_DIRECTORY,localCurrentDirectory);
     }
 
-    public static String getRemoteCurrentDirectory(ConfigurableProperties options)
+    public static String getRemoteCurrentDirectory(Configurable options)
     {
         return (String) options.getProperty(KEY_REMOTE_DIRECTORY);
     }
 
-    public static void setRemoteCurrentDirectory(ConfigurableProperties options,String remoteCurrentDirectory)
+    public static void setRemoteCurrentDirectory(Configurable options,String remoteCurrentDirectory)
     {
         options.setProperty(KEY_REMOTE_DIRECTORY,remoteCurrentDirectory);
     }
 
+*/
 }

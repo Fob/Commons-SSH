@@ -32,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Sergey Vidyuk (svidyuk at gmail dot com)
  * @since 1.0
  */
+@Deprecated
 class ConnectionFactoryResolver {
 
     private static final Log log = LogFactory
@@ -95,8 +96,8 @@ class ConnectionFactoryResolver {
 
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer
-                .append("Either unable to load any of SSH connection factories or none of them does support all required features. "
-                        + "SSH implementation libraries supported by Commons SSH:");
+                .append("Either unable to load any of SSH connection factories or none of them does support all required features. ")
+                        .append("Requested SSH implementation libraries:");
         for (final Iterator iter = descriptions.iterator(); iter.hasNext();)
         {
             final Description description = (Description) iter.next();
