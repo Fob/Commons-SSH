@@ -7,7 +7,6 @@ public abstract class PropertiesBuilder
     private Configurable config;
 
     public static final String ASYNC="net.sf.commons.ssh.options.PropertiesBuilder.async";
-    public static final String ="net.sf.commons.ssh.options.PropertiesBuilder.async";
 
     protected PropertiesBuilder(Configurable config)
     {

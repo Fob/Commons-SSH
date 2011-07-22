@@ -1,54 +1,15 @@
 package net.sf.commons.ssh.options;
 
 
-import java.util.*;
-@Deprecated
-public class AbstractConfigurable implements Configurable
+
+public abstract class AbstractConfigurable extends AbstractProperties implements Configurable
 {
-    protected Map<String,Object> properties = new HashMap<String,Object>();
-    protected List<Properties> parentProperties = new ArrayList<Properties>();
-
-    public Object getProperty(String key)
+    public void updateFrom(Properties properties)
     {
-        Object object = properties.get(key);
-        if(object!=null)
-            return object;
-        for(Properties config:parentProperties)
-        {
-            object=config.getProperty(key);
-            if(object!=null)
-                break;
-        }
-        return object;
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void setProperty(String key,Object object)
-    {
-        properties.put(key,object);
-    }
+    public abstract void cleanConfig();
 
-    public void updateFrom(Map<String, Object> properties) {
-        for(Map.Entry<String,Object> en:properties.entrySet())
-        {
-            if(!en.getValue().equals(getProperty(en.getKey())))
-                setProperty(en.getKey(),en.getValue());
-        }
-    }
 
-    public void include(Properties configurable)
-    {
-        parentProperties.add(configurable);
-    }
-
-    @Override
-    public String toString()
-    {
-        StringBuilder builder=new StringBuilder();
-        builder.append(properties.toString()).append("\n");
-        for(Properties config: parentProperties)
-        {
-            builder.append(config.toString());
-        }
-        return builder.toString();
-    }
 }
