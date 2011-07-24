@@ -1,6 +1,6 @@
 package net.sf.commons.ssh.event;
 
-import net.sf.commons.ssh.utils.Closable;
+import net.sf.commons.ssh.common.Closable;
 
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;

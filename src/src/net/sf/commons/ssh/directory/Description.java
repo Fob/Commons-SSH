@@ -15,7 +15,7 @@
  */
 package net.sf.commons.ssh.directory;
 
-import com.netcracker.mediation.common.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

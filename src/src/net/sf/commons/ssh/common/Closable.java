@@ -1,4 +1,4 @@
-package net.sf.commons.ssh.utils;
+package net.sf.commons.ssh.common;
 
 public interface Closable extends java.io.Closeable
 {

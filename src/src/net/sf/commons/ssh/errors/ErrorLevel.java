@@ -1,6 +1,5 @@
 package net.sf.commons.ssh.errors;
-
-public enum Status
+public enum ErrorLevel
 {
     SUCCESSFUL,
     WARN,

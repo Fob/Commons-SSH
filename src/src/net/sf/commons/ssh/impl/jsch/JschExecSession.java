@@ -18,7 +18,7 @@ package net.sf.commons.ssh.impl.jsch;
 import java.io.*;
 
 import net.sf.commons.ssh.ExecSession;
-import net.sf.commons.ssh.utils.AutoflushPipeOutputStream;
+import net.sf.commons.ssh.common.AutoflushPipeOutputStream;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;

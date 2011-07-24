@@ -1,17 +1,18 @@
 package net.sf.commons.ssh.options;
 
-
-
-public class SystemConfig implements Properties //todo from abstract
+public class SystemConfig extends AbstractProperties
 {
+	
+	@Override
+	protected Object getSelfProperty(String key)
+	{
+		return System.getProperty(key);
+	}
 
-    public Object getProperty(String key) {
-        return System.getProperty(key);
-    }
-
-    @Override
-    public String toString() {
-        return System.getProperties().entrySet()+"\n";
-    }
+	@Override
+	public String toString()
+	{
+		return "SystemConfig: " + System.getProperties().entrySet() + super.toString();
+	}
 
 }

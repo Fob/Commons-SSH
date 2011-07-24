@@ -5,7 +5,7 @@ import java.util.Collection;
 
 public interface ErrorHolder
 {
-    Status getStatus();
+    ErrorLevel getStatus();
     Collection<Error> getAllErrors();
     Collection<Error> getSelfErrors();
     Collection<ErrorHolder> getChildrenHolders();

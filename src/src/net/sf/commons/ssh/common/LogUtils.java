@@ -1,4 +1,4 @@
-package net.sf.commons.ssh.utils;
+package net.sf.commons.ssh.common;
 
 
 import org.apache.commons.logging.Log;

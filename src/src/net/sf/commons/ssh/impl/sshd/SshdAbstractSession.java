@@ -18,7 +18,7 @@ package net.sf.commons.ssh.impl.sshd;
 import java.io.*;
 
 import net.sf.commons.ssh.Session;
-import net.sf.commons.ssh.utils.AutoflushPipeOutputStream;
+import net.sf.commons.ssh.common.AutoflushPipeOutputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

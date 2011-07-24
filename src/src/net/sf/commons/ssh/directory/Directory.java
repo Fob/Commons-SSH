@@ -55,7 +55,8 @@ public class Directory
 
     private final Map<String,Description> descriptions;
 
-    Directory()
+    @SuppressWarnings("unchecked")
+	Directory()
     {
         Map<String,Description> descriptions;
 

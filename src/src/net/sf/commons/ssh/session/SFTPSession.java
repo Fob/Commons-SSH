@@ -22,7 +22,6 @@ import java.io.OutputStream;
 import java.util.List;
 
 /**
- * @author Egor Ivanov (crackcraft at gmail dot com)
  * @since 1.2
  * @see net.sf.commons.ssh.Feature#SESSION_SFTP
  */
