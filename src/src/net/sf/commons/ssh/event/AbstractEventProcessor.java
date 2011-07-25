@@ -1,19 +1,25 @@
 package net.sf.commons.ssh.event;
 
+import java.util.Map;
+
+import net.sf.commons.ssh.options.ContainerConfigurable;
+import net.sf.commons.ssh.options.Properties;
+
 /**
  * @author fob
  * @date 24.07.2011
  * @since 2.0
  */
-public abstract class AbstractEventProcessor implements EventProcessor
+public abstract class AbstractEventProcessor extends ContainerConfigurable implements EventProcessor
 {
 	protected EventEngine engine;
 
 	/**
 	 * creating Processor API and link it to {@link EventEngine}
 	 */
-	public AbstractEventProcessor()
+	public AbstractEventProcessor(Properties properties)
 	{
+		super(properties);
 		engine = createEventEngine();
 	}
 
@@ -27,17 +33,25 @@ public abstract class AbstractEventProcessor implements EventProcessor
 	/**
 	 * Delegate from {@link EventEngine} {@link AbstractEventProcessor#engine}
 	 */
-	public void addEventHandler(EventHandler handler, EventFilter filter)
+	@Override
+	public void addEventHandler(EventHandler handler)
 	{
-		engine.addEventHandler(handler);
+		if (engine != null)
+		{
+			engine.addEventHandler(handler);
+		}
 	}
 
 	/**
 	 * Delegate from {@link EventEngine} {@link AbstractEventProcessor#engine}
 	 */
+	@Override
 	public void removeEventHandler(EventHandler handler)
 	{
-		engine.removeEventHandler(handler);
+		if (engine != null)
+		{
+			engine.removeEventHandler(handler);
+		}
 	}
 
 	/**
@@ -45,16 +59,29 @@ public abstract class AbstractEventProcessor implements EventProcessor
 	 */
 	protected void fire(Event event)
 	{
-		engine.fire(event);
+		if (engine != null)
+		{
+			engine.fire(event);
+		}
 	}
-	
 
 	/**
 	 * Delegate from {@link EventEngine} {@link AbstractEventProcessor#engine}
 	 */
 	protected void fireNow(Event event)
 	{
-		engine.fire(event);
+		if (engine != null)
+		{
+			engine.fire(event);
+		}
 	}
-	
+
+	/**
+	 * Delegate from {@link EventEngine} {@link AbstractEventProcessor#engine}
+	 */
+	@Override
+	public Selector createSelector()
+	{
+		return engine.createSelector();
+	}
 }

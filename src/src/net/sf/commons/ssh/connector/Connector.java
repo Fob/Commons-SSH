@@ -13,6 +13,7 @@ import java.util.Set;
 
 public interface Connector extends Closable,Configurable,ErrorHolder,EventProcessor
 {
+	void start();
     Connection createConnection();
     Connection openConnection(String host,int port,AuthenticationOptions auth);
     Set<Feature> getSupportedFeatures();

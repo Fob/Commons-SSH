@@ -189,7 +189,8 @@ public interface SFTPSession extends Session {
      * 
      * @see SFTPFile
      */
-    List ls() throws IOException;
+    @SuppressWarnings("rawtypes")
+	List ls() throws IOException;
 
     /**
      * List the contents remote directory.
@@ -204,7 +205,8 @@ public interface SFTPSession extends Session {
      * 
      * @see SFTPFile
      */
-    List ls(String path) throws IOException;
+    @SuppressWarnings("rawtypes")
+	List ls(String path) throws IOException;
 
     /**
      * Creates a new directory on the remote server. This method will throw an

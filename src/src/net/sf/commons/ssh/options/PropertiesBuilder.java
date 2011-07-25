@@ -4,16 +4,14 @@ import java.lang.reflect.Field;
 
 public abstract class PropertiesBuilder
 {
-    private Configurable config;
+	
 
-    public static final String ASYNC="net.sf.commons.ssh.options.PropertiesBuilder.async";
+	protected PropertiesBuilder()
+	{
+		super();
+	}
 
-    protected PropertiesBuilder(Configurable config)
-    {
-        this.config = config;
-    }
-
-    public void verify() throws IllegalPropertyException
+	public void verify(Properties config) throws IllegalPropertyException
     {
         Field[] fields = this.getClass().getDeclaredFields();
         for(Field field:fields)

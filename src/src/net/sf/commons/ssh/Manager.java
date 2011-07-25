@@ -25,23 +25,23 @@ public final class Manager
 		return instance;
 	}
 
-	public Connector newConnector(Collection<Feature> features)
+	public Connector newConnector(Collection<Feature> features,net.sf.commons.ssh.options.Properties properties)
 	{
-		return newConnector(Directory.getInstance().getDescriptions(), features);
+		return newConnector(Directory.getInstance().getDescriptions(), features,properties);
 	}
 
-	public Connector newConnector(String factory, Collection<Feature> features)
+	public Connector newConnector(String factory, Collection<Feature> features,net.sf.commons.ssh.options.Properties properties)
 	{
-		return newConnector(Arrays.asList(factory), features);
+		return newConnector(Arrays.asList(factory), features,properties);
 	}
 
-	public Connector newConnector(List<String> factories, Collection<Feature> features)
+	public Connector newConnector(List<String> factories, Collection<Feature> features,net.sf.commons.ssh.options.Properties properties)
 	{
-		return newConnector(Directory.getInstance().getDescriptions(factories), features);
+		return newConnector(Directory.getInstance().getDescriptions(factories), features,properties);
 	}
 
 	@SuppressWarnings("unchecked")
-	private Connector newConnector(Collection<Description> factories, Collection<Feature> features)
+	private Connector newConnector(Collection<Description> factories, Collection<Feature> features,net.sf.commons.ssh.options.Properties properties)
 	{
 		LogUtils.info(log, "Try to create Connector with features {1} from: \n{0}", factories, features);
 

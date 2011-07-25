@@ -5,6 +5,7 @@ package net.sf.commons.ssh.options;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author fob
@@ -12,9 +13,24 @@ import java.util.Map;
  * @since 2.0
  * Configurable based on Map<String,Object> container
  */
-public class MapConfigurable extends AbstractConfigurable implements Configurable
+public abstract class ContainerConfigurable extends AbstractConfigurable implements Configurable
 {
-	protected Map<String,Object> configContainer = new HashMap<String,Object>();
+	protected Map<String,Object> configContainer;
+	
+	
+
+
+	public ContainerConfigurable(Properties properties)
+	{
+		if(InitialPropertiesBuilder.getInstance().isSynchronizedConfigurable(properties))
+			configContainer = new ConcurrentHashMap<String, Object>();
+		else
+			configContainer = new HashMap<String,Object>();
+		configureDefault(properties);
+	}
+	
+	protected abstract void configureDefault(Properties properties);
+	
 
 	@Override
 	public void setProperty(String key, Object value)
