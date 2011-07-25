@@ -32,7 +32,7 @@ public abstract class ContainerConfigurable extends AbstractConfigurable impleme
 	protected abstract void configureDefault(Properties properties);
 	
 
-	@Override
+
 	public void setProperty(String key, Object value)
 	{
 		configContainer.put(key, value);		

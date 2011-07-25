@@ -6,7 +6,7 @@ public abstract class AbstractProperties implements Properties
 
 	protected abstract Object getSelfProperty(String key);
 
-	@Override
+
 	public Object getProperty(String key)
 	{
 		Object result = getSelfProperty(key);
@@ -17,7 +17,6 @@ public abstract class AbstractProperties implements Properties
 		return result;
 	}
 
-	@Override
 	public void includeDefault(Properties configurable)
 	{
 		if (parent == null)

@@ -1,4 +1,4 @@
-package net.sf.commons.ssh.options;
+package net.sf.commons.ssh.session;
 
  @Deprecated
 public class SftpSessionPropertiesBuilder// extends PropertiesBuilder

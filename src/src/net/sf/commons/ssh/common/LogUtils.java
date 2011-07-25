@@ -15,7 +15,7 @@ public class LogUtils
         }
     }
 
-    public static void info(Log log, String message, Throwable e, Object[] objects)
+    public static void info(Log log,Throwable e, String message, Object... objects)
     {
         if (log.isInfoEnabled())
         {
@@ -31,7 +31,7 @@ public class LogUtils
         }
     }
 
-    public static void trace(Log log, String message, Throwable e, Object[] objects)
+    public static void trace(Log log,Throwable e, String message, Object... objects)
     {
         if (log.isTraceEnabled())
         {
@@ -47,7 +47,7 @@ public class LogUtils
         }
     }
 
-    public static void warn(Log log, String message, Throwable e, Object[] objects)
+    public static void warn(Log log,Throwable e, String message, Object... objects)
     {
         if (log.isWarnEnabled())
         {
@@ -63,7 +63,7 @@ public class LogUtils
         }
     }
 
-    public static void error(Log log, String message, Throwable e, Object[] objects)
+    public static void error(Log log,Throwable e, String message, Object... objects)
     {
         if (log.isErrorEnabled())
         {
@@ -79,7 +79,7 @@ public class LogUtils
         }
     }
 
-    public static void debug(Log log, String message, Throwable e, Object[] objects)
+    public static void debug(Log log,Throwable e, String message, Object... objects)
     {
         if (log.isDebugEnabled())
         {
