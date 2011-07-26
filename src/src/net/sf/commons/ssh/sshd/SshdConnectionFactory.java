@@ -18,7 +18,9 @@ package net.sf.commons.ssh.sshd;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import net.sf.commons.ssh.*;
@@ -33,23 +35,25 @@ import org.apache.sshd.client.future.ConnectFuture;
  */
 public class SshdConnectionFactory extends ConnectionFactory
 {
-
+    public static final String CONNECTION_GROUP = "net.sf.commons.ssh.sshd.SshdConnectionFactory.connectionGroup";
+    public static final String PROCESSOR_COUNT = "net.sf.commons.ssh.sshd.SshdConnectionFactory.processorCount";
+    public static final String THREAD_SAFE_ENABLE = "net.sf.commons.ssh.sshd.SshdConnectionFactory.threadSafeEnable";
+    private static final Map<String,ClientHolder> clients = new ConcurrentHashMap<String,ClientHolder>();
     /**
      * Creates new instance of {@link SshdConnectionFactory}
      */
     public SshdConnectionFactory()
     {
-        SshClient.setUpDefaultClient();
     }
 
-    private ClientSession connectUsingPassword(SshClient sshClient,
+    private ClientSession connectUsingPassword(ClientHolder sshClient,
                                                String host, int port, PasswordAuthenticationOptions authOptions)
             throws IOException
     {
 
         try
         {
-            ConnectFuture connectFuture = sshClient.connect(host, port);
+            ConnectFuture connectFuture = sshClient.getClient().connect(host, port);
             if (!connectFuture.await(getConnectTimeout(), TimeUnit.MILLISECONDS))
             {
                 throw new SocketTimeoutException("connection timeout");
@@ -92,8 +96,7 @@ public class SshdConnectionFactory extends ConnectionFactory
     public Connection openConnection(String host, int port,
                                      AuthenticationOptions authOptions) throws IOException
     {
-        final SshClient sshClient = SshClient.setUpDefaultClient();
-        sshClient.start();
+        ClientHolder sshClient = getClient();
 
         ClientSession clientSession;
 
@@ -110,6 +113,94 @@ public class SshdConnectionFactory extends ConnectionFactory
         }
 
         return new SshdConnection(sshClient, clientSession);
+    }
+
+    protected ClientHolder getClient()
+    {
+        String connectionGroup = getProperty(CONNECTION_GROUP);
+
+
+        if(connectionGroup == null)
+        {
+            SshClient client = SshClient.setUpDefaultClient();
+            setupHackedProperties(client);
+            client.start();
+            return new ClientHolder(null,client);
+        }
+
+        ClientHolder holder = clients.get(connectionGroup);
+        if(holder == null)
+        {
+            SshClient client = SshClient.setUpDefaultClient();
+            setupHackedProperties(client);
+            client.start();
+            holder = new ClientHolder(connectionGroup,client).borrowClient();
+        }
+        return holder;
+    }
+
+    public static class ClientHolder
+    {
+        String group;
+        SshClient client;
+        int count;
+
+        public ClientHolder(String group, SshClient client)
+        {
+            this.group = group;
+            this.client = client;
+            count = 0;
+        }
+
+        public String getGroup()
+        {
+            return group;
+        }
+
+        public SshClient getClient()
+        {
+            return client;
+        }
+
+        public ClientHolder borrowClient()
+        {
+            count++;
+            if(count == 1)
+            {
+                clients.put(group,this);
+            }
+            return this;
+        }
+
+        public void close()
+        {
+            count--;
+            if(count<=0)
+            {
+                getClient().stop();
+                if(group!=null)
+                    clients.remove(group);
+            }
+        }
+    }
+
+    private void setupHackedProperties(SshClient client)
+    {
+        String processorCount = getProperty(PROCESSOR_COUNT);
+        String threadSafeEnable = getProperty(THREAD_SAFE_ENABLE);
+
+        try
+        {
+            if(processorCount != null)
+                client.setNioProcessorCount(Integer.valueOf(processorCount));
+            if(threadSafeEnable != null && Boolean.valueOf(threadSafeEnable))
+                client.setPumpingMethod(org.apache.sshd.client.PumpingMethod.SELF);
+        }
+        catch (NumberFormatException e)
+        {
+            log.warn("hacked library not found");
+        }
+
     }
 
 }

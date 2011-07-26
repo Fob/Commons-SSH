@@ -32,9 +32,9 @@ import org.apache.sshd.client.channel.ChannelSession;
 class SshdConnection extends Connection {
     private final ClientSession clientSession;
 
-    private final SshClient sshClient;
+    private final SshdConnectionFactory.ClientHolder sshClient;
 
-    SshdConnection(SshClient sshClient, ClientSession clientSession) {
+    SshdConnection(SshdConnectionFactory.ClientHolder sshClient, ClientSession clientSession) {
 	this.sshClient = sshClient;
 	this.clientSession = clientSession;
     }
@@ -45,7 +45,7 @@ class SshdConnection extends Connection {
 	if ((clientSession.waitFor(ClientSession.CLOSED, 1000) & ClientSession.CLOSED) == 0)
 	    clientSession.close(true);
 
-	sshClient.stop();
+	sshClient.close();
     }
 
     public boolean isClosed() {
