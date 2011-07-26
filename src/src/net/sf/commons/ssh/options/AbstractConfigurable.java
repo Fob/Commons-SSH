@@ -4,11 +4,11 @@ public abstract class AbstractConfigurable extends AbstractProperties implements
 {
 
 	
-	@Override
+
 	public void updateFrom(Properties properties)  throws CloneNotSupportedException
 	{
 		Properties config = this.clone();
-		properties.includeDefault(config); // add cloned properties as default properties
+		properties.includeDefault(config);
 		parent = properties;
 		cleanSelfConfig();
 	}

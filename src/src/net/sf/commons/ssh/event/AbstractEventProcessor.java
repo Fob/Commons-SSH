@@ -1,6 +1,7 @@
 package net.sf.commons.ssh.event;
 
-import java.util.Map;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.sf.commons.ssh.options.ContainerConfigurable;
 import net.sf.commons.ssh.options.Properties;
@@ -12,76 +13,93 @@ import net.sf.commons.ssh.options.Properties;
  */
 public abstract class AbstractEventProcessor extends ContainerConfigurable implements EventProcessor
 {
-	protected EventEngine engine;
+    protected AbstractEventProcessor parentEngine;
+    protected List<EventHandler> handlers = new CopyOnWriteArrayList<EventHandler>();
 
-	/**
-	 * creating Processor API and link it to {@link EventEngine}
-	 */
 	public AbstractEventProcessor(Properties properties)
 	{
 		super(properties);
-		engine = createEventEngine();
+		initEventEngine();
 	}
 
-	/**
-	 * create engine for this Processor
-	 * 
-	 * @return Event Engine
-	 */
-	protected abstract EventEngine createEventEngine();
+    protected void  initEventEngine()
+    {
+        //todo
+    }
 
-	/**
-	 * Delegate from {@link EventEngine} {@link AbstractEventProcessor#engine}
-	 */
-	@Override
-	public void addEventHandler(EventHandler handler)
-	{
-		if (engine != null)
-		{
-			engine.addEventHandler(handler);
-		}
-	}
+    protected void notifyThisFrom(AbstractEventProcessor processor)
+    {
+        processor.notifyLast(this);
+    }
 
-	/**
-	 * Delegate from {@link EventEngine} {@link AbstractEventProcessor#engine}
-	 */
-	@Override
-	public void removeEventHandler(EventHandler handler)
-	{
-		if (engine != null)
-		{
-			engine.removeEventHandler(handler);
-		}
-	}
+    protected void notifyFirst(AbstractEventProcessor parentEngine)
+    {
+        if (this.parentEngine != null)
+            parentEngine.notifyFirst(this.parentEngine);
 
-	/**
-	 * Delegate from {@link EventEngine} {@link AbstractEventProcessor#engine}
-	 */
-	protected void fire(Event event)
-	{
-		if (engine != null)
-		{
-			engine.fire(event);
-		}
-	}
+        this.parentEngine = parentEngine;
+    }
 
-	/**
-	 * Delegate from {@link EventEngine} {@link AbstractEventProcessor#engine}
-	 */
-	protected void fireNow(Event event)
-	{
-		if (engine != null)
-		{
-			engine.fire(event);
-		}
-	}
+    protected void notifyLast(AbstractEventProcessor parentEngine)
+    {
+        if (this.parentEngine == null)
+            this.parentEngine = parentEngine;
+        else
+            this.parentEngine.notifyLast(parentEngine);
+    }
 
-	/**
-	 * Delegate from {@link EventEngine} {@link AbstractEventProcessor#engine}
-	 */
-	@Override
-	public Selector createSelector()
-	{
-		return engine.createSelector();
-	}
+    protected void fire(Event event)
+    {
+        //TODO push to process
+
+        processNow(event);
+    }
+
+    protected void processNow(Event event)
+    {
+        for (EventHandler handler : handlers)
+            if (handler.getHandlerType() == HandlerType.IMMEDIATE_PROCESS &&
+                    handler.getEventFilter().check(event))
+                handler.handle(event);
+
+        if (parentEngine != null)
+            parentEngine.processNow(event);
+    }
+
+    /*
+      * (non-Javadoc)
+      *
+      * @see net.sf.commons.ssh.event.EventProcessor#createSelector()
+      */
+    public Selector createSelector()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /*
+      * (non-Javadoc)
+      *
+      * @see
+      * net.sf.commons.ssh.event.EventProcessor#addEventHandler(net.sf.commons
+      * .ssh.event.EventHandler, net.sf.commons.ssh.event.EventFilter)
+      */
+    public void addEventHandler(EventHandler handler)
+    {
+        handlers.add(handler);
+    }
+
+    /*
+      * (non-Javadoc)
+      *
+      * @see
+      * net.sf.commons.ssh.event.EventProcessor#removeEventHandler(net.sf.commons
+      * .ssh.event.EventHandler)
+      */
+    public void removeEventHandler(EventHandler handler)
+    {
+        handlers.remove(handler);
+    }
+
+    protected abstract ProducerType getProducerType();
 }

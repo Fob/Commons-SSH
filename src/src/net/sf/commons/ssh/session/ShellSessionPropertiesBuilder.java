@@ -1,137 +1,93 @@
 package net.sf.commons.ssh.session;
 
-@Deprecated
-public class ShellSessionPropertiesBuilder// extends PropertiesBuilder
+
+import net.sf.commons.ssh.options.*;
+
+public class ShellSessionPropertiesBuilder extends PropertiesBuilder
 {
-/*
+    private static ShellSessionPropertiesBuilder instance = null;
+
+    @Required
+    @PropertyType(Integer.class)
     public static final String KEY_TERMINAL_COLS="net.sf.commons.ssh.options.ShellSessionOptionsBuilder.terminalCols";
+    @Required
+    @PropertyType(Integer.class)
     public static final String KEY_TERMINAL_HEIGHT="net.sf.commons.ssh.options.ShellSessionOptionsBuilder.terminalHeight";
+    @Required
+    @PropertyType(Integer.class)
     public static final String KEY_TERMINAL_ROWS="net.sf.commons.ssh.options.ShellSessionOptionsBuilder.terminalRows";
+    @Required
+    @PropertyType(String.class)
     public static final String KEY_TERMINAL_TYPE="net.sf.commons.ssh.options.ShellSessionOptionsBuilder.terminalType";
+    @Required
+    @PropertyType(Integer.class)
     public static final String KEY_TERMINAL_WIDTH="net.sf.commons.ssh.options.ShellSessionOptionsBuilder.terminalWidth";
 
-
-    public ShellSessionPropertiesBuilder(Configurable options)
+    public synchronized static ShellSessionPropertiesBuilder getInstance()
     {
-        super(options);
+        if (instance == null)
+        {
+            instance = new ShellSessionPropertiesBuilder();
+        }
+        return instance;
     }
 
-    @Override
-    protected void setupDefault()
+    public ShellSessionPropertiesBuilder()
     {
-        setTerminalCols(80);
-        setTerminalHeight(0);
-        setTerminalRows(24);
-        setTerminalType("ansi");
-        setTerminalWidth(0);
+        defaultProperties.put(KEY_TERMINAL_COLS, Integer.valueOf(80));
+        defaultProperties.put(KEY_TERMINAL_HEIGHT, Integer.valueOf(0));
+        defaultProperties.put(KEY_TERMINAL_ROWS,Integer.valueOf(24));
+        defaultProperties.put(KEY_TERMINAL_TYPE,"ansi");
+        defaultProperties.put(KEY_TERMINAL_WIDTH, Integer.valueOf(0));
     }
 
-    public int getTerminalCols()
+    public int getTerminalCols(Properties opt)
     {
-        return (Integer)options.getProperty(KEY_TERMINAL_COLS);
+        return (Integer)getProperty(opt, KEY_TERMINAL_COLS);
     }
 
-    public void setTerminalCols(int terminalCols)
+    public void setTerminalCols(Configurable options,int terminalCols)
     {
         options.setProperty(KEY_TERMINAL_COLS,terminalCols);
     }
 
-    public int getTerminalHeight()
+    public int getTerminalHeight(Properties opt)
     {
-        return (Integer) options.getProperty(KEY_TERMINAL_HEIGHT);
+        return (Integer) getProperty(opt, KEY_TERMINAL_HEIGHT);
     }
 
-    public void setTerminalHeight(int terminalHeight)
+    public void setTerminalHeight(Configurable options,int terminalHeight)
     {
         options.setProperty(KEY_TERMINAL_HEIGHT,terminalHeight);
     }
 
-    public int getTerminalRows()
+    public int getTerminalRows(Properties opt)
     {
-        return (Integer)options.getProperty(KEY_TERMINAL_ROWS);
+        return (Integer)getProperty(opt, KEY_TERMINAL_ROWS);
     }
 
-    public void setTerminalRows(int terminalRows)
+    public void setTerminalRows(Configurable options,int terminalRows)
     {
         options.setProperty(KEY_TERMINAL_ROWS,terminalRows);
     }
 
-    public String getTerminalType()
+    public String getTerminalType(Properties opt)
     {
-        return (String) options.getProperty(KEY_TERMINAL_TYPE);
+        return (String) getProperty(opt, KEY_TERMINAL_TYPE);
     }
 
-    public void setTerminalType(String terminalType)
+    public void setTerminalType(Configurable options,String terminalType)
     {
         options.setProperty(KEY_TERMINAL_TYPE,terminalType);
     }
 
-    public int getTerminalWidth()
+    public int getTerminalWidth(Properties opt)
     {
-        return (Integer)options.getProperty(KEY_TERMINAL_WIDTH);
+        return (Integer)getProperty(opt, KEY_TERMINAL_WIDTH);
     }
 
-    public void setTerminalWidth(int terminalWidth)
+    public void setTerminalWidth(Configurable options,int terminalWidth)
     {
         options.setProperty(KEY_TERMINAL_WIDTH,terminalWidth);
     }
-    //static
-    public static void setupDefault(Configurable options)
-    {
-        setTerminalCols(options,80);
-        setTerminalHeight(options,0);
-        setTerminalRows(options,24);
-        setTerminalType(options,"ansi");
-        setTerminalWidth(options,0);
-    }
-
-    public static int getTerminalCols(Configurable options)
-    {
-        return (Integer)options.getProperty(KEY_TERMINAL_COLS);
-    }
-
-    public static void setTerminalCols(Configurable options,int terminalCols)
-    {
-        options.setProperty(KEY_TERMINAL_COLS,terminalCols);
-    }
-
-    public static int getTerminalHeight(Configurable options)
-    {
-        return (Integer) options.getProperty(KEY_TERMINAL_HEIGHT);
-    }
-
-    public static void setTerminalHeight(Configurable options,int terminalHeight)
-    {
-        options.setProperty(KEY_TERMINAL_HEIGHT,terminalHeight);
-    }
-
-    public static int getTerminalRows(Configurable options)
-    {
-        return (Integer)options.getProperty(KEY_TERMINAL_ROWS);
-    }
-
-    public static void setTerminalRows(Configurable options,int terminalRows)
-    {
-        options.setProperty(KEY_TERMINAL_ROWS,terminalRows);
-    }
-
-    public static String getTerminalType(Configurable options)
-    {
-        return (String) options.getProperty(KEY_TERMINAL_TYPE);
-    }
-
-    public static void setTerminalType(Configurable options,String terminalType)
-    {
-        options.setProperty(KEY_TERMINAL_TYPE,terminalType);
-    }
-
-    public static int getTerminalWidth(Configurable options)
-    {
-        return (Integer)options.getProperty(KEY_TERMINAL_WIDTH);
-    }
-
-    public static void setTerminalWidth(Configurable options,int terminalWidth)
-    {
-        options.setProperty(KEY_TERMINAL_WIDTH,terminalWidth);
-    }*/
 }

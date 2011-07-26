@@ -2,6 +2,7 @@ package net.sf.commons.ssh.common;
 
 import net.sf.commons.ssh.errors.AbstractErrorHolder;
 import net.sf.commons.ssh.errors.ErrorHolder;
+import net.sf.commons.ssh.event.AbstractEventProcessor;
 import net.sf.commons.ssh.options.InitialPropertiesBuilder;
 import net.sf.commons.ssh.options.Properties;
 
@@ -46,10 +47,11 @@ public abstract class AbstractContainer<T extends Container> extends AbstractErr
         return (Collection)children;
     }
 
-    protected T createChild()
+    protected void registerChild(T child)
     {
-
-        //TODO
-        return null;
+        children.add(child);
+        if(child instanceof AbstractEventProcessor)
+            notifyThisFrom((AbstractEventProcessor)child);
     }
+
 }

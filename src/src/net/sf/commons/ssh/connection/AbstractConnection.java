@@ -1,9 +1,7 @@
 package net.sf.commons.ssh.connection;
 
 import net.sf.commons.ssh.common.AbstractContainer;
-import net.sf.commons.ssh.connector.ConnectorPropertiesBuilder;
-import net.sf.commons.ssh.event.EventEngine;
-import net.sf.commons.ssh.event.ThreadEventQueue;
+import net.sf.commons.ssh.event.ProducerType;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.Session;
 
@@ -23,16 +21,11 @@ public abstract class AbstractConnection extends AbstractContainer<Session> impl
     protected void configureDefault(Properties properties)
     {
         super.configureDefault(properties);
-        includeDefault(ConnectionPropertiesBuilder.getInstance().getDefault());
     }
 
     @Override
-    protected EventEngine createEventEngine()
+    protected ProducerType getProducerType()
     {
-        if(ConnectorPropertiesBuilder.getInstance().isCreateEventThread(this))
-            return new EventEngine(ThreadEventQueue.EventQueueType.DELEGATE_TO_PARENT);
-        else
-            return new EventEngine(ThreadEventQueue.EventQueueType.OFF);
+        return ProducerType.CONNECTION;
     }
-
 }

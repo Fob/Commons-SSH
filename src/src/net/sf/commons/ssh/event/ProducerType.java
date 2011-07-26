@@ -1,14 +1,14 @@
 /**
  * 
  */
-package net.sf.commons.ssh.common;
+package net.sf.commons.ssh.event;
 
 /**
  * @author fob
  * @date 24.07.2011
  * @since 2.0
  */
-public enum HierarhyType
+public enum ProducerType
 {
 	/**
 	 * upper level, connections container.

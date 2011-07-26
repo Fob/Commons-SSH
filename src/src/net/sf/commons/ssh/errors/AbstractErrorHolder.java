@@ -36,7 +36,6 @@ public abstract class AbstractErrorHolder extends AbstractClosable implements Er
 	 * 
 	 * @see net.sf.commons.ssh.errors.ErrorHolder#getStatus()
 	 */
-	@Override
 	public ErrorLevel getStatus()
 	{
 		ErrorLevel result = ErrorLevel.SUCCESSFUL;
@@ -46,7 +45,6 @@ public abstract class AbstractErrorHolder extends AbstractClosable implements Er
 				result = Collections.max(errorsContainer, new Comparator<Error>()
 					{
 
-						@Override
 						public int compare(Error o1, Error o2)
 						{
 							return o1.getLevel().compareTo(o2.getLevel());
@@ -61,7 +59,6 @@ public abstract class AbstractErrorHolder extends AbstractClosable implements Er
 			childrenStatus = Collections.max(children, new Comparator<ErrorHolder>()
 				{
 
-					@Override
 					public int compare(ErrorHolder o1, ErrorHolder o2)
 					{
 						return o1.getStatus().compareTo(o2.getStatus());
@@ -78,7 +75,6 @@ public abstract class AbstractErrorHolder extends AbstractClosable implements Er
 	 * 
 	 * @see net.sf.commons.ssh.errors.ErrorHolder#getAllErrors()
 	 */
-	@Override
 	public Collection<Error> getAllErrors()
 	{
 		List<Error> result;
@@ -97,7 +93,6 @@ public abstract class AbstractErrorHolder extends AbstractClosable implements Er
 	 * 
 	 * @see net.sf.commons.ssh.errors.ErrorHolder#getSelfErrors()
 	 */
-	@Override
 	public Collection<Error> getSelfErrors()
 	{
 		synchronized (errorLock)

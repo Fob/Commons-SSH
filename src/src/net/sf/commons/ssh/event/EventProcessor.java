@@ -18,8 +18,6 @@ public interface EventProcessor
 	 * 
 	 * @param handler
 	 *            - {@link EventHandler} to process events
-	 * @param filter
-	 *            - {@link EventFilter} processed events filter
 	 */
 	void addEventHandler(EventHandler handler);
 

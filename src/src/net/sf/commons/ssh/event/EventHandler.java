@@ -17,4 +17,6 @@ public interface EventHandler
 	void setEventFilter(EventFilter filter);
 
 	EventFilter getEventFilter();
+
+    HandlerType getHandlerType();
 }

@@ -1,6 +1,6 @@
 package net.sf.commons.ssh.errors;
 
-import net.sf.commons.ssh.common.HierarhyType;
+import net.sf.commons.ssh.event.ProducerType;
 
 import org.apache.commons.logging.Log;
 
@@ -41,9 +41,9 @@ public interface Error
 
 	/**
 	 * 
-	 * @return {@link HierarhyType} return container type
+	 * @return {@link net.sf.commons.ssh.event.ProducerType} return container type
 	 */
-	HierarhyType getContainerType();
+	ProducerType getContainerType();
 
 	/**
 	 * 
