@@ -4,19 +4,14 @@ public class EventClassFilter extends AbstractEventFilter implements EventFilter
 {
     protected Class cls;
 
-    public EventClassFilter(Class cls,EventFilter andFilter)
+    public EventClassFilter(Class cls)
     {
-        super(andFilter);
         this.cls = cls;
     }
 
-    public EventClassFilter(Class cls)
+    @Override
+    protected boolean checkEvent(Event event)
     {
-        this(cls,null);
-    }
-
-    public boolean check(Event event)
-    {
-        return Event.class.equals(cls) && super.check(event);
+        return cls.equals(event.getClass());
     }
 }

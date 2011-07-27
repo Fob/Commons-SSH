@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.commons.ssh.common.AbstractClosable;
+import net.sf.commons.ssh.event.events.ErrorEvent;
 import net.sf.commons.ssh.options.Properties;
 
 /**
@@ -103,6 +104,7 @@ public abstract class AbstractErrorHolder extends AbstractClosable implements Er
 
 	protected void pushError(Error error)
 	{
+        fire(new ErrorEvent(this,error));
 		synchronized (errorLock)
 		{
 			errorsContainer.add(error);

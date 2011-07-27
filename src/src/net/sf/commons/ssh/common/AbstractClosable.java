@@ -1,6 +1,7 @@
 package net.sf.commons.ssh.common;
 
 import net.sf.commons.ssh.event.AbstractEventProcessor;
+import net.sf.commons.ssh.event.events.ClosingEvent;
 import net.sf.commons.ssh.options.Properties;
 
 import org.apache.commons.logging.Log;
@@ -55,6 +56,7 @@ public abstract class AbstractClosable extends AbstractEventProcessor implements
                 return;
             }
             LogUtils.info(log, "Close object [{0}]", this);
+            fire(new ClosingEvent(this,this));
             isClosing = true;
         }
     }

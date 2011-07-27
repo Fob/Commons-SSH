@@ -13,6 +13,16 @@ public interface EventFilter
         {
             return true;
         }
+
+        public EventFilter andFilterBy(EventFilter filter)
+        {
+            throw new UnsupportedOperationException("this is constant filter");
+        }
+
+        public EventFilter orFilterBy(EventFilter filter)
+        {
+            throw new UnsupportedOperationException("this is constant filter");
+        }
     };
 
     EventFilter DENY_ALL = new EventFilter()
@@ -20,6 +30,16 @@ public interface EventFilter
         public boolean check(Event event)
         {
             return false;
+        }
+
+        public EventFilter andFilterBy(EventFilter filter)
+        {
+             throw new UnsupportedOperationException("this is constant filter");
+        }
+
+        public EventFilter orFilterBy(EventFilter filter)
+        {
+             throw new UnsupportedOperationException("this is constant filter");
         }
     };
 	/**

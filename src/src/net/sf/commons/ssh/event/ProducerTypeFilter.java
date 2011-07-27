@@ -5,20 +5,14 @@ public class ProducerTypeFilter extends AbstractEventFilter
 {
     protected ProducerType producerType;
 
-    public ProducerTypeFilter(ProducerType producerType, EventFilter andFilter)
+    public ProducerTypeFilter(ProducerType producerType)
     {
-        super(andFilter);
         this.producerType = producerType;
     }
 
-    public ProducerTypeFilter(ProducerType producerType)
-    {
-        this(producerType,null);
-    }
-
     @Override
-    public boolean check(Event event)
+    protected boolean checkEvent(Event event)
     {
-        return producerType == event.getProducerType() && super.check(event);
+        return producerType == event.getProducerType();
     }
 }

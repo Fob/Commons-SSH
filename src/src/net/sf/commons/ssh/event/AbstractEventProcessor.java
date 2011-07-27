@@ -3,6 +3,8 @@ package net.sf.commons.ssh.event;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import net.sf.commons.ssh.event.events.SetPropertyEvent;
+import net.sf.commons.ssh.event.events.UpdateConfigurableEvent;
 import net.sf.commons.ssh.options.ContainerConfigurable;
 import net.sf.commons.ssh.options.Properties;
 
@@ -102,4 +104,18 @@ public abstract class AbstractEventProcessor extends ContainerConfigurable imple
     }
 
     protected abstract ProducerType getProducerType();
+
+    @Override
+    public void setProperty(String key, Object value)
+    {
+        fire(new SetPropertyEvent(this,key,value,getProperty(key)));
+        super.setProperty(key, value);
+    }
+
+    @Override
+    public void updateFrom(Properties properties) throws CloneNotSupportedException
+    {
+        fire(new UpdateConfigurableEvent(this,properties,this));
+        super.updateFrom(properties);
+    }
 }

@@ -1,26 +1,39 @@
 package net.sf.commons.ssh.event;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class AbstractEventFilter implements EventFilter
 {
-    protected EventFilter andFilter = EventFilter.ACCEPT_ALL;
+    private List<EventFilter> andFilters = new ArrayList<EventFilter>();
+    private List<EventFilter> orFilters = new ArrayList<EventFilter>();
 
-    protected EventFilter orFilter = EventFilter.DENY_ALL;
-
+    protected abstract boolean checkEvent(Event event);
 
     public boolean check(Event event)
     {
-        return andFilter.check(event);
+        boolean result = checkEvent(event);
+        for(EventFilter filter:orFilters)
+        {
+            result= result || filter.check(event);
+        }
+
+        for(EventFilter filter:andFilters)
+        {
+            result= result && filter.check(event);
+        }
+        return result;
     }
 
     public EventFilter andFilterBy(EventFilter filter)
     {
-        andFilter = filter.andFilterBy(andFilter);
+        andFilters.add(filter);
         return this;
     }
 
     public EventFilter orFilterBy(EventFilter filter)
     {
-        orFilter = filter.orFilterBy(filter);
+        orFilters.add(filter);
         return this;
     }
 }
