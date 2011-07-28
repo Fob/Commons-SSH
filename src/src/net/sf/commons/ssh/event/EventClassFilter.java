@@ -2,9 +2,10 @@ package net.sf.commons.ssh.event;
 
 public class EventClassFilter extends AbstractEventFilter implements EventFilter
 {
-    protected Class cls;
+    @SuppressWarnings("rawtypes")
+	protected Class cls;
 
-    public EventClassFilter(Class cls)
+    public EventClassFilter(@SuppressWarnings("rawtypes") Class cls)
     {
         this.cls = cls;
     }

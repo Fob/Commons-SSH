@@ -1,6 +1,7 @@
 package net.sf.commons.ssh.connection;
 
 
+import net.sf.commons.ssh.auth.AuthenticationOptions;
 import net.sf.commons.ssh.options.*;
 
 
@@ -25,6 +26,8 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
     @Required
     @PropertyType(String.class)
     public static final String KEY_HOST = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.host";
+    @Required
+    public static final String KEY_AUTHENTICATION_OPTIONS = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.auth";
 
     public ConnectionPropertiesBuilder()
     {
@@ -103,5 +106,15 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
     public void setHost(Configurable opt, String value)
     {
         opt.setProperty(KEY_HOST, value);
+    }
+    
+    public AuthenticationOptions getAuthenticationOptions(Properties opt)
+    {
+    	return (AuthenticationOptions) opt.getProperty(KEY_AUTHENTICATION_OPTIONS);    	
+    }
+    
+    public void setAuthenticationOptions(Configurable opt,AuthenticationOptions auth)
+    {
+    	opt.setProperty(KEY_AUTHENTICATION_OPTIONS, auth);    	
     }
 }

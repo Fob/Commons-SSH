@@ -8,8 +8,8 @@ import net.sf.commons.ssh.session.ShellSession;
 
 public interface Connection extends Container
 {
-    void connect() throws Exception;
-    void authenticate() throws Exception;
+    void connect() throws ConnectionException;
+    void authenticate() throws AuthenticationException;
     boolean isConnected();
     boolean isConnecting();
     boolean isAuthenticated();

@@ -6,5 +6,7 @@ public enum EventType
     UPDATE_CONFIGURABLE,
     ERROR,
     CLOSING,
-    CLOSED
+    CLOSED,
+    CONNECTED,
+    AUTHENTICATED
 }

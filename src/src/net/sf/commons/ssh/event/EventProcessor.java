@@ -28,5 +28,8 @@ public interface EventProcessor
 	 *            {@link EventHandler}
 	 */
 	void removeEventHandler(EventHandler handler);
+	
+	EventHandler addListener(EventListener listener,EventFilter filter,HandlerType type);
+	EventHandler addListener(EventListener listener,EventFilter filter);
 
 }

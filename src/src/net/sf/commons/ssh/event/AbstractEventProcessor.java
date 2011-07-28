@@ -118,4 +118,17 @@ public abstract class AbstractEventProcessor extends ContainerConfigurable imple
         fire(new UpdateConfigurableEvent(this,properties,this));
         super.updateFrom(properties);
     }
+
+	@Override
+	public EventHandler addListener(EventListener listener, EventFilter filter, HandlerType type)
+	{
+		return new EventHandlerImpl(listener,type,filter);
+	}
+
+	@Override
+	public EventHandler addListener(EventListener listener, EventFilter filter)
+	{
+		return addListener(listener, filter ,HandlerType.IMMEDIATE_PROCESS);
+	}
+    
 }
