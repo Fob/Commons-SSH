@@ -1,6 +1,8 @@
 package net.sf.commons.ssh.connection;
 
 
+import java.io.IOException;
+
 import net.sf.commons.ssh.common.Container;
 import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.SFTPSession;
@@ -19,7 +21,7 @@ public interface Connection extends Container
     ExecSession createExecSession();
     SFTPSession createSFTPSession();
 
-    ShellSession openShellSession();
-    ExecSession openExecSession(String command);
-    SFTPSession openSFTPSession();
+    ShellSession openShellSession() throws IOException;
+    ExecSession openExecSession(String command) throws IOException;
+    SFTPSession openSFTPSession() throws IOException;
 }

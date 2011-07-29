@@ -12,7 +12,7 @@ public class SystemConfig extends AbstractProperties
 	@Override
 	public String toString()
 	{
-		return "SystemConfig: " + System.getProperties().entrySet() + super.toString();
+		return "[JMV Properties]\n" + super.toString();
 	}
 
 }

@@ -36,13 +36,15 @@ public abstract class AbstractContainer<T extends Container> extends AbstractErr
         includeDefault(InitialPropertiesBuilder.getInstance().getDefault());
 	}
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     protected Collection<Closable> getClosableChildren()
     {
         return (Collection)children;
     }
 
-    public Collection<ErrorHolder> getChildrenHolders()
+    @SuppressWarnings("rawtypes")
+	public Collection<ErrorHolder> getChildrenHolders()
     {
         return (Collection)children;
     }
@@ -53,5 +55,11 @@ public abstract class AbstractContainer<T extends Container> extends AbstractErr
         if(child instanceof AbstractEventProcessor)
             notifyThisFrom((AbstractEventProcessor)child);
     }
+    
+	@Override
+	public String toString()
+	{
+		return this.getClass().getName()+"\nconfiguration:\n" + super.toString();
+	}
 
 }

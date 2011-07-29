@@ -20,7 +20,7 @@ public abstract class AbstractClosable extends AbstractEventProcessor implements
 		super(properties);
 	}
 
-	private final Log log = LogFactory.getLog(this.getClass());
+	protected final Log log = LogFactory.getLog(this.getClass());
     protected boolean isClosing = false;
     protected final Object isClosingLock = new Object();
 

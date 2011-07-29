@@ -34,6 +34,7 @@ public abstract class AbstractConnector extends AbstractContainer<Connection> im
     public AbstractConnector(Properties properties)
     {
         super(properties);
+        
     }
 
     @Override
@@ -90,8 +91,14 @@ public abstract class AbstractConnector extends AbstractContainer<Connection> im
 						ConnectedEvent connectedEvent = (ConnectedEvent) event;
 						if (connectedEvent.getConnection().isConnected())
 						{
-							connectedEvent.getConnection().authenticate();
-							// TODO
+							try
+							{
+								connectedEvent.getConnection().authenticate();
+							}
+							catch (AuthenticationException e)
+							{
+								log.error("unexpected error, asynchronous method should't throw errors",e);								
+							}
 						}
 					}
 				}, new EventTypeFilter(EventType.CONNECTED));
@@ -102,6 +109,5 @@ public abstract class AbstractConnector extends AbstractContainer<Connection> im
 		
 		return connection;
 	}
-    
-    
+
 }
