@@ -1,7 +1,7 @@
 package net.sf.commons.ssh.errors;
 public enum ErrorLevel
 {
-    SUCCESSFUL,
+    INFO,
     WARN,
     ERROR,
     CRITICAL;

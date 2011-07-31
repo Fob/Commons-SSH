@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.commons.ssh.common.AbstractClosable;
+import net.sf.commons.ssh.event.events.ClosingEvent;
 import net.sf.commons.ssh.event.events.ErrorEvent;
 import net.sf.commons.ssh.options.Properties;
 
@@ -39,7 +40,7 @@ public abstract class AbstractErrorHolder extends AbstractClosable implements Er
 	 */
 	public ErrorLevel getStatus()
 	{
-		ErrorLevel result = ErrorLevel.SUCCESSFUL;
+		ErrorLevel result = ErrorLevel.INFO;
 		synchronized (errorLock)
 		{
 			if (!errorsContainer.isEmpty())
@@ -55,7 +56,7 @@ public abstract class AbstractErrorHolder extends AbstractClosable implements Er
 		}
 		Collection<ErrorHolder> children = getChildrenHolders();
 
-		ErrorLevel childrenStatus = ErrorLevel.SUCCESSFUL;
+		ErrorLevel childrenStatus = ErrorLevel.INFO;
 		if (!children.isEmpty())
 			childrenStatus = Collections.max(children, new Comparator<ErrorHolder>()
 				{
@@ -110,5 +111,31 @@ public abstract class AbstractErrorHolder extends AbstractClosable implements Er
 			errorsContainer.add(error);
 		}
 	}
+	
+	@Override
+	protected void closeImpl()
+	{
+		try
+		{
+			closeimpl();
+		}
+		catch (Exception e)
+		{
+			Error error = new Error("Error when closing container", this,ErrorLevel.ERROR, e,"close()");
+			error.writeLog();
+			pushError(error);
+			synchronized (isClosingLock)
+			{
+				if(!isClosed())
+					isClosing = false;
+			}
+			if(e instanceof RuntimeException)
+				throw (RuntimeException) e;
+			else
+				throw new RuntimeException(e);
+		}
+	}
+	
+	protected abstract void closeimpl();
 
 }

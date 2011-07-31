@@ -120,7 +120,7 @@ public abstract class AbstractEventProcessor extends ContainerConfigurable imple
         handlers.remove(handler);
     }
 
-    protected abstract ProducerType getProducerType();
+    public abstract ProducerType getProducerType();
 
     @Override
     public void setProperty(String key, Object value)

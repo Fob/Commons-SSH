@@ -23,21 +23,17 @@ import java.io.File;
  * @since 1.1
  * @author Egor Ivanov (crackcraft at gmail dot com)
  */
-public class PublicKeyAuthenticationOptions implements AuthenticationOptions {
-    /**
-     * @since 1.1
-     */
-    public String login;
+public class PublicKeyAuthenticationOptions extends AuthenticationOptions {
 
     /**
      * @since 1.1
      */
-    public String keyfile;
+    protected String keyfile;
 
     /**
      * @since 1.1
      */
-    public String phrase;
+    protected String phrase;
 
     /**
      * Creates new instance of
@@ -92,4 +88,26 @@ public class PublicKeyAuthenticationOptions implements AuthenticationOptions {
 	this(login, keyfile);
 	this.phrase = phrase;
     }
+
+	public String getKeyfile()
+	{
+		return keyfile;
+	}
+
+	public void setKeyfile(String keyfile)
+	{
+		this.keyfile = keyfile;
+	}
+
+	public String getPhrase()
+	{
+		return phrase;
+	}
+
+	public void setPhrase(String phrase)
+	{
+		this.phrase = phrase;
+	}
+    
+    
 }

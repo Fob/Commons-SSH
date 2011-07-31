@@ -63,7 +63,7 @@ public abstract class AbstractConnector extends AbstractContainer<Connection> im
     }
 
     @Override
-    protected ProducerType getProducerType()
+    public ProducerType getProducerType()
     {
         return ProducerType.CONNECTOR;
     }

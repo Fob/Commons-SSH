@@ -31,5 +31,7 @@ public interface EventProcessor
 	
 	EventHandler addListener(EventListener listener,EventFilter filter,HandlerType type);
 	EventHandler addListener(EventListener listener,EventFilter filter);
+	
+	ProducerType getProducerType();
 
 }

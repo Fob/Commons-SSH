@@ -21,6 +21,20 @@ package net.sf.commons.ssh.auth;
  * @since 1.0
  * @author Sergey Vidyuk (svidyuk at gmail dot com)
  */
-public interface AuthenticationOptions {
+public abstract class AuthenticationOptions {
+	
+	protected String login;
+
+	public String getLogin()
+	{
+		return login;
+	}
+
+	public void setLogin(String login)
+	{
+		this.login = login;
+	}
+	
+	
 
 }

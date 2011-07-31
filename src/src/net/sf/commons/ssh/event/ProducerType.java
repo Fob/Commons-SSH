@@ -22,5 +22,17 @@ public enum ProducerType
 	 * logical ssh session(channel).
 	 */
 	SESSION;
+	
+	public ProducerType getChildType()
+	{
+		switch (this)
+		{
+		case CONNECTOR:
+			return CONNECTION;
+		case CONNECTION:
+			return SESSION;
+		}
+		return null;
+	}
 
 }

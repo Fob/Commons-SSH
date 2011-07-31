@@ -21,16 +21,11 @@ package net.sf.commons.ssh.auth;
  * @since 1.0
  * @author Sergey Vidyuk (svidyuk at gmail dot com)
  */
-public class PasswordAuthenticationOptions implements AuthenticationOptions {
+public class PasswordAuthenticationOptions extends AuthenticationOptions {
     /**
      * @since 1.0
      */
-    public String login;
-
-    /**
-     * @since 1.0
-     */
-    public String password;
+    protected String password;
 
     /**
      * Creates new instance of {@link PasswordAuthenticationOptions}
@@ -61,5 +56,15 @@ public class PasswordAuthenticationOptions implements AuthenticationOptions {
 	this(login);
 	this.password = password;
     }
+
+	public String getPassword()
+	{
+		return password;
+	}
+
+	public void setPassword(String password)
+	{
+		this.password = password;
+	}
 
 }
