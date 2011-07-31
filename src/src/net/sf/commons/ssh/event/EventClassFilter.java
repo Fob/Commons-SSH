@@ -2,17 +2,23 @@ package net.sf.commons.ssh.event;
 
 public class EventClassFilter extends AbstractEventFilter implements EventFilter
 {
-    @SuppressWarnings("rawtypes")
+	@SuppressWarnings("rawtypes")
 	protected Class cls;
 
-    public EventClassFilter(@SuppressWarnings("rawtypes") Class cls)
-    {
-        this.cls = cls;
-    }
+	protected boolean subClassAllowed = false;
 
-    @Override
-    protected boolean checkEvent(Event event)
-    {
-        return cls.equals(event.getClass());
-    }
+	public EventClassFilter(@SuppressWarnings("rawtypes") Class cls, boolean subClassAllowed)
+	{
+		this.cls = cls;
+		this.subClassAllowed = subClassAllowed;
+	}
+
+	@Override
+	protected boolean checkEvent(Event event)
+	{
+		if (subClassAllowed)
+			return cls.isAssignableFrom(event.getClass());
+		else
+			return cls == event.getClass();
+	}
 }

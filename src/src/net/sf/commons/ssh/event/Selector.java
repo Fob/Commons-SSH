@@ -2,29 +2,42 @@ package net.sf.commons.ssh.event;
 
 
 import net.sf.commons.ssh.event.states.State;
+import net.sf.commons.ssh.options.Properties;
 
 import java.io.Closeable;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-public interface Selector extends Closeable
+public abstract class Selector implements Closeable
 {
-    <T> void register(State<T> state,T object);
-    void unRegister(Object object);
+	protected EventProcessor processor;
+	protected Properties properties;
+	
+    public abstract <T> void register(State<T> state,T object);
+    public abstract void unRegister(Object object);
     
-    void clean();
+    public abstract void clean();
 
 
-    Collection<StateHolder> select(long timeout,TimeUnit timeUnit) throws InterruptedException;
-    Collection<StateHolder> select() throws InterruptedException;
+    public abstract Collection<StateHolder> select(long timeout,TimeUnit timeUnit) throws InterruptedException;
+    public Collection<StateHolder> select() throws InterruptedException
+    {
+    	return select(0,TimeUnit.MILLISECONDS);
+    }
 
-    StateHolder selectFirst(long timeout,TimeUnit timeUnit) throws InterruptedException;
-    StateHolder selectFirst() throws InterruptedException;
+    public abstract StateHolder selectFirst(long timeout,TimeUnit timeUnit) throws InterruptedException;
+    public StateHolder selectFirst() throws InterruptedException
+    {
+    	return selectFirst(0,TimeUnit.MILLISECONDS);
+    }
 
-    Collection<StateHolder> selectAll(long timeout,TimeUnit timeUnit) throws InterruptedException;
-    Collection<StateHolder> selectAll() throws InterruptedException;
+    public abstract Collection<StateHolder> selectAll(long timeout,TimeUnit timeUnit) throws InterruptedException;
+    public Collection<StateHolder> selectAll() throws InterruptedException
+    {
+    	return selectAll(0,TimeUnit.MILLISECONDS);
+    }
     
-    class StateHolder
+    public class StateHolder
     {
     	private final State state;
     	private final Object object;
@@ -48,4 +61,12 @@ public interface Selector extends Closeable
 		}
     	
     }
+
+	public Selector(EventProcessor processor,Properties properties)
+	{
+		this.processor = processor;
+		this.properties =properties;
+	}
+    
+    
 }

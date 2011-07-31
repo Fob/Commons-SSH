@@ -15,6 +15,7 @@ import net.sf.commons.ssh.event.EventListener;
 import net.sf.commons.ssh.event.EventType;
 import net.sf.commons.ssh.event.EventTypeFilter;
 import net.sf.commons.ssh.event.ProducerType;
+import net.sf.commons.ssh.event.SelectorPropertiesBuilder;
 import net.sf.commons.ssh.event.events.ConnectedEvent;
 import net.sf.commons.ssh.options.InitialPropertiesBuilder;
 import net.sf.commons.ssh.options.Properties;
@@ -46,6 +47,7 @@ public abstract class AbstractConnector extends AbstractContainer<Connection> im
         includeDefault(ConnectionPropertiesBuilder.getInstance().getDefault());
         includeDefault(ShellSessionPropertiesBuilder.getInstance().getDefault());
         includeDefault(SftpSessionPropertiesBuilder.getInstance().getDefault());
+        includeDefault(SelectorPropertiesBuilder.getInstance().getDefault());
     }
 
 

@@ -62,4 +62,12 @@ public abstract class AbstractContainer<T extends Container> extends AbstractErr
 		return this.getClass().getName()+"\nconfiguration:\n" + super.toString();
 	}
 
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this == obj;
+	}
+	
+	
+
 }
