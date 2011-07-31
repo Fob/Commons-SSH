@@ -40,12 +40,12 @@ public class SelectorPropertiesBuilder extends PropertiesBuilder
 		defaultProperties.put(KEY_SELECTOR_IMPLEMENTATION, SynchronizedSelector.class);
 	}
 	
-	public Class getSelectorImplementation(Properties properties)
+	public Class<? extends Selector> getSelectorImplementation(Properties properties)
 	{
-		return (Class) getProperty(properties, KEY_SELECTOR_IMPLEMENTATION);
+		return (Class<? extends Selector>) getProperty(properties, KEY_SELECTOR_IMPLEMENTATION);
 	}
 	
-	public void setSelectorImplementation(Configurable config,Class cls)
+	public void setSelectorImplementation(Configurable config,Class<? extends Selector> cls)
 	{
 		config.setProperty(KEY_SELECTOR_IMPLEMENTATION, cls);		
 	}

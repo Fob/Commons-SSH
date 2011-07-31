@@ -1,8 +1,11 @@
 package net.sf.commons.ssh.event;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import net.sf.commons.ssh.common.EventProcessorThread;
 import net.sf.commons.ssh.event.events.SetPropertyEvent;
 import net.sf.commons.ssh.event.events.UpdateConfigurableEvent;
 import net.sf.commons.ssh.options.ContainerConfigurable;
@@ -21,13 +24,7 @@ public abstract class AbstractEventProcessor extends ContainerConfigurable imple
 	public AbstractEventProcessor(Properties properties)
 	{
 		super(properties);
-		initEventEngine();
 	}
-
-    protected void  initEventEngine()
-    {
-        //todo
-    }
 
     protected void notifyThisFrom(AbstractEventProcessor processor)
     {
@@ -52,9 +49,10 @@ public abstract class AbstractEventProcessor extends ContainerConfigurable imple
 
     protected void fire(Event event)
     {
-        //TODO push to process
-
+        pushToProcess(event);
         processNow(event);
+        if (parentEngine != null)
+            parentEngine.fire(event);
     }
 
     protected void processNow(Event event)
@@ -63,9 +61,14 @@ public abstract class AbstractEventProcessor extends ContainerConfigurable imple
             if (handler.getHandlerType() == HandlerType.IMMEDIATE_PROCESS &&
                     handler.getEventFilter().check(event))
                 handler.handle(event);
-
-        if (parentEngine != null)
-            parentEngine.processNow(event);
+    }
+    
+    protected void pushToProcess(Event event)
+    {
+    	for(EventHandler handler : handlers)
+    		if(handler.getHandlerType() == HandlerType.PUSH_TO_PROCESS && EventProcessorThread.isEnableThread() &&
+    				handler.getEventFilter().check(event))
+    			EventProcessorThread.getInstance().submit(event, handler);
     }
 
     /*
@@ -75,8 +78,22 @@ public abstract class AbstractEventProcessor extends ContainerConfigurable imple
       */
     public Selector createSelector()
     {
-        // TODO Auto-generated method stub
-        return null;
+        Class<? extends Selector> cls = SelectorPropertiesBuilder.getInstance().getSelectorImplementation(this);
+        try
+		{
+			Constructor<? extends Selector> constructor = cls.getConstructor(EventProcessor.class, Properties.class);
+			return constructor.newInstance(this, this);
+		}
+		catch (NoSuchMethodException e)
+		{
+			log.error("selector implementation should has construstor(EventProcessor.class, Properties.class)",e);
+			throw new RuntimeException("selector implementation should has construstor(EventProcessor.class, Properties.class)",e);
+		}
+        catch (Exception e)
+        {
+        	log.error("can't create selector",e);
+        	throw new RuntimeException("selector implementation should has construstor(EventProcessor.class, Properties.class)",e);        	
+        }
     }
 
     /*

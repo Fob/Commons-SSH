@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @author fob
  * @date 24.07.2011
@@ -16,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class ContainerConfigurable extends AbstractConfigurable implements Configurable
 {
 	protected Map<String,Object> configContainer;
-	
+	protected Log log = LogFactory.getLog(this.getClass());
 	
 
 
