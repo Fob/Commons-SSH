@@ -27,6 +27,7 @@ import net.sf.commons.ssh.*;
 
 import org.apache.sshd.ClientSession;
 import org.apache.sshd.SshClient;
+import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
 
 /**
@@ -54,28 +55,35 @@ public class SshdConnectionFactory extends ConnectionFactory
         try
         {
             ConnectFuture connectFuture = sshClient.getClient().connect(host, port);
-            if(getConnectTimeout() == 0)
+            if (!connectFuture.await(getConnectTimeout() == 0?5*60000:getConnectTimeout(), TimeUnit.MILLISECONDS))
             {
-                connectFuture.await();
-            }
-            else
-                if (!connectFuture.await(getConnectTimeout(), TimeUnit.MILLISECONDS))
-                {
+                if(connectFuture.getException() == null)
                     throw new SocketTimeoutException("connection timeout");
-                }
-
+                else
+                    throw new RuntimeException("connection timeout",connectFuture.getException());
+            }
+            if(!connectFuture.isConnected())
+                throw new RuntimeException("connection failed",connectFuture.getException());
+            log.trace("connected to device "+host+" successfully");
             ClientSession clientSession = connectFuture.getSession();
 
-            int ret = ClientSession.WAIT_AUTH;
-            while ((ret & ClientSession.WAIT_AUTH) != 0)
+            //int ret = ClientSession.WAIT_AUTH;
+            //while ((ret & ClientSession.WAIT_AUTH) != 0)
+            //{
+            AuthFuture authFuture = clientSession.authPassword(authOptions.login,authOptions.password);
+            if(!authFuture.await(getConnectTimeout() == 0?5*60000:getConnectTimeout(), TimeUnit.MILLISECONDS))
             {
-                System.out.print("Password:");
-                clientSession.authPassword(authOptions.login,
-                        authOptions.password);
-                ret = clientSession.waitFor(ClientSession.WAIT_AUTH
-                        | ClientSession.CLOSED | ClientSession.AUTHED, 0);
+                if(authFuture.getException() == null)
+                    throw new SocketTimeoutException("authentication timeout");
+                else
+                    throw new RuntimeException("authentication timeout",authFuture.getException());
             }
-
+            if(!authFuture.isSuccess())
+                throw new RuntimeException("connection failed",connectFuture.getException());
+               // ret = clientSession.waitFor(ClientSession.WAIT_AUTH
+                //        | ClientSession.CLOSED | ClientSession.AUTHED , 0);
+            //}
+            log.trace("authenticated");
             return clientSession;
         }
         catch (Exception exc)
