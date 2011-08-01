@@ -54,10 +54,15 @@ public class SshdConnectionFactory extends ConnectionFactory
         try
         {
             ConnectFuture connectFuture = sshClient.getClient().connect(host, port);
-            if (!connectFuture.await(getConnectTimeout(), TimeUnit.MILLISECONDS))
+            if(getConnectTimeout() == 0)
             {
-                throw new SocketTimeoutException("connection timeout");
+                connectFuture.await();
             }
+            else
+                if (!connectFuture.await(getConnectTimeout(), TimeUnit.MILLISECONDS))
+                {
+                    throw new SocketTimeoutException("connection timeout");
+                }
 
             ClientSession clientSession = connectFuture.getSession();
 
