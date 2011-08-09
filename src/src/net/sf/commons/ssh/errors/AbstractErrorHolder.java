@@ -3,6 +3,7 @@
  */
 package net.sf.commons.ssh.errors;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.commons.ssh.common.AbstractClosable;
-import net.sf.commons.ssh.event.events.ClosingEvent;
+import net.sf.commons.ssh.common.UnexpectedRuntimeException;
 import net.sf.commons.ssh.event.events.ErrorEvent;
 import net.sf.commons.ssh.options.Properties;
 
@@ -103,6 +104,7 @@ public abstract class AbstractErrorHolder extends AbstractClosable implements Er
 		}
 	}
 
+	@Override
 	protected void pushError(Error error)
 	{
         fire(new ErrorEvent(this,error));
@@ -111,31 +113,5 @@ public abstract class AbstractErrorHolder extends AbstractClosable implements Er
 			errorsContainer.add(error);
 		}
 	}
-	
-	@Override
-	protected void closeImpl()
-	{
-		try
-		{
-			closeimpl();
-		}
-		catch (Exception e)
-		{
-			Error error = new Error("Error when closing container", this,ErrorLevel.ERROR, e,"close()");
-			error.writeLog();
-			pushError(error);
-			synchronized (isClosingLock)
-			{
-				if(!isClosed())
-					isClosing = false;
-			}
-			if(e instanceof RuntimeException)
-				throw (RuntimeException) e;
-			else
-				throw new RuntimeException(e);
-		}
-	}
-	
-	protected abstract void closeimpl();
 
 }

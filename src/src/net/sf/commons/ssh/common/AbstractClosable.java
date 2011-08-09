@@ -1,5 +1,7 @@
 package net.sf.commons.ssh.common;
 
+import net.sf.commons.ssh.errors.Error;
+import net.sf.commons.ssh.errors.ErrorLevel;
 import net.sf.commons.ssh.event.AbstractEventProcessor;
 import net.sf.commons.ssh.event.Event;
 import net.sf.commons.ssh.event.EventListener;
@@ -28,72 +30,61 @@ public abstract class AbstractClosable extends AbstractEventProcessor implements
 	}
 
 	protected final Log log = LogFactory.getLog(this.getClass());
-	protected boolean isClosing = false;
-	protected final Object isClosingLock = new Object();
+
 
 	protected abstract Collection<Closable> getClosableChildren();
 
 	public boolean isClosing()
 	{
-		synchronized (isClosingLock)
-		{
-			return isClosing;
-		}
+		return getContainerStatus() == Status.CLOSING;
 	}
 
-	public boolean isClosed()
+	public boolean isClosedWithChildren()
 	{
 		for (Closable child : getClosableChildren())
 		{
-			if (!child.isClosed())
+			if (!child.isClosedWithChildren())
 			{
 				return false;
 			}
 		}
-		return isClosedImpl();
+		return isClosed();
 	}
 
+
+	@Override
 	public void close() throws IOException
 	{
-		synchronized (isClosingLock)
+		synchronized (statusLock)
 		{
-			if (isClosing())
+			if (status==Status.CLOSING || status == Status.CLOSED)
 			{
 				log.info("Object is closing or closed already.");
 				return;
 			}
 			LogUtils.info(log, "Close object [{0}]", this);
 			fire(new ClosingEvent(this, this));
-			isClosing = true;
+			status = Status.CLOSING;
 		}
-		//TODO check
-		if (InitialPropertiesBuilder.getInstance().isAsynchronous(this))
+		try
 		{
-			this.addListener(new EventListener()
-				{
-
-					@Override
-					public void handle(Event event)
-					{
-						for (Closable child : getClosableChildren())
-							if (child.isClosed())
-								return;
-						closeImpl();
-					}
-				}, new EventTypeFilter(EventType.CLOSED).andFilterBy(new ProducerTypeFilter(this.getProducerType()
-					.getChildType())));
-		}
-
-		log.trace("close children");
-		for (Closable child : getClosableChildren())
-			child.close();
-		LogUtils.trace(log, "closing container {0}",this);
-		if (!InitialPropertiesBuilder.getInstance().isAsynchronous(this))
 			closeImpl();
+		}
+		catch (Exception e)
+		{
+			Error error =new Error("Can't close container",this,ErrorLevel.ERROR,e,"close()",log);
+			error.writeLog();
+			setContainerStatus(Status.UNKNOWN);
+			pushError(error);
+			if(e instanceof IOException)
+				throw (IOException)e;
+			else if (e instanceof RuntimeException)
+				throw (RuntimeException)e;
+			else
+				throw new UnexpectedRuntimeException("Can't close container", e);
+		}
 	}
-
-	protected abstract void closeImpl();
-
-	protected abstract boolean isClosedImpl();
+	
+	protected abstract void closeImpl() throws IOException;
 
 }

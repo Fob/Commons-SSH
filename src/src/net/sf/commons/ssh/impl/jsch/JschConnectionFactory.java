@@ -60,6 +60,7 @@ public class JschConnectionFactory extends ConnectionFactory {
 	    Session connection = jsch.getSession(authOptions.login, host, port);
 
 	    connection.setPassword(authOptions.password);
+	    
 
 	    Properties properties = new Properties();
 	    properties.setProperty("StrictHostKeyChecking", "no");

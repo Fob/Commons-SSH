@@ -3,6 +3,7 @@
  */
 package net.sf.commons.ssh.impl.jsch;
 
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.jcraft.jsch.JSch;
@@ -12,6 +13,7 @@ import net.sf.commons.ssh.connection.Connection;
 import net.sf.commons.ssh.connector.AbstractConnector;
 import net.sf.commons.ssh.connector.SupportedFeatures;
 import net.sf.commons.ssh.event.Event;
+import net.sf.commons.ssh.event.EventHandlingException;
 import net.sf.commons.ssh.event.EventListener;
 import net.sf.commons.ssh.event.EventType;
 import net.sf.commons.ssh.event.EventTypeFilter;
@@ -25,7 +27,7 @@ import net.sf.commons.ssh.options.Properties;
  * @date 31.07.2011
  * @since 2.0
  */
-@SupportedFeatures({Feature.SSH2,Feature.SESSION_SHELL})
+@SupportedFeatures({Feature.SSH2,Feature.SYNCHRONOUS,Feature.AUTH_CREDENTIALS,Feature.AUTH_PUBLICKEY,Feature.CONNECTION_TIMEOUT,Feature.SOCKET_TIMEOUT,Feature.SESSION_SHELL})
 public class JSCHConnector extends AbstractConnector
 {
 	
@@ -42,14 +44,14 @@ public class JSCHConnector extends AbstractConnector
 			{
 				
 				@Override
-				public void handle(Event event)
+				public void handle(Event event) throws EventHandlingException
 				{
 					SetPropertyEvent setEvent = (SetPropertyEvent) event;
 					if(setEvent.getKey().equals(InitialPropertiesBuilder.ASYNCHRONOUS))
 					{
 						Boolean newValue = setEvent.getNewValue() instanceof Boolean ? (Boolean)setEvent.getNewValue() : Boolean.valueOf((String)setEvent.getNewValue());
 						if(newValue)
-							throw new IllegalArgumentException("This library not supported asychronous mode, Use Feature.Asynchronous");
+							throw new EventHandlingException("This library not supported asychronous mode, Use Feature.Asynchronous");
 					}
 					
 				}
@@ -72,7 +74,7 @@ public class JSCHConnector extends AbstractConnector
 	 * @see net.sf.commons.ssh.common.AbstractClosable#closeImpl()
 	 */
 	@Override
-	protected void closeimpl()
+	protected void closeImpl() throws IOException
 	{
 		jsch = null;
 		isClosed.set(true);
@@ -83,11 +85,9 @@ public class JSCHConnector extends AbstractConnector
 	 * @see net.sf.commons.ssh.common.AbstractClosable#isClosedImpl()
 	 */
 	@Override
-	protected boolean isClosedImpl()
+	public boolean isClosed()
 	{
 		return isClosed.get();
 	}
-	
-	
 
 }

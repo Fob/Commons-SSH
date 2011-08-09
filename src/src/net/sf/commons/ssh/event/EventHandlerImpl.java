@@ -3,6 +3,9 @@
  */
 package net.sf.commons.ssh.event;
 
+import net.sf.commons.ssh.errors.AbstractErrorHolder;
+import net.sf.commons.ssh.errors.Error; 
+
 /**
  * @author fob
  * @date 28.07.2011
@@ -27,9 +30,26 @@ public class EventHandlerImpl implements EventHandler
 	}
 	
 	@Override
-	public void handle(Event event)
+	public void handle(Event event) throws EventHandlingException
 	{
-		listener.handle(event);
+		try
+		{
+			listener.handle(event);
+		}
+		catch (EventHandlingException e) 
+		{
+			throw e;
+		}
+		catch (Exception e)
+		{
+			if(event.getProducer() instanceof AbstractEventProcessor)
+			{
+				Error error = new Error("Event Listener error, event["+event+"]", event.getProducer(), e);
+				error.writeLog();
+				if(event.getEventType() != EventType.ERROR)
+					((AbstractEventProcessor)event.getProducer()).pushError(error);
+			}
+		}
 	}
 
 	@Override

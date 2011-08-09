@@ -3,16 +3,21 @@
  */
 package net.sf.commons.ssh.impl.jsch;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 
+import net.sf.commons.ssh.auth.AuthenticationMethod;
+import net.sf.commons.ssh.auth.PasswordAuthenticationOptions;
+import net.sf.commons.ssh.auth.PasswordPropertiesBuilder;
+import net.sf.commons.ssh.common.Status;
 import net.sf.commons.ssh.connection.AbstractConnection;
 import net.sf.commons.ssh.connection.AuthenticationException;
 import net.sf.commons.ssh.connection.ConnectionException;
+import net.sf.commons.ssh.connection.ConnectionPropertiesBuilder;
+import net.sf.commons.ssh.connection.HostCheckingException;
 import net.sf.commons.ssh.event.events.AuthenticatedEvent;
 import net.sf.commons.ssh.event.events.ClosedEvent;
+import net.sf.commons.ssh.event.events.ConnectedEvent;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.SFTPSession;
@@ -27,39 +32,19 @@ public class JSCHConnection extends AbstractConnection
 {
 	private JSch jsch;
 	private Session connection = null;
-	private AtomicBoolean isClosed = new AtomicBoolean(false);
 
 	/**
 	 * @param properties
 	 */
-	public JSCHConnection(Properties properties,JSch jsch)
+	public JSCHConnection(Properties properties, JSch jsch)
 	{
 		super(properties);
 		this.jsch = jsch;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.commons.ssh.connection.Connection#connect()
-	 */
-	@Override
-	public void connect() throws ConnectionException
-	{
-		super.connect();
-		//TODO
-	}
-	
-
-	/* (non-Javadoc)
-	 * @see net.sf.commons.ssh.connection.Connection#authenticate()
-	 */
-	@Override
-	public void authenticate() throws AuthenticationException
-	{
-		super.authenticate();
-		fire(new AuthenticatedEvent(this));
-	}
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.commons.ssh.connection.Connection#isConnected()
 	 */
 	@Override
@@ -68,29 +53,34 @@ public class JSCHConnection extends AbstractConnection
 		return connection.isConnected();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.commons.ssh.connection.Connection#isAuthenticated()
 	 */
 	@Override
 	public boolean isAuthenticated()
 	{
-		synchronized (lock)
-		{
-			return isAuthenticating && connection.isConnected();
-		}
+		Status status = getContainerStatus();
+		return (status == Status.AUTHENTICATED || status == Status.INPROGRESS) && isConnected();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.commons.ssh.connection.Connection#createShellSession()
 	 */
 	@Override
 	public ShellSession createShellSession()
 	{
+
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.commons.ssh.connection.Connection#createExecSession()
 	 */
 	@Override
@@ -100,7 +90,9 @@ public class JSCHConnection extends AbstractConnection
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.commons.ssh.connection.Connection#createSFTPSession()
 	 */
 	@Override
@@ -110,24 +102,71 @@ public class JSCHConnection extends AbstractConnection
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.commons.ssh.common.AbstractClosable#closeImpl()
 	 */
 	@Override
 	protected void closeImpl()
 	{
 		connection.disconnect();
-		isClosed.set(true);
+		setContainerStatus(Status.CLOSED);
 		fire(new ClosedEvent(this));
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sf.commons.ssh.common.AbstractClosable#isClosedImpl()
-	 */
-	@Override
-	protected boolean isClosedImpl()
+	public boolean isClosed()
 	{
-		return isClosed.get();
+		return getContainerStatus() == Status.CLOSED;
+	}
+
+	@Override
+	protected void openImpl() throws ConnectionException, AuthenticationException, HostCheckingException
+	{
+		ConnectionPropertiesBuilder.getInstance().verify(this);
+		AuthenticationMethod method = ConnectionPropertiesBuilder.getInstance().getAuthenticationMethod(this);
+		switch (method)
+		{
+		case NONE:
+			break;
+		case PASSWORD:
+			connectUsingPassword();
+			break;
+		case PUBLICKEY:
+			break;
+		default:
+			throw new IllegalArgumentException("unsupported authentication method "+method);
+		}
+		setContainerStatus(Status.INPROGRESS);
+		fire(new ConnectedEvent(this));
+		fire(new AuthenticatedEvent(this));
+	}
+
+	private void connectUsingPassword() throws ConnectionException,AuthenticationException,HostCheckingException
+	{
+		PasswordPropertiesBuilder.getInstance().verify(this);
+		final String login = PasswordPropertiesBuilder.getInstance().getLogin(this);
+		connection = jsch.getSession(ConnectionPropertiesBuilder.getInstance().getHost(this), login,
+				ConnectionPropertiesBuilder.getInstance().getPort(this));
+		connection.setPassword(PasswordPropertiesBuilder.getInstance().getPassword(this));
+		connection.connect();
+		//TODO JSCHException encapsulate
+	}
+	
+	private void setupCommonProperties()
+	{
+		ConnectionPropertiesBuilder cpb =ConnectionPropertiesBuilder.getInstance();
+		final Long soTimeout = cpb.getSoTimeout(this);
+		
+		if(soTimeout !=null)
+			connection.setTimeout(soTimeout.intValue());
+		
+		final Long connectTimeout = cpb.getConnectTimeout(this);
+		if(connectTimeout!=null)
+		{
+			connection.setSocketFactory(new JschSocketFactory(connectTimeout.intValue(), soTimeout == null ? 0 : soTimeout.intValue()));
+		}
+		
 	}
 
 }

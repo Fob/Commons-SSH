@@ -6,4 +6,5 @@ import net.sf.commons.ssh.options.Configurable;
 
 public interface Container extends Closable,Configurable,ErrorHolder,EventProcessor
 {
+	public Status getContainerStatus();
 }

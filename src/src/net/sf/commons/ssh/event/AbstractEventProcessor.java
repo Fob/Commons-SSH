@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.sf.commons.ssh.common.EventProcessorThread;
+import net.sf.commons.ssh.common.Status;
+import net.sf.commons.ssh.errors.Error;
 import net.sf.commons.ssh.event.events.SetPropertyEvent;
 import net.sf.commons.ssh.event.events.UpdateConfigurableEvent;
 import net.sf.commons.ssh.options.ContainerConfigurable;
@@ -20,6 +22,9 @@ public abstract class AbstractEventProcessor extends ContainerConfigurable imple
 {
     protected AbstractEventProcessor parentEngine;
     protected List<EventHandler> handlers = new CopyOnWriteArrayList<EventHandler>();
+    
+	protected final Object statusLock = new Object();
+	protected Status status = Status.CREATED;
 
 	public AbstractEventProcessor(Properties properties)
 	{
@@ -147,5 +152,24 @@ public abstract class AbstractEventProcessor extends ContainerConfigurable imple
 	{
 		return addListener(listener, filter ,HandlerType.IMMEDIATE_PROCESS);
 	}
+	
+	protected Status getContainerStatus()
+	{
+		synchronized (statusLock)
+		{
+			return status;
+		}		
+	}
+	
+	protected void setContainerStatus(Status status)
+	{
+		synchronized (statusLock)
+		{
+			this.status = status;
+		}		
+	}
+	
+	//Upper Level API
+	protected abstract void pushError(Error error);
     
 }

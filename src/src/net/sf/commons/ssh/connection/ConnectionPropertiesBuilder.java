@@ -1,42 +1,36 @@
 package net.sf.commons.ssh.connection;
 
 
-import net.sf.commons.ssh.auth.AuthenticationOptions;
+import net.sf.commons.ssh.auth.AuthenticationMethod;
 import net.sf.commons.ssh.options.*;
 
 
 public class ConnectionPropertiesBuilder extends PropertiesBuilder
 {
     private static ConnectionPropertiesBuilder instance = null;
-    @Required
     @PropertyType(Long.class)
     public static final String KEY_KEX_TIMEOUT = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.kexTimeout";
     @Required
     @PropertyType(Integer.class)
     public static final String KEY_PORT = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.port";
-    @Required
     @PropertyType(Boolean.class)
     public static final String KEY_SEND_IGNORE = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.sendIgnore";
-    @Required
     @PropertyType(Long.class)
     public static final String KEY_SOCKET_TIMEOUT = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.soTimeout";
-    @Required
     @PropertyType(Long.class)
     public static final String KEY_CONNECT_TIMEOUT = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.connectTimeout";
     @Required
     @PropertyType(String.class)
     public static final String KEY_HOST = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.host";
-    @Required
-    public static final String KEY_AUTHENTICATION_OPTIONS = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.auth";
+	@Required
+	@PropertyType(AuthenticationMethod.class)
+	public static final String KEY_AUTHENTICATION_METHOD = "net.sf.commons.ssh.auth.authenticationMethod";
 
     public ConnectionPropertiesBuilder()
     {
-        defaultProperties.put(KEY_KEX_TIMEOUT, Long.valueOf(3600));
         defaultProperties.put(KEY_PORT, Integer.valueOf(22));
-        defaultProperties.put(KEY_SEND_IGNORE, false);
-        defaultProperties.put(KEY_SOCKET_TIMEOUT, Long.valueOf(0));
-        defaultProperties.put(KEY_CONNECT_TIMEOUT, Long.valueOf(0));
         defaultProperties.put(KEY_HOST,"127.0.0.1");
+        defaultProperties.put(KEY_AUTHENTICATION_METHOD, AuthenticationMethod.NONE);
     }
 
     public synchronized static ConnectionPropertiesBuilder getInstance()
@@ -108,13 +102,14 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
         opt.setProperty(KEY_HOST, value);
     }
     
-    public AuthenticationOptions getAuthenticationOptions(Properties opt)
-    {
-    	return (AuthenticationOptions) opt.getProperty(KEY_AUTHENTICATION_OPTIONS);    	
-    }
+	public void setAuthenticationMethod(Configurable config,AuthenticationMethod value)
+	{
+		setProperty(config, KEY_AUTHENTICATION_METHOD, value);
+	}
+	
+	public AuthenticationMethod getAuthenticationMethod(Properties config)
+	{
+		return (AuthenticationMethod) getProperty(config, KEY_AUTHENTICATION_METHOD);		
+	}
     
-    public void setAuthenticationOptions(Configurable opt,AuthenticationOptions auth)
-    {
-    	opt.setProperty(KEY_AUTHENTICATION_OPTIONS, auth);    	
-    }
 }

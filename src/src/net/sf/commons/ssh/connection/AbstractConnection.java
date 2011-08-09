@@ -3,14 +3,18 @@ package net.sf.commons.ssh.connection;
 import java.io.IOException;
 
 import net.sf.commons.ssh.common.AbstractContainer;
+import net.sf.commons.ssh.common.LogUtils;
+import net.sf.commons.ssh.common.Status;
+import net.sf.commons.ssh.common.UnexpectedRuntimeException;
+import net.sf.commons.ssh.errors.ErrorLevel;
 import net.sf.commons.ssh.event.ProducerType;
-import net.sf.commons.ssh.options.IllegalPropertyException;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.ExecSessionPropertiesBuilder;
 import net.sf.commons.ssh.session.SFTPSession;
 import net.sf.commons.ssh.session.Session;
 import net.sf.commons.ssh.session.ShellSession;
+import net.sf.commons.ssh.errors.Error;
 
 /**
  * @author fob
@@ -19,27 +23,24 @@ import net.sf.commons.ssh.session.ShellSession;
  */
 public abstract class AbstractConnection extends AbstractContainer<Session> implements Connection
 {
-	protected boolean isAuthenticating = false;
-	protected final Object lock = new Object();
-	
-	protected boolean isConnecting = false;
-	
-    public AbstractConnection(Properties properties)
-    {
-        super(properties);
-    }
 
-    @Override
-    protected void configureDefault(Properties properties)
-    {
-        super.configureDefault(properties);
-    }
 
-    @Override
-    public ProducerType getProducerType()
-    {
-        return ProducerType.CONNECTION;
-    }
+	public AbstractConnection(Properties properties)
+	{
+		super(properties);
+	}
+
+	@Override
+	protected void configureDefault(Properties properties)
+	{
+		super.configureDefault(properties);
+	}
+
+	@Override
+	public ProducerType getProducerType()
+	{
+		return ProducerType.CONNECTION;
+	}
 
 	@Override
 	public ShellSession openShellSession() throws IOException
@@ -67,76 +68,58 @@ public abstract class AbstractConnection extends AbstractContainer<Session> impl
 	}
 
 	@Override
-	public void connect() throws ConnectionException
-	{
-		try
-		{
-			ConnectionPropertiesBuilder.getInstance().verify(this);
-		}
-		catch (IllegalPropertyException e)
-		{
-			log.error("connection error",e);
-			throw new ConnectionException(e.getMessage(),e);
-		}
-		synchronized (lock)
-		{
-			if (isConnecting)
-				throw new ConnectionException("Connection initiated");
-			isConnecting = true;
-		}
-	}
-
-	@Override
-	public void authenticate() throws AuthenticationException
-	{
-		if(!isConnected())
-			throw new AuthenticationException("Connecto to device before authenticating");
-		synchronized (lock)
-		{
-			if (isAuthenticating)
-				throw new AuthenticationException("Authentication Already initiated");
-			isAuthenticating = true;
-		}
-		try
-		{
-			authenticateImpl();
-		}
-		catch (Exception e)
-		{
-			synchronized (lock)
-			{
-				isAuthenticating = false;
-			}
-			
-			this.pushError(...);
-			if(e instanceof RuntimeException)
-				throw (RuntimeException) e;
-			else
-				throw new AuthenticationException(e.getMessage(),e);
-		}
-	}
-	
-	protected abstract void authenticateImpl()  throws AuthenticationException;
-
-	@Override
 	public boolean isConnecting()
 	{
-		synchronized (lock)
-		{
-			return isConnecting;
-		}
+		return getContainerStatus() == Status.CONNECTING;
 	}
 
 	@Override
 	public boolean isAuthenticating()
 	{
-		synchronized (lock)
-		{
-			return isAuthenticating;
-		}
+		return getContainerStatus() == Status.AUTHENTICATING;
 	}
 
-    
-    
+	@Override
+	public void open() throws ConnectionException, AuthenticationException, HostCheckingException
+	{
+		
+		synchronized (statusLock)
+		{
+			if (status == Status.CONNECTING || status == Status.AUTHENTICATING || status == Status.INPROGRESS
+					|| status == Status.HOST_CHECKING || status == Status.CONNECTED || status == Status.AUTHENTICATED
+					|| status == Status.CHECKED)
+			{
+				LogUtils.warn(log, "connection {0} already opening", this);
+				return;
+			}
+			status = Status.CONNECTING;
+		}
+		
+		try
+		{
+			openImpl();
+		}
+		catch (Exception e)
+		{
+			setContainerStatus(Status.UNKNOWN);
+			Error error = new Error("Opening failed", this, ErrorLevel.ERROR, e, "open()", log);
+			error.writeLog();
+			this.pushError(error);
+			if (e instanceof AuthenticationException)
+				throw (AuthenticationException) e;
+			else if (e instanceof ConnectionException)
+				throw (ConnectionException) e;
+			else if (e instanceof RuntimeException)
+				throw (RuntimeException) e;
+			else
+				throw new UnexpectedRuntimeException("Opening failed", e);
+		}
+		
+		
+	}
+	
+	protected abstract void openImpl() throws ConnectionException, AuthenticationException, HostCheckingException;
+	
+	
 
 }

@@ -67,7 +67,21 @@ public abstract class AbstractContainer<T extends Container> extends AbstractErr
 	{
 		return this == obj;
 	}
-	
-	
 
+	@Override
+	public void clearClosed()
+	{
+		for(Closable closable : getClosableChildren())
+		{
+			if(closable.isClosed())
+				children.remove(closable);
+		}
+	}
+
+	@Override
+	public Status getContainerStatus()
+	{
+		return super.getContainerStatus();
+	}
+	
 }

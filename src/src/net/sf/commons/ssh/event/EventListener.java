@@ -15,6 +15,6 @@ public interface EventListener
 	 * @param event
 	 * @return custom value
 	 */
-	void handle(Event event);	
+	void handle(Event event) throws EventHandlingException;	
 
 }
