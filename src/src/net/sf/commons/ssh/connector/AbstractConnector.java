@@ -69,46 +69,13 @@ public abstract class AbstractConnector extends AbstractContainer<Connection> im
     }
 
 	@Override
-	public Connection openConnection(String host, int port, AuthenticationOptions auth) throws ConnectionException,AuthenticationException
+	public Connection openConnection(String host, int port, Properties connectionProperties) throws ConnectionException,AuthenticationException
 	{
 		Connection connection = createConnection();
 		ConnectionPropertiesBuilder.getInstance().setHost(connection, host);
 		ConnectionPropertiesBuilder.getInstance().setPort(connection, port);
-		ConnectionPropertiesBuilder.getInstance().setAuthenticationOptions(connection, auth);
-		
-		if(!InitialPropertiesBuilder.getInstance().isAsynchronous(connection))
-		{
-			//synchronous connect
-			connection.connect();
-			connection.authenticate();
-		}
-		else
-		{
-			connection.addListener(new EventListener()
-				{
-
-					@Override
-					public void handle(Event event)
-					{
-						ConnectedEvent connectedEvent = (ConnectedEvent) event;
-						if (connectedEvent.getConnection().isConnected())
-						{
-							try
-							{
-								connectedEvent.getConnection().authenticate();
-							}
-							catch (AuthenticationException e)
-							{
-								log.error("unexpected error, asynchronous method should't throw errors",e);								
-							}
-						}
-					}
-				}, new EventTypeFilter(EventType.CONNECTED));
-			
-			connection.connect();
-
-		}
-		
+		this.updateFrom(connectionProperties);
+		connection.connect(true);
 		return connection;
 	}
 

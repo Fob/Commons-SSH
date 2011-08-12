@@ -2,12 +2,15 @@ package net.sf.commons.ssh.connection;
 
 import java.io.IOException;
 
+import com.sun.org.apache.bcel.internal.generic.LUSHR;
+
 import net.sf.commons.ssh.common.AbstractContainer;
 import net.sf.commons.ssh.common.LogUtils;
 import net.sf.commons.ssh.common.Status;
 import net.sf.commons.ssh.common.UnexpectedRuntimeException;
 import net.sf.commons.ssh.errors.ErrorLevel;
 import net.sf.commons.ssh.event.ProducerType;
+import net.sf.commons.ssh.event.events.AuthenticatedEvent;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.ExecSessionPropertiesBuilder;
@@ -80,7 +83,7 @@ public abstract class AbstractConnection extends AbstractContainer<Session> impl
 	}
 
 	@Override
-	public void open() throws ConnectionException, AuthenticationException, HostCheckingException
+	public void connect(boolean authenticate) throws ConnectionException, AuthenticationException, HostCheckingException
 	{
 		
 		synchronized (statusLock)
@@ -97,12 +100,12 @@ public abstract class AbstractConnection extends AbstractContainer<Session> impl
 		
 		try
 		{
-			openImpl();
+			connectImpl(authenticate);
 		}
 		catch (Exception e)
 		{
 			setContainerStatus(Status.UNKNOWN);
-			Error error = new Error("Opening failed", this, ErrorLevel.ERROR, e, "open()", log);
+			Error error = new Error("Connection failed", this, ErrorLevel.ERROR, e, "connect("+authenticate+")", log);
 			error.writeLog();
 			this.pushError(error);
 			if (e instanceof AuthenticationException)
@@ -112,14 +115,57 @@ public abstract class AbstractConnection extends AbstractContainer<Session> impl
 			else if (e instanceof RuntimeException)
 				throw (RuntimeException) e;
 			else
-				throw new UnexpectedRuntimeException("Opening failed", e);
+				throw new UnexpectedRuntimeException("Connection failed", e);
 		}
-		
 		
 	}
 	
-	protected abstract void openImpl() throws ConnectionException, AuthenticationException, HostCheckingException;
+	protected abstract void connectImpl(boolean authenticate) throws ConnectionException, AuthenticationException, HostCheckingException;
+
+	@Override
+	public void authenticate() throws AuthenticationException
+	{
+		synchronized (statusLock)
+		{
+			if (status == Status.AUTHENTICATING || status == Status.AUTHENTICATED || status == Status.INPROGRESS)
+			{
+				LogUtils.debug(log, "this connection {0} already authenticated", this);
+				return;
+			}
+			if (!isConnected())
+			{
+				LogUtils.debug(log, "connection sould be in status CONNECTED before authenticate");
+				throw new AuthenticationException("connection sould be in status CONNECTED before authenticate");
+			}
+			status = Status.AUTHENTICATING;
+		}
+		
+		try
+		{
+			authenticateImpl();
+		}
+		catch (Exception e)
+		{
+			synchronized (statusLock)
+			{
+				if (status == Status.AUTHENTICATING)
+					status = Status.UNKNOWN;
+			}
+			Error error = new Error("Authentication failed", this, ErrorLevel.ERROR, e, "authenticate()", log);
+			pushError(error);
+			if(e instanceof AuthenticationException)
+				throw (AuthenticationException) e;
+			else if(e instanceof RuntimeException)
+				throw (RuntimeException) e;
+			else
+				throw new AuthenticationException("Authentication Failed",e);
+		}
+	}
 	
-	
+	public void authenticateImpl() throws AuthenticationException
+	{
+		setContainerStatus(Status.INPROGRESS);
+		fire(new AuthenticatedEvent(this));		
+	}
 
 }

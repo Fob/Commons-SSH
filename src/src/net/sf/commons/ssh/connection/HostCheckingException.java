@@ -8,7 +8,7 @@ package net.sf.commons.ssh.connection;
  * @date 07.08.2011
  * @since 2.0
  */
-public class HostCheckingException extends RuntimeException
+public class HostCheckingException extends Exception
 {
 
 	private static final long serialVersionUID = -7221862749439444044L;

@@ -30,7 +30,7 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
     {
         defaultProperties.put(KEY_PORT, Integer.valueOf(22));
         defaultProperties.put(KEY_HOST,"127.0.0.1");
-        defaultProperties.put(KEY_AUTHENTICATION_METHOD, AuthenticationMethod.NONE);
+        defaultProperties.put(KEY_AUTHENTICATION_METHOD, AuthenticationMethod.PASSWORD);
     }
 
     public synchronized static ConnectionPropertiesBuilder getInstance()

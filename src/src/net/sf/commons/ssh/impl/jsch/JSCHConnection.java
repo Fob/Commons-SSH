@@ -149,6 +149,7 @@ public class JSCHConnection extends AbstractConnection
 		connection = jsch.getSession(ConnectionPropertiesBuilder.getInstance().getHost(this), login,
 				ConnectionPropertiesBuilder.getInstance().getPort(this));
 		connection.setPassword(PasswordPropertiesBuilder.getInstance().getPassword(this));
+		setupCommonProperties();
 		connection.connect();
 		//TODO JSCHException encapsulate
 	}

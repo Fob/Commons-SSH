@@ -11,4 +11,6 @@ import java.lang.annotation.Target;
 public @interface PropertyType
 {
     public Class value() default String.class;
+    public boolean required() default false;
+    
 }
