@@ -3,9 +3,6 @@
  */
 package net.sf.commons.ssh.options;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author fob
  * @date 24.07.2011
@@ -19,11 +16,9 @@ public class InitialPropertiesBuilder extends PropertiesBuilder
     public static final String SYNCHRONIZED_CONFIGURABLE = "net.sf.commons.ssh.options.InitialPropertiesBuilder.SynchronizedConfigurable";
 	@PropertyType(Boolean.class)
     public static final String SYNCHRONIZED_ERROR_HOLDER = "net.sf.commons.ssh.options.InitialPropertiesBuilder.SynchronizedErrorHolder";
-    @Required
-    @PropertyType(Boolean.class)
+    @PropertyType(value = Boolean.class,required = true)
     public static final String SYNCHRONIZED_CHILDEN = "net.sf.commons.ssh.options.InitialPropertiesBuilder.SynchronizedChildren";
-    @Required
-    @PropertyType(Boolean.class)
+    @PropertyType(value = Boolean.class, required = true)
     public static final String ASYNCHRONOUS = "net.sf.commons.ssh.options.InitialPropertiesBuilder.Asynchronous";
 
     protected InitialPropertiesBuilder()

@@ -2,7 +2,6 @@ package net.sf.commons.ssh.connector;
 
 
 import net.sf.commons.ssh.Feature;
-import net.sf.commons.ssh.auth.AuthenticationOptions;
 import net.sf.commons.ssh.common.Container;
 import net.sf.commons.ssh.connection.AuthenticationException;
 import net.sf.commons.ssh.connection.Connection;

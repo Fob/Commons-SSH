@@ -10,8 +10,7 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
     private static ConnectionPropertiesBuilder instance = null;
     @PropertyType(Long.class)
     public static final String KEY_KEX_TIMEOUT = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.kexTimeout";
-    @Required
-    @PropertyType(Integer.class)
+    @PropertyType(value = Integer.class,required = true)
     public static final String KEY_PORT = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.port";
     @PropertyType(Boolean.class)
     public static final String KEY_SEND_IGNORE = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.sendIgnore";
@@ -19,11 +18,9 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
     public static final String KEY_SOCKET_TIMEOUT = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.soTimeout";
     @PropertyType(Long.class)
     public static final String KEY_CONNECT_TIMEOUT = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.connectTimeout";
-    @Required
-    @PropertyType(String.class)
+    @PropertyType(value = String.class, required = true)
     public static final String KEY_HOST = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.host";
-	@Required
-	@PropertyType(AuthenticationMethod.class)
+	@PropertyType(value = AuthenticationMethod.class, required = true)
 	public static final String KEY_AUTHENTICATION_METHOD = "net.sf.commons.ssh.auth.authenticationMethod";
 
     public ConnectionPropertiesBuilder()
@@ -49,7 +46,7 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
 
     public void setKexTimeout(Configurable opt, Long value)
     {
-        opt.setProperty(KEY_KEX_TIMEOUT, value);
+        setProperty(opt,KEY_KEX_TIMEOUT, value);
     }
 
     public Integer getPort(Properties opt)
@@ -59,7 +56,7 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
 
     public void setPort(Configurable opt, Integer value)
     {
-        opt.setProperty(KEY_PORT, value);
+        setProperty(opt,KEY_PORT, value);
     }
 
     public Boolean getSendIgnore(Properties opt)
@@ -69,7 +66,7 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
 
     public void setSendIgnore(Configurable opt, Boolean value)
     {
-        opt.setProperty(KEY_SEND_IGNORE, value);
+        setProperty(opt,KEY_SEND_IGNORE, value);
     }
 
     public Long getSoTimeout(Properties opt)
@@ -89,7 +86,7 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
 
     public void setConnectTimeout(Configurable opt, Long value)
     {
-        opt.setProperty(KEY_CONNECT_TIMEOUT, value);
+        setProperty(opt,KEY_CONNECT_TIMEOUT, value);
     }
 
     public String getHost(Properties opt)
@@ -99,7 +96,7 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
 
     public void setHost(Configurable opt, String value)
     {
-        opt.setProperty(KEY_HOST, value);
+        setProperty(opt,KEY_HOST, value);
     }
     
 	public void setAuthenticationMethod(Configurable config,AuthenticationMethod value)

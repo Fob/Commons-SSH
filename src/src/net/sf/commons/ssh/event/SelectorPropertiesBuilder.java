@@ -7,7 +7,6 @@ import net.sf.commons.ssh.options.Configurable;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.options.PropertiesBuilder;
 import net.sf.commons.ssh.options.PropertyType;
-import net.sf.commons.ssh.options.Required;
 
 /**
  * @author fob
@@ -18,8 +17,7 @@ public class SelectorPropertiesBuilder extends PropertiesBuilder
 {
 	private static SelectorPropertiesBuilder instance = null;
 	
-	@Required
-	@PropertyType(Class.class)
+	@PropertyType(value = Class.class, required = true)
 	public static final String KEY_SELECTOR_IMPLEMENTATION = "net.sf.commons.ssh.event.SelectorPropertiesBuilder.implementation";
 	
 	@PropertyType(Boolean.class)
@@ -47,7 +45,7 @@ public class SelectorPropertiesBuilder extends PropertiesBuilder
 	
 	public void setSelectorImplementation(Configurable config,Class<? extends Selector> cls)
 	{
-		config.setProperty(KEY_SELECTOR_IMPLEMENTATION, cls);		
+		setProperty(config,KEY_SELECTOR_IMPLEMENTATION, cls);		
 	}
 	
 	public boolean isRegisterListenersOnObjects(Properties properties)
@@ -58,7 +56,7 @@ public class SelectorPropertiesBuilder extends PropertiesBuilder
 	
 	public void setRegisterListenersOnObjects(Configurable config,boolean value)
 	{
-		config.setProperty(KEY_REGISTER_LISTENERS_ON_OBJECTS, value);		
+		setProperty(config,KEY_REGISTER_LISTENERS_ON_OBJECTS, value);		
 	}
 
 }

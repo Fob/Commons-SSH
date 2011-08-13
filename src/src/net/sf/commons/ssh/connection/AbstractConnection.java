@@ -2,8 +2,6 @@ package net.sf.commons.ssh.connection;
 
 import java.io.IOException;
 
-import com.sun.org.apache.bcel.internal.generic.LUSHR;
-
 import net.sf.commons.ssh.common.AbstractContainer;
 import net.sf.commons.ssh.common.LogUtils;
 import net.sf.commons.ssh.common.Status;
@@ -89,7 +87,7 @@ public abstract class AbstractConnection extends AbstractContainer<Session> impl
 		synchronized (statusLock)
 		{
 			if (status == Status.CONNECTING || status == Status.AUTHENTICATING || status == Status.INPROGRESS
-					|| status == Status.HOST_CHECKING || status == Status.CONNECTED || status == Status.AUTHENTICATED
+					|| status == Status.CONNECTED || status == Status.AUTHENTICATED
 					|| status == Status.CHECKED)
 			{
 				LogUtils.warn(log, "connection {0} already opening", this);

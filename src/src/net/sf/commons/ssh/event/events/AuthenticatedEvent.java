@@ -3,13 +3,13 @@
  */
 package net.sf.commons.ssh.event.events;
 
-import net.sf.commons.ssh.auth.AuthenticationOptions;
+import net.sf.commons.ssh.auth.AuthenticationMethod;
 import net.sf.commons.ssh.connection.Connection;
 import net.sf.commons.ssh.connection.ConnectionPropertiesBuilder;
 import net.sf.commons.ssh.event.AbstractEvent;
 import net.sf.commons.ssh.event.AbstractEventProcessor;
 import net.sf.commons.ssh.event.EventType;
-import net.sf.commons.ssh.options.Properties;
+
 
 /**
  * @author fob
@@ -33,9 +33,9 @@ public class AuthenticatedEvent extends AbstractEvent
 		return (Connection) getProducer();		
 	}
 	
-	public AuthenticationOptions getAuthenticationOptions()
+	public AuthenticationMethod getMethod()
 	{
-		return ConnectionPropertiesBuilder.getInstance().getAuthenticationOptions(getConnection());		
+		return ConnectionPropertiesBuilder.getInstance().getAuthenticationMethod(getConnection());
 	}
-
+	
 }

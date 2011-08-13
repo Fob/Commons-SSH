@@ -20,7 +20,7 @@ public abstract class PropertiesBuilder
 	protected PropertiesBuilder()
 	{
 		super();
-		converter = new DefaultConverter();
+		converter = createConverter();
 	}
 
     public Properties getDefault()
@@ -57,6 +57,10 @@ public abstract class PropertiesBuilder
         properties.setProperty(key,getConverter().convert(value, key));
     }
     
+    protected TypeConverter createConverter()
+    {
+    	return new DefaultConverter(this.getClass());
+    }
     public TypeConverter getConverter()
     {
     	return converter;     	    	

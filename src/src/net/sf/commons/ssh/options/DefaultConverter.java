@@ -12,7 +12,7 @@ import java.util.Map;
 
 import net.sf.commons.ssh.common.LogUtils;
 import net.sf.commons.ssh.common.UnexpectedRuntimeException;
-import net.sf.commons.ssh.common.VerificationMethod;
+
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

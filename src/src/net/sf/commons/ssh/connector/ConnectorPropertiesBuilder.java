@@ -12,7 +12,6 @@ public class ConnectorPropertiesBuilder extends PropertiesBuilder
 {
     private static ConnectorPropertiesBuilder instance = null;
 
-    @Required
     @PropertyType(Boolean.class)
     public static final String CREATE_EVENT_THREAD = "net.sf.commons.ssh.connector.createEventThread";
 
@@ -38,6 +37,6 @@ public class ConnectorPropertiesBuilder extends PropertiesBuilder
 
     public void setCreateEventThread(Configurable opt,boolean flag)
     {
-        opt.setProperty(CREATE_EVENT_THREAD,flag);
+        setProperty(opt,CREATE_EVENT_THREAD,flag);
     }
 }

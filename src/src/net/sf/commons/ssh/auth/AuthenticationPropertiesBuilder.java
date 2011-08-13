@@ -7,7 +7,6 @@ import net.sf.commons.ssh.options.Configurable;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.options.PropertiesBuilder;
 import net.sf.commons.ssh.options.PropertyType;
-import net.sf.commons.ssh.options.Required;
 
 /**
  * @author fob
@@ -16,8 +15,7 @@ import net.sf.commons.ssh.options.Required;
  */
 public abstract class AuthenticationPropertiesBuilder extends PropertiesBuilder
 {
-	@Required
-	@PropertyType(String.class)
+	@PropertyType(value = String.class,required = true)
 	public static final String KEY_LOGIN = "net.sf.commons.ssh.auth.login";
 	
 
