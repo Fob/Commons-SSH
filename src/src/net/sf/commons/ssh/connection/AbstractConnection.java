@@ -9,6 +9,7 @@ import net.sf.commons.ssh.common.UnexpectedRuntimeException;
 import net.sf.commons.ssh.errors.ErrorLevel;
 import net.sf.commons.ssh.event.ProducerType;
 import net.sf.commons.ssh.event.events.AuthenticatedEvent;
+import net.sf.commons.ssh.options.IllegalPropertyException;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.ExecSessionPropertiesBuilder;
@@ -92,6 +93,14 @@ public abstract class AbstractConnection extends AbstractContainer<Session> impl
 			{
 				LogUtils.warn(log, "connection {0} already opening", this);
 				return;
+			}
+			try
+			{
+				ConnectionPropertiesBuilder.getInstance().verify(this);
+			}
+			catch (Exception e)
+			{
+				throw new ConnectionException("Verification Connection Properties failed",e);				
 			}
 			status = Status.CONNECTING;
 		}

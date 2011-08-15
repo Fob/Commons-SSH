@@ -99,6 +99,7 @@ public class JschConnectionFactory extends ConnectionFactory {
 
 	    jsch.addIdentity((new File(authOptions.keyfile)).getAbsolutePath(),
 		    authOptions.phrase);
+	    jsch.addIdentity(name, prvkey, pubkey, passphrase)
 	    Session connection = jsch.getSession(authOptions.login, host, port);
 
 	    Properties properties = new Properties();

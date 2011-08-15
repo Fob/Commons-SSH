@@ -28,6 +28,7 @@ import com.sshtools.j2ssh.authentication.AuthenticationProtocolState;
 import com.sshtools.j2ssh.authentication.PasswordAuthenticationClient;
 import com.sshtools.j2ssh.authentication.PublicKeyAuthenticationClient;
 import com.sshtools.j2ssh.transport.IgnoreHostKeyVerification;
+import com.sshtools.j2ssh.transport.publickey.SshPrivateKey;
 import com.sshtools.j2ssh.transport.publickey.SshPrivateKeyFile;
 import net.sf.commons.ssh.auth.AuthenticationOptions;
 import net.sf.commons.ssh.auth.PasswordAuthenticationOptions;
@@ -101,7 +102,8 @@ public class J2sshConnectionFactory extends ConnectionFactory
         pac.setUsername(authOptions.login);
         pac.setKey(SshPrivateKeyFile.parse(new File(authOptions.keyfile))
                 .toPrivateKey(authOptions.phrase));
-
+        SshPrivateKey key;
+        key.
         try
         {
             int status = ssh.authenticate(pac);

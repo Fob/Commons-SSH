@@ -14,7 +14,7 @@ public interface Connection extends Container
 	void connect(boolean authenticate) throws ConnectionException,AuthenticationException,HostCheckingException;
 	void authenticate() throws AuthenticationException;
 	
-	PublicKey getHostCertificate();
+	PublicKey getHostKey();
 	
     boolean isConnected();
     boolean isConnecting();

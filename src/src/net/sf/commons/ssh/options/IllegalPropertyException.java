@@ -1,6 +1,6 @@
 package net.sf.commons.ssh.options;
 
-public class IllegalPropertyException extends Exception
+public class IllegalPropertyException extends RuntimeException
 {
 	private static final long serialVersionUID = -5852734633386383533L;
 

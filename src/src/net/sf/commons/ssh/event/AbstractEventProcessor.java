@@ -8,6 +8,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import net.sf.commons.ssh.common.EventProcessorThread;
 import net.sf.commons.ssh.common.Status;
 import net.sf.commons.ssh.errors.Error;
+import net.sf.commons.ssh.event.events.IncludeDefaultEvent;
+import net.sf.commons.ssh.event.events.PropertyChangedEvent;
 import net.sf.commons.ssh.event.events.SetPropertyEvent;
 import net.sf.commons.ssh.event.events.UpdateConfigurableEvent;
 import net.sf.commons.ssh.options.ContainerConfigurable;
@@ -130,16 +132,29 @@ public abstract class AbstractEventProcessor extends ContainerConfigurable imple
     @Override
     public void setProperty(String key, Object value)
     {
-        fire(new SetPropertyEvent(this,key,value,getProperty(key)));
+    	Object old = getProperty(key);
+        fire(new SetPropertyEvent(this,key,value,old));
         super.setProperty(key, value);
+        fire(new PropertyChangedEvent(this, key, getProperty(key), old));
     }
 
     @Override
     public void updateFrom(Properties properties) throws CloneNotSupportedException
     {
-        fire(new UpdateConfigurableEvent(this,properties,this));
+        fire(new UpdateConfigurableEvent(this,properties,this,false));
         super.updateFrom(properties);
+        fire(new UpdateConfigurableEvent(this,properties,this,true));
     }
+    
+    
+
+	@Override
+	public void includeDefault(Properties configurable)
+	{
+		fire(new IncludeDefaultEvent(this, configurable, this, false));
+		super.includeDefault(configurable);
+		fire(new IncludeDefaultEvent(this, configurable, this, true));
+	}
 
 	@Override
 	public EventHandler addListener(EventListener listener, EventFilter filter, HandlerType type)

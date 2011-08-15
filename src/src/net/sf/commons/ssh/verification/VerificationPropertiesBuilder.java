@@ -29,7 +29,7 @@ import net.sf.commons.ssh.options.TypeConverter;
 public class VerificationPropertiesBuilder extends PropertiesBuilder
 {
 	private static VerificationPropertiesBuilder instance = null;
-	@PropertyType(value = VerificationRepository.class, required = true)
+	@PropertyType(value = VerificationRepository.class)
 	public static final String KEY_VERIFICATION_REPOSITORY = "net.sf.commons.ssh.verification.repository";
 
 	protected VerificationPropertiesBuilder()

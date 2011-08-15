@@ -10,13 +10,15 @@ public class UpdateConfigurableEvent extends AbstractEvent
 {
     private Properties updatedBy;
     private Configurable config;
+    boolean post=false;
 
-    public UpdateConfigurableEvent(AbstractEventProcessor producer, Properties updatedBy, Configurable config)
+    public UpdateConfigurableEvent(AbstractEventProcessor producer, Properties updatedBy, Configurable config,boolean post)
     {
         super(producer);
         this.updatedBy = updatedBy;
         this.config = config;
         this.eventType = EventType.UPDATE_CONFIGURABLE;
+        this.post = post;
     }
 
     public Properties getUpdatedBy()
@@ -28,4 +30,11 @@ public class UpdateConfigurableEvent extends AbstractEvent
     {
         return config;
     }
+
+	public boolean isPost()
+	{
+		return post;
+	}
+    
+    
 }
