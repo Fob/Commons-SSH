@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Properties;
 import java.util.Set;
 
+import net.sf.commons.ssh.verification.VerificationRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -52,7 +53,7 @@ public abstract class ConnectionFactory
     {
         return ConnectionFactoryResolver.resolve(factory, requiredFeatures);
     }
-
+    public abstract void setVerificationRepository(VerificationRepository repository);
     /**
      * The timeout value for the key exchange
      * <p/>

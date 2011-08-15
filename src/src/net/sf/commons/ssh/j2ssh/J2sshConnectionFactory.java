@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.sshtools.j2ssh.transport.HostKeyVerification;
 import net.sf.commons.ssh.*;
 
 import com.sshtools.j2ssh.SshClient;
@@ -29,6 +30,7 @@ import com.sshtools.j2ssh.authentication.PasswordAuthenticationClient;
 import com.sshtools.j2ssh.authentication.PublicKeyAuthenticationClient;
 import com.sshtools.j2ssh.transport.IgnoreHostKeyVerification;
 import com.sshtools.j2ssh.transport.publickey.SshPrivateKeyFile;
+import net.sf.commons.ssh.verification.VerificationRepository;
 
 /**
  * @author Sergey Vidyuk (svidyuk at gmail dot com)
@@ -47,7 +49,7 @@ public class J2sshConnectionFactory extends ConnectionFactory
      * @since 1.0
      */
     private long kexTransferLimit = 1048576;
-
+    private HostKeyVerification repository= new IgnoreHostKeyVerification();
     /**
      * Creates new instance of {@link J2sshConnectionFactory}
      */
@@ -66,7 +68,7 @@ public class J2sshConnectionFactory extends ConnectionFactory
                                       PasswordAuthenticationOptions authOptions) throws IOException
     {
 
-        ssh.connect(host, port, new IgnoreHostKeyVerification());
+        ssh.connect(host, port, repository);
 
         PasswordAuthenticationClient pac = new PasswordAuthenticationClient();
         pac.setUsername(authOptions.login);
@@ -92,7 +94,7 @@ public class J2sshConnectionFactory extends ConnectionFactory
     private void connectUsingPublicKey(SshClient ssh, String host, int port,
                                        PublicKeyAuthenticationOptions authOptions) throws IOException
     {
-        ssh.connect(host, port, new IgnoreHostKeyVerification());
+        ssh.connect(host, port, repository);
 
         PublicKeyAuthenticationClient pac = new PublicKeyAuthenticationClient();
         pac.setUsername(authOptions.login);
@@ -129,6 +131,12 @@ public class J2sshConnectionFactory extends ConnectionFactory
     public long getKexTransferLimit()
     {
         return kexTransferLimit;
+    }
+
+    @Override
+    public void setVerificationRepository(VerificationRepository repository)
+    {
+        this.repository = new J2SSHVerificationRepository(repository);
     }
 
     protected Set getSupportedFeaturesImpl()

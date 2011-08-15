@@ -20,7 +20,9 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import ch.ethz.ssh2.ServerHostKeyVerifier;
 import net.sf.commons.ssh.*;
+import net.sf.commons.ssh.verification.VerificationRepository;
 
 /**
  * @since 1.0
@@ -28,6 +30,7 @@ import net.sf.commons.ssh.*;
  */
 public class GanymedConnectionFactory extends ConnectionFactory {
 
+    private ServerHostKeyVerifier verifier = null;
     /**
      * Creates new instance of {@link GanymedConnectionFactory}
      * 
@@ -51,7 +54,7 @@ public class GanymedConnectionFactory extends ConnectionFactory {
 	try {
 	    // establish connection
 	    connection = new ch.ethz.ssh2.Connection(host, port);
-	    connection.connect(null, getConnectTimeout(), getKexTimeout());
+	    connection.connect(verifier, getConnectTimeout(), getKexTimeout());
 
 	    boolean authResult = connection.authenticateWithPassword(
 		    authOptions.login, authOptions.password);
@@ -81,7 +84,8 @@ public class GanymedConnectionFactory extends ConnectionFactory {
 	try {
 	    // establish connection
 	    connection = new ch.ethz.ssh2.Connection(host, port);
-	    connection.connect(null, getConnectTimeout(), getKexTimeout());
+
+	    connection.connect(verifier, getConnectTimeout(), getKexTimeout());
 
 	    boolean authResult = connection.authenticateWithPublicKey(
 		    authOptions.login, new File(authOptions.keyfile),
@@ -102,6 +106,12 @@ public class GanymedConnectionFactory extends ConnectionFactory {
 	    throw e;
 	}
 
+    }
+
+    @Override
+    public void setVerificationRepository(VerificationRepository repository)
+    {
+        verifier = new GanymedVerification(repository);
     }
 
     protected Set getSupportedFeaturesImpl() {

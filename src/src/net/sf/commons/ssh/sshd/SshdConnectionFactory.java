@@ -25,8 +25,10 @@ import java.util.concurrent.TimeUnit;
 
 import net.sf.commons.ssh.*;
 
+import net.sf.commons.ssh.verification.VerificationRepository;
 import org.apache.sshd.ClientSession;
 import org.apache.sshd.SshClient;
+import org.apache.sshd.client.ServerKeyVerifier;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
 
@@ -40,6 +42,7 @@ public class SshdConnectionFactory extends ConnectionFactory
     public static final String PROCESSOR_COUNT = "net.sf.commons.ssh.sshd.SshdConnectionFactory.processorCount";
     public static final String THREAD_SAFE_ENABLE = "net.sf.commons.ssh.sshd.SshdConnectionFactory.threadSafeEnable";
     private static final Map<String,ClientHolder> clients = new ConcurrentHashMap<String,ClientHolder>();
+    private SSHDServerKeyVerifier verifier = null;
     /**
      * Creates new instance of {@link SshdConnectionFactory}
      */
@@ -96,6 +99,12 @@ public class SshdConnectionFactory extends ConnectionFactory
         }
     }
 
+    @Override
+    public void setVerificationRepository(VerificationRepository repository)
+    {
+        verifier = new SSHDServerKeyVerifier(repository);
+    }
+
     protected Set getSupportedFeaturesImpl()
     {
         final Set result = new HashSet();
@@ -110,7 +119,12 @@ public class SshdConnectionFactory extends ConnectionFactory
                                      AuthenticationOptions authOptions) throws IOException
     {
         ClientHolder sshClient = getClient();
-
+        if(verifier!=null)
+        {
+            ServerKeyVerifier current = sshClient.getClient().getServerKeyVerifier();
+            if(current == null || !(current instanceof SSHDServerKeyVerifier) || verifier.repository != ((SSHDServerKeyVerifier) current).repository)
+                sshClient.getClient().setServerKeyVerifier(verifier);
+        }
         ClientSession clientSession;
 
         if (authOptions instanceof PasswordAuthenticationOptions)

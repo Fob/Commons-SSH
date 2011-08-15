@@ -2,6 +2,7 @@ package net.sf.commons.ssh.sshj;
 
 
 import net.sf.commons.ssh.*;
+import net.sf.commons.ssh.verification.VerificationRepository;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -14,6 +15,13 @@ public class SSHJConnectionFactory extends ConnectionFactory
     public static final String SSHJCLIENT_CLASS="net.schmizz.sshj.SSHClient";
     public static final String SESSION_CLASS="net.schmizz.sshj.connection.channel.direct.Session";
     private Class clsSSHJClient;
+
+    @Override
+    public void setVerificationRepository(VerificationRepository repository)
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     @Override
     protected Set getSupportedFeaturesImpl()
     {
