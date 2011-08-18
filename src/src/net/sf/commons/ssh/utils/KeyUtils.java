@@ -20,9 +20,14 @@ import java.security.spec.RSAPublicKeySpec;
 
 public class KeyUtils
 {
-    	public static PublicKey getKeyFromBase64(byte[] keyBytes) throws InvalidKeySpecException, IOException, NoSuchAlgorithmException
+    public static PublicKey getKeyFromBase64(byte[] keyBytes) throws InvalidKeySpecException, IOException, NoSuchAlgorithmException
+    {
+        return getKeyFromBytes(Base64.decodeBase64(keyBytes));
+    }
+
+    public static PublicKey getKeyFromBytes(byte[] keyBytes) throws InvalidKeySpecException, IOException, NoSuchAlgorithmException
 	{
-		DataInputStream keyData = new DataInputStream(new ByteArrayInputStream(Base64.decodeBase64(keyBytes)));
+		DataInputStream keyData = new DataInputStream(new ByteArrayInputStream(keyBytes));
 		int length = keyData.readInt();
 		String alg = new String(readBytes(keyData, length));
 		alg = StringUtils.substringAfter(alg, "-").toLowerCase();

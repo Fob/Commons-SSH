@@ -26,7 +26,7 @@ public class LogUtils
     {
         if (log.isTraceEnabled())
         {
-            log.info(MessageFormat.format(message, objects));
+            log.trace(MessageFormat.format(message, objects));
         }
     }
 
@@ -34,7 +34,7 @@ public class LogUtils
     {
         if (log.isTraceEnabled())
         {
-            log.info(MessageFormat.format(message, objects), e);
+            log.trace(MessageFormat.format(message, objects), e);
         }
     }
 

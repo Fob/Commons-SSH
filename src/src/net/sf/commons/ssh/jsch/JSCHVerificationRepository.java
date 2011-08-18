@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.commons.ssh.utils.KeyUtils;
+import net.sf.commons.ssh.utils.LogUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -42,10 +43,10 @@ public class JSCHVerificationRepository implements HostKeyRepository
 	 */
 	public int check(String host, byte[] key)
 	{
-		//TODO check by bytes
 		try
 		{
-			PublicKey publicKey = KeyUtils.getKeyFromBase64(key);
+            LogUtils.trace(log,"host [{0}] key [{1}]",host,new String(key));
+			PublicKey publicKey = KeyUtils.getKeyFromBytes(key);
 			return repository.check(host, publicKey)?OK:NOT_INCLUDED;
 		}
 		catch (Exception e)

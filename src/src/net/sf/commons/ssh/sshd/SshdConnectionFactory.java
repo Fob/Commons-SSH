@@ -68,6 +68,11 @@ public class SshdConnectionFactory extends ConnectionFactory
             if(!connectFuture.isConnected())
                 throw new RuntimeException("connection failed",connectFuture.getException());
             log.trace("connected to device "+host+" successfully");
+            if(connectFuture.isCanceled())
+            {
+                log.trace("connection cancelled ");
+                throw new IOException("connection was cancelled");
+            }
             ClientSession clientSession = connectFuture.getSession();
 
             //int ret = ClientSession.WAIT_AUTH;

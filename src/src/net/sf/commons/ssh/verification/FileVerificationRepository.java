@@ -8,6 +8,7 @@ import java.security.PublicKey;
 import java.util.Iterator;
 
 import net.sf.commons.ssh.utils.IOUtils;
+import net.sf.commons.ssh.utils.LogUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,9 +33,11 @@ public class FileVerificationRepository implements VerificationRepository
 	 */
 	public FileVerificationRepository(String filePath) throws FileSystemException
 	{
-		super();
-		this.filePath = filePath;
-		file = VFS.getManager().resolveFile(new File("."), filePath);
+		LogUtils.trace(log,"FileVerificationRepository():: filePath = {0}",filePath);
+        this.filePath = filePath;
+        File baseFile = new File(".");
+        LogUtils.trace(log,"create file repository from baseFile {0} repository {1}",baseFile.getAbsolutePath(),filePath);
+        file = VFS.getManager().resolveFile(baseFile,filePath);
 	}
 
 	protected BufferedReader getReader() throws FileSystemException

@@ -26,7 +26,7 @@ public class J2SSHVerificationRepository implements HostKeyVerification
 
         try
         {
-            return repository.check(s, KeyUtils.getKeyFromBase64(sshPublicKey.getEncoded()));
+            return repository.check(s, KeyUtils.getKeyFromBytes(sshPublicKey.getEncoded()));
         }
         catch (Exception e)
         {
