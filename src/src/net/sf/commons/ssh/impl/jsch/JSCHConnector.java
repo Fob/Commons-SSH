@@ -43,7 +43,8 @@ import net.sf.commons.ssh.verification.VerificationRepository;
 @SupportedFeatures(
 	{
 			Feature.SSH2, Feature.SYNCHRONOUS, Feature.AUTH_CREDENTIALS, Feature.AUTH_PUBLICKEY,
-			Feature.CONNECTION_TIMEOUT, Feature.SOCKET_TIMEOUT, Feature.SESSION_SHELL
+			Feature.CONNECTION_TIMEOUT, Feature.SOCKET_TIMEOUT, Feature.SESSION_SHELL,Feature.ERROR_STREAM,
+			Feature.AUTH_NONE, Feature.AUTHENTICATE_TIMEOUT, Feature.AUTHENTICATE_TIMEOUT
 	})
 public class JSCHConnector extends AbstractConnector
 {
@@ -78,7 +79,6 @@ public class JSCHConnector extends AbstractConnector
 			}, new EventTypeFilter(EventType.SET_PROPERTY));
 		jsch = new JSch();
 		setupVerification();
-
 		this.addListener(
 				new EventListener()
 					{

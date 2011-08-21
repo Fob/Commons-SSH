@@ -11,6 +11,7 @@ import java.security.PublicKey;
 import java.util.Iterator;
 
 import net.sf.commons.ssh.common.IOUtils;
+import net.sf.commons.ssh.common.LogUtils;
 import net.sf.commons.ssh.common.UnexpectedRuntimeException;
 
 import org.apache.commons.lang.StringUtils;
@@ -37,9 +38,11 @@ public class FileVerificationRepository implements VerificationRepository
 	 */
 	public FileVerificationRepository(String filePath) throws FileSystemException
 	{
-		super();
-		this.filePath = filePath;
-		file = VFS.getManager().resolveFile(new File("."), filePath);
+		LogUtils.trace(log,"FileVerificationRepository():: filePath = {0}",filePath);
+        this.filePath = filePath;
+        File baseFile = new File(".");
+        LogUtils.trace(log,"create file repository from baseFile {0} repository {1}",baseFile.getAbsolutePath(),filePath);
+        file = VFS.getManager().resolveFile(baseFile,filePath);
 	}
 
 	protected BufferedReader getReader() throws FileSystemException
@@ -58,7 +61,7 @@ public class FileVerificationRepository implements VerificationRepository
 	 * @see net.sf.commons.ssh.verification.VerificationRepository#check(java.lang.String,
 	 *      java.security.PublicKey)
 	 */
-	@Override
+
 	public boolean check(String host, PublicKey key)
 	{
 		Iterator<VerificationEntry> iterator = getIterator(host);
@@ -74,7 +77,7 @@ public class FileVerificationRepository implements VerificationRepository
 	/**
 	 * @see net.sf.commons.ssh.verification.VerificationRepository#getIterator()
 	 */
-	@Override
+
 	public Iterator<VerificationEntry> getIterator()
 	{
 		final BufferedReader reader;
@@ -90,7 +93,7 @@ public class FileVerificationRepository implements VerificationRepository
 		return new Iterator<VerificationEntry>()
 			{
 
-				@Override
+
 				public boolean hasNext()
 				{
 					try
@@ -104,7 +107,7 @@ public class FileVerificationRepository implements VerificationRepository
 					}
 				}
 
-				@Override
+
 				public VerificationEntry next()
 				{
 					try
@@ -120,7 +123,6 @@ public class FileVerificationRepository implements VerificationRepository
 					}
 				}
 
-				@Override
 				public void remove()
 				{
 					throw new UnsupportedOperationException();
@@ -140,7 +142,6 @@ public class FileVerificationRepository implements VerificationRepository
 	/**
 	 * @see net.sf.commons.ssh.verification.VerificationRepository#getIterator(java.lang.String)
 	 */
-	@Override
 	public Iterator<VerificationEntry> getIterator(String host)
 	{
 		final BufferedReader reader;
@@ -156,7 +157,6 @@ public class FileVerificationRepository implements VerificationRepository
 		return new Iterator<VerificationEntry>()
 			{
 
-				@Override
 				public boolean hasNext()
 				{
 					try
@@ -170,7 +170,6 @@ public class FileVerificationRepository implements VerificationRepository
 					}
 				}
 
-				@Override
 				public VerificationEntry next()
 				{
 					try
@@ -182,11 +181,10 @@ public class FileVerificationRepository implements VerificationRepository
 					}
 					catch (Exception e)
 					{
-						throw new UnexpectedRuntimeException("bad file format or file", e);
+						throw new RuntimeException("bad file format or file", e);
 					}
 				}
 
-				@Override
 				public void remove()
 				{
 					throw new UnsupportedOperationException();

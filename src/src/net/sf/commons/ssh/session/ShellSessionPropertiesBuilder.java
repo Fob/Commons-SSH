@@ -3,25 +3,22 @@ package net.sf.commons.ssh.session;
 
 import net.sf.commons.ssh.options.*;
 
-public class ShellSessionPropertiesBuilder extends PropertiesBuilder
+public class ShellSessionPropertiesBuilder extends SessionPropertiesBuilder
 {
     private static ShellSessionPropertiesBuilder instance = null;
 
-    @Required
-    @PropertyType(Integer.class)
+    @PropertyType(value = Integer.class,required = true)
     public static final String KEY_TERMINAL_COLS="net.sf.commons.ssh.options.ShellSessionOptionsBuilder.terminalCols";
-    @Required
-    @PropertyType(Integer.class)
+    @PropertyType(value = Integer.class, required = true)
     public static final String KEY_TERMINAL_HEIGHT="net.sf.commons.ssh.options.ShellSessionOptionsBuilder.terminalHeight";
-    @Required
-    @PropertyType(Integer.class)
+    @PropertyType(value = Integer.class, required = true)
     public static final String KEY_TERMINAL_ROWS="net.sf.commons.ssh.options.ShellSessionOptionsBuilder.terminalRows";
-    @Required
-    @PropertyType(String.class)
+    @PropertyType(value = String.class, required = true)
     public static final String KEY_TERMINAL_TYPE="net.sf.commons.ssh.options.ShellSessionOptionsBuilder.terminalType";
-    @Required
-    @PropertyType(Integer.class)
+    @PropertyType(value = Integer.class, required = true)
     public static final String KEY_TERMINAL_WIDTH="net.sf.commons.ssh.options.ShellSessionOptionsBuilder.terminalWidth";
+    @PropertyType(value = Boolean.class,required = true)
+    public static final String KEY_SEPARATE_ERROR_STREAM = "net.sf.commons.ssh.options.ShellSessionOptionsBuilder.errorStream";
 
     public synchronized static ShellSessionPropertiesBuilder getInstance()
     {
@@ -39,6 +36,7 @@ public class ShellSessionPropertiesBuilder extends PropertiesBuilder
         defaultProperties.put(KEY_TERMINAL_ROWS,Integer.valueOf(24));
         defaultProperties.put(KEY_TERMINAL_TYPE,"ansi");
         defaultProperties.put(KEY_TERMINAL_WIDTH, Integer.valueOf(0));
+        defaultProperties.put(KEY_SEPARATE_ERROR_STREAM, false);
     }
 
     public int getTerminalCols(Properties opt)
@@ -89,5 +87,15 @@ public class ShellSessionPropertiesBuilder extends PropertiesBuilder
     public void setTerminalWidth(Configurable options,int terminalWidth)
     {
         options.setProperty(KEY_TERMINAL_WIDTH,terminalWidth);
+    }
+    
+    public void setSeparateErrorStream(Configurable config,boolean value)
+    {
+    	setProperty(config, KEY_SEPARATE_ERROR_STREAM, value);
+    }
+    
+    public boolean isSeparateErrorStream(Properties config)
+    {
+    	return (Boolean)getProperty(config, KEY_SEPARATE_ERROR_STREAM);    	
     }
 }

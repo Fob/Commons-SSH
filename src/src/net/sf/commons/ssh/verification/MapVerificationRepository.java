@@ -4,7 +4,6 @@
 package net.sf.commons.ssh.verification;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -72,16 +71,10 @@ public class MapVerificationRepository implements VerificationRepository
 		this(new InputStreamReader(stream));
 	}
 
-	public MapVerificationRepository(String file) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException
-	{
-		this(VFS.getManager().resolveFile(new File("."), file).getContent().getInputStream());
-	}
-
 	/**
 	 * @see net.sf.commons.ssh.verification.VerificationRepository#check(java.lang.String,
 	 *      java.security.PublicKey)
 	 */
-	@Override
 	public boolean check(String host, PublicKey key)
 	{
 		List<PublicKey> keys = map.get(host.toLowerCase());
@@ -96,7 +89,6 @@ public class MapVerificationRepository implements VerificationRepository
 	/**
 	 * @see net.sf.commons.ssh.verification.VerificationRepository#getIterator()
 	 */
-	@Override
 	public Iterator<VerificationEntry> getIterator()
 	{
 		Map<PublicKey, Set<String>> mapStructure = new HashMap<PublicKey, Set<String>>();
@@ -118,13 +110,11 @@ public class MapVerificationRepository implements VerificationRepository
 		return new Iterator<VerificationEntry>()
 			{
 
-				@Override
 				public boolean hasNext()
 				{
 					return iterator.hasNext();
 				}
 
-				@Override
 				public VerificationEntry next()
 				{
 					Entry<PublicKey, Set<String>> entry = iterator.next();
@@ -132,7 +122,6 @@ public class MapVerificationRepository implements VerificationRepository
 					return new VerificationEntry(entry.getValue(), entry.getKey());
 				}
 
-				@Override
 				public void remove()
 				{
 					throw new UnsupportedOperationException();
@@ -143,7 +132,6 @@ public class MapVerificationRepository implements VerificationRepository
 	/**
 	 * @see net.sf.commons.ssh.verification.VerificationRepository#getIterator(java.lang.String)
 	 */
-	@Override
 	public Iterator<VerificationEntry> getIterator(String host)
 	{
 		Map<PublicKey, Set<String>> mapStructure = new HashMap<PublicKey, Set<String>>();
@@ -162,13 +150,12 @@ public class MapVerificationRepository implements VerificationRepository
 		return new Iterator<VerificationEntry>()
 			{
 
-				@Override
+
 				public boolean hasNext()
 				{
 					return iterator.hasNext();
 				}
 
-				@Override
 				public VerificationEntry next()
 				{
 					Entry<PublicKey, Set<String>> entry = iterator.next();
@@ -176,12 +163,12 @@ public class MapVerificationRepository implements VerificationRepository
 					return new VerificationEntry(entry.getValue(), entry.getKey());
 				}
 
-				@Override
 				public void remove()
 				{
 					throw new UnsupportedOperationException();
 				}
 			};
 	}
+
 
 }

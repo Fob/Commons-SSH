@@ -7,12 +7,16 @@ package net.sf.commons.ssh.impl.jsch;
 import java.security.PublicKey;
 import java.util.Set;
 
+import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
 import net.sf.commons.ssh.auth.AuthenticationMethod;
 import net.sf.commons.ssh.auth.PasswordPropertiesBuilder;
+import net.sf.commons.ssh.auth.PublicKeyPropertiesBuilder;
+import net.sf.commons.ssh.common.KeyUtils;
+import net.sf.commons.ssh.common.LogUtils;
 import net.sf.commons.ssh.common.Status;
 import net.sf.commons.ssh.common.UnexpectedRuntimeException;
 import net.sf.commons.ssh.connection.AbstractConnection;
@@ -31,7 +35,6 @@ import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.SFTPSession;
 import net.sf.commons.ssh.session.ShellSession;
-import net.sf.commons.ssh.verification.VerificationEntry;
 
 
 /**
@@ -84,9 +87,18 @@ public class JSCHConnection extends AbstractConnection
 	@Override
 	public ShellSession createShellSession()
 	{
-
-		// TODO Auto-generated method stub
-		return null;
+		ChannelShell channel;
+		try
+		{
+			channel = (ChannelShell) connection.openChannel("shell");
+		}
+		catch (JSchException e)
+		{
+			throw new UnexpectedRuntimeException(e.getMessage(),e);
+		}
+		JSCHShellSession session = new JSCHShellSession(this, channel);
+		registerChild(session);
+		return session;
 	}
 
 	/*
@@ -97,8 +109,7 @@ public class JSCHConnection extends AbstractConnection
 	@Override
 	public ExecSession createExecSession()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("jsch exec session not implemented");
 	}
 
 	/*
@@ -109,8 +120,7 @@ public class JSCHConnection extends AbstractConnection
 	@Override
 	public SFTPSession createSFTPSession()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("jsch sftp session not implemented");
 	}
 
 	/*
@@ -139,7 +149,7 @@ public class JSCHConnection extends AbstractConnection
 					+ Status.CONNECTED);
 		try
 		{
-			return VerificationEntry.getKeyFromBase64(connection.getHostKey().getKey().getBytes());
+			return KeyUtils.getKeyFromBase64(connection.getHostKey().getKey().getBytes());
 		}
 		catch (Exception e)
 		{
@@ -183,15 +193,27 @@ public class JSCHConnection extends AbstractConnection
 				connection.setPassword(PasswordPropertiesBuilder.getInstance().getPassword(this));
 				break;
 			case PUBLICKEY:
-				//TODO
+				try
+				{
+					PublicKeyPropertiesBuilder.getInstance().verify(this);
+				}
+				catch (IllegalPropertyException e)
+				{
+					throw new AuthenticationException("check required parameters for " + method
+							+ " authentication method");
+				}
+				
+				jsch.addIdentity(PublicKeyPropertiesBuilder.getInstance().getKey(this).toString()
+						,PublicKeyPropertiesBuilder.getInstance().getKey(this) , null, PublicKeyPropertiesBuilder.getInstance().getPassphrase(this).getBytes());
+				connection = jsch.getSession(cpb.getHost(this), PublicKeyPropertiesBuilder.getInstance().getLogin(this));
 				setupCommonConnectionParameters();
 				break;
 			default:
 				throw new UnsupportedOperationException("JSCH library doesn't support " + method + " authentication");
 			}
-			Long connectTimeout = ConnectionPropertiesBuilder.getInstance().getConnectTimeout(this);
-			if (connectTimeout != null)
-				connection.connect(connectTimeout.intValue());
+			Long authenticateTimeout = ConnectionPropertiesBuilder.getInstance().getAuthenticateTimeout(this);
+			if (authenticateTimeout != null)
+				connection.connect(authenticateTimeout.intValue());
 			else
 				connection.connect();
 		}
@@ -203,7 +225,7 @@ public class JSCHConnection extends AbstractConnection
 		fire(new ConnectedEvent(this));
 		fire(new AuthenticatedEvent(this));
 	}
-
+ 
 	private void setupCommonConnectionParameters() throws JSchException
 	{
 		Long soTimeout = ConnectionPropertiesBuilder.getInstance().getSoTimeout(this);
@@ -218,9 +240,11 @@ public class JSCHConnection extends AbstractConnection
 		int port = ConnectionPropertiesBuilder.getInstance().getPort(this);
 		connection.setPort(port);
 		Set<String> libraryOptions = InitialPropertiesBuilder.getInstance().getLibraryOptions(this);
+		LogUtils.trace(log, "push options {0} to library", libraryOptions);
 		for(String option: libraryOptions)
 		{
 			Object value = this.getProperty(option);
+			LogUtils.trace(log, "push {0}={1}", option,value);
 			if(value ==null || !(value instanceof String))
 				continue;
 			connection.setConfig(option, (String)value);

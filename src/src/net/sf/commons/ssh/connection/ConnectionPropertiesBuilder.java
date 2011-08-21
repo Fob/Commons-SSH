@@ -22,6 +22,8 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
     public static final String KEY_HOST = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.host";
 	@PropertyType(value = AuthenticationMethod.class, required = true)
 	public static final String KEY_AUTHENTICATION_METHOD = "net.sf.commons.ssh.auth.authenticationMethod";
+    @PropertyType(Long.class)
+    public static final String KEY_AUTHENTICATE_TIMEOUT = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.authTimeout";
 
     public ConnectionPropertiesBuilder()
     {
@@ -108,5 +110,15 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
 	{
 		return (AuthenticationMethod) getProperty(config, KEY_AUTHENTICATION_METHOD);		
 	}
+	
+    public Long getAuthenticateTimeout(Properties opt)
+    {
+        return (Long) getProperty(opt, KEY_AUTHENTICATE_TIMEOUT);
+    }
+
+    public void setAuthenticateTimeout(Configurable opt, Long value)
+    {
+        setProperty(opt,KEY_AUTHENTICATE_TIMEOUT, value);
+    }
     
 }

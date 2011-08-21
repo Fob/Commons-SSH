@@ -9,18 +9,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.Writer;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
@@ -33,6 +36,7 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
 import org.apache.sshd.common.util.SecurityUtils;
 import org.bouncycastle.openssl.PEMReader;
+import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.openssl.PasswordFinder;
 
 /**
@@ -42,15 +46,22 @@ import org.bouncycastle.openssl.PasswordFinder;
  */
 public class KeyUtils
 {
-	public static PublicKey getKeyFromBase64(byte[] keyBytes) throws InvalidKeySpecException, IOException, NoSuchAlgorithmException
+	public static PublicKey getKeyFromBase64(byte[] keyBytes) throws InvalidKeySpecException, IOException,
+			NoSuchAlgorithmException
 	{
-		DataInputStream keyData = new DataInputStream(new ByteArrayInputStream(Base64.decodeBase64(keyBytes)));
+		return getKeyFromBytes(Base64.decodeBase64(keyBytes));
+	}
+
+	public static PublicKey getKeyFromBytes(byte[] keyBytes) throws InvalidKeySpecException, IOException,
+			NoSuchAlgorithmException
+	{
+		DataInputStream keyData = new DataInputStream(new ByteArrayInputStream(keyBytes));
 		int length = keyData.readInt();
 		String alg = new String(readBytes(keyData, length));
 		alg = StringUtils.substringAfter(alg, "-").toLowerCase();
-		if("dss".equals(alg))
+		if ("dss".equals(alg))
 			alg = "dsa";
-		
+
 		KeyFactory keyFactory = KeyFactory.getInstance(alg.toUpperCase());
 		KeySpec spec;
 		if ("rsa".equals(alg))
@@ -75,13 +86,15 @@ public class KeyUtils
 
 			spec = new DSAPublicKeySpec(y, p, q, g);
 		}
-		return keyFactory.generatePublic(spec);				
+		return keyFactory.generatePublic(spec);
 	}
-	
-	public static PublicKey getKeyFromBase64(String keyBytes) throws InvalidKeySpecException, IOException, NoSuchAlgorithmException
+
+	public static PublicKey getKeyFromBase64(String keyBytes) throws InvalidKeySpecException, IOException,
+			NoSuchAlgorithmException
 	{
 		return getKeyFromBase64(keyBytes.getBytes());
 	}
+
 	public static String encodeKeyToBase64(PublicKey publicKey)
 	{
 		ByteArrayOutputStream keyBytes = new ByteArrayOutputStream();
@@ -125,21 +138,25 @@ public class KeyUtils
 		}
 		return new String(Base64.encodeBase64(keyBytes.toByteArray()));
 	}
-	
-	public static PublicKey getKeyFromPubFile(Reader reader) throws InvalidKeySpecException, IOException, NoSuchAlgorithmException
+
+	public static PublicKey getKeyFromPubFile(Reader reader) throws InvalidKeySpecException, IOException,
+			NoSuchAlgorithmException
 	{
 		BufferedReader bReader = new BufferedReader(reader);
 		String line = bReader.readLine();
 		line = StringUtils.substringAfter(line, " ");
 		line = StringUtils.substringBefore(line, " ");
-		return getKeyFromBase64(line.getBytes());				
+		return getKeyFromBase64(line.getBytes());
 	}
-	public static PublicKey getKeyFromPubFile(InputStream stream) throws InvalidKeySpecException, IOException, NoSuchAlgorithmException
+
+	public static PublicKey getKeyFromPubFile(InputStream stream) throws InvalidKeySpecException, IOException,
+			NoSuchAlgorithmException
 	{
 		return getKeyFromPubFile(new InputStreamReader(stream));
 	}
-	
-	public static PublicKey getKeyFromPubFile(String file) throws InvalidKeySpecException, IOException, NoSuchAlgorithmException
+
+	public static PublicKey getKeyFromPubFile(String file) throws InvalidKeySpecException, IOException,
+			NoSuchAlgorithmException
 	{
 		FileObject fileObject = VFS.getManager().resolveFile(new File("."), file);
 		InputStream st = fileObject.getContent().getInputStream();
@@ -152,36 +169,35 @@ public class KeyUtils
 			IOUtils.close(st);
 		}
 	}
-	
-	public static PrivateKey getPrivateKeyFromStream(InputStream stream,final String passphrase) throws IOException
+
+	public static KeyPair getPrivateKeyFromStream(InputStream stream, final String passphrase) throws IOException
 	{
-		if(!SecurityUtils.isBouncyCastleRegistered())
+		if (!SecurityUtils.isBouncyCastleRegistered())
 			return null;
 		PEMReader reader;
-		if(passphrase == null)
+		if (passphrase == null)
 			reader = new PEMReader(new InputStreamReader(stream));
 		else
-			reader = new PEMReader(new InputStreamReader(stream),new PasswordFinder()
+			reader = new PEMReader(new InputStreamReader(stream), new PasswordFinder()
 				{
-					
+
 					@Override
 					public char[] getPassword()
 					{
 						return passphrase.toCharArray();
 					}
 				});
-		KeyPair keyPair = (KeyPair) reader.readObject();
-		return keyPair.getPrivate();
+		return (KeyPair) reader.readObject();
 	}
-	
-	public static PrivateKey getPrivateKeyFromBytes(byte[] bytes,String passphrase) throws IOException
+
+	public static KeyPair getPrivateKeyFromBytes(byte[] bytes, String passphrase) throws IOException
 	{
-		return getPrivateKeyFromStream(new ByteArrayInputStream(bytes), passphrase);				
+		return getPrivateKeyFromStream(new ByteArrayInputStream(bytes), passphrase);
 	}
-	
-	public static PrivateKey getPrivateKeyFromFile(String file,String passphrase) throws IOException
+
+	public static KeyPair getPrivateKeyFromFile(String file, String passphrase) throws IOException
 	{
-		
+
 		FileObject fileObject = VFS.getManager().resolveFile(new File("."), file);
 		InputStream st = fileObject.getContent().getInputStream();
 		try
@@ -191,33 +207,41 @@ public class KeyUtils
 		finally
 		{
 			IOUtils.close(st);
-		}			
+		}
 	}
-	
-	protected static byte[] readBytes(InputStream stream,int len) throws IOException
+
+	protected static byte[] readBytes(InputStream stream, int len) throws IOException
 	{
 		byte[] buffer = new byte[len];
 		stream.read(buffer);
 		return buffer;
 	}
+
 	private static BigInteger readBigInteger(int length, InputStream stream) throws IOException
 	{
 		byte[] buffer = new byte[length];
 		stream.read(buffer);
 		return new BigInteger(buffer);
 	}
-	
-	public static void main(String[] args) throws InvalidKeySpecException, NoSuchAlgorithmException, IOException
+
+	public static byte[] serializePrivateKey(PrivateKey key) throws IOException
 	{
-		File f = new File("/home/fob/.ssh/id_rsa.pubt");
-		//PublicKey key = getKeyFromPubFile("/home/fob/.ssh/id_rsa.pub");
-		//KeyPair[] pairs = new FileKeyPairProvider(new String[]{"/home/fob/.ssh/id_rsa"}).loadKeys();
-		if(SecurityUtils.isBouncyCastleRegistered())
-		{
-			PEMReader reader = new PEMReader(new InputStreamReader(new FileInputStream(f)));
-			System.out.println(reader.readObject());
-		}
-		
-		//System.out.println(pairs[0].getPrivate());
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		serializePrivateKey(key, new OutputStreamWriter(stream));
+		return stream.toByteArray();
+	}
+
+	public static void serializePrivateKey(PrivateKey key, Writer writer) throws IOException
+	{
+		PEMWriter pemWriter = new PEMWriter(writer);
+		pemWriter.writeObject(key);
+		pemWriter.flush();
+	}
+	
+	public static void serializePrivateKey(PrivateKey key, Writer writer,char[] password,String alg) throws IOException
+	{
+		PEMWriter pemWriter = new PEMWriter(writer);
+		pemWriter.writeObject(key,alg,password,new SecureRandom());
+		pemWriter.flush();
 	}
 }

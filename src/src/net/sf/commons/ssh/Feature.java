@@ -19,5 +19,6 @@ public enum Feature
     SYNCHRONOUS,
     ERROR_STREAM,
     SSH1,
-    SSH2;
+    SSH2,
+    CONNECT_WITHOUT_AUTHENTICATE;
 }

@@ -10,5 +10,7 @@ public enum EventType
     CLOSING,
     CLOSED,
     CONNECTED,
-    AUTHENTICATED
+    AUTHENTICATED,
+    OPENNED,
+    READ_AVAILABLE;
 }

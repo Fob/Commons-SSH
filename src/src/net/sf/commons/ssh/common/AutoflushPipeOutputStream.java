@@ -15,6 +15,8 @@ public final class AutoflushPipeOutputStream extends PipedOutputStream {
 
     private static final Log log = LogFactory
 	    .getLog(AutoflushPipeOutputStream.class);
+    
+    private Runnable action = null;
 
     private static String toString(byte[] a, int off, int len) {
 	if (a == null)
@@ -69,6 +71,18 @@ public final class AutoflushPipeOutputStream extends PipedOutputStream {
 
 	super.write(b, off, len);
 	super.flush();
+	if(action!=null)
+		action.run();
     }
 
+	public Runnable getAction()
+	{
+		return action;
+	}
+
+	public void setAction(Runnable action)
+	{
+		this.action = action;
+	}
+ 
 }

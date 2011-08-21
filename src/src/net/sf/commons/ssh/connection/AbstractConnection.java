@@ -88,8 +88,7 @@ public abstract class AbstractConnection extends AbstractContainer<Session> impl
 		synchronized (statusLock)
 		{
 			if (status == Status.CONNECTING || status == Status.AUTHENTICATING || status == Status.INPROGRESS
-					|| status == Status.CONNECTED || status == Status.AUTHENTICATED
-					|| status == Status.CHECKED)
+					|| status == Status.CONNECTED || status == Status.AUTHENTICATED)
 			{
 				LogUtils.warn(log, "connection {0} already opening", this);
 				return;

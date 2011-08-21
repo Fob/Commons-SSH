@@ -105,7 +105,7 @@ public abstract class AbstractErrorHolder extends AbstractClosable implements Er
 	}
 
 	@Override
-	protected void pushError(Error error)
+	public void pushError(Error error)
 	{
         fire(new ErrorEvent(this,error));
 		synchronized (errorLock)
