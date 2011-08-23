@@ -17,6 +17,7 @@ package net.sf.commons.ssh.sshd;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.security.PublicKey;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -117,6 +118,7 @@ public class SshdConnectionFactory extends ConnectionFactory
         result.add(Features.SESSION_EXEC);
         result.add(Features.SESSION_SHELL);
         result.add(Features.CONNECTION_TIMEOUT);
+        result.add(Features.GET_PUBLIC_KEY);
         return result;
     }
 
@@ -145,6 +147,54 @@ public class SshdConnectionFactory extends ConnectionFactory
         }
 
         return new SshdConnection(sshClient, clientSession);
+    }
+
+    @Override
+    public PublicKey getPublicKey(String host, int port) throws Exception
+    {
+        ClientHolder sshClient = getClient();
+        try
+        {
+            GetPublicKeyVerifier verifier;
+            ServerKeyVerifier sverifier = sshClient.getClient().getServerKeyVerifier();
+            if(sverifier instanceof GetPublicKeyVerifier)
+                verifier = (GetPublicKeyVerifier) sverifier;
+            else
+            {
+                verifier = new GetPublicKeyVerifier();
+                sshClient.getClient().setServerKeyVerifier(verifier);
+            }
+            ConnectFuture connectFuture = sshClient.getClient().connect(host, port);
+            if (!connectFuture.await(getConnectTimeout() == 0 ? 5 * 60000 : getConnectTimeout(), TimeUnit.MILLISECONDS))
+            {
+                if (connectFuture.getException() == null)
+                {
+                    throw new SocketTimeoutException("connection timeout");
+                }
+                else
+                {
+                    throw new RuntimeException("connection timeout", connectFuture.getException());
+                }
+            }
+            if (!connectFuture.isConnected())
+            {
+                throw new RuntimeException("connection failed", connectFuture.getException());
+            }
+            log.trace("connected to device " + host + " successfully");
+            if (connectFuture.isCanceled())
+            {
+                log.trace("connection cancelled ");
+                throw new IOException("connection was cancelled");
+            }
+
+            PublicKey result = verifier.getKey(host);
+            connectFuture.cancel();
+            return result;
+        }
+        finally
+        {
+            sshClient.close();
+        }
     }
 
     protected ClientHolder getClient()

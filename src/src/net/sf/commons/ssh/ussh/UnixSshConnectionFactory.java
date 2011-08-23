@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
 import java.net.InetSocketAddress;
+import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -41,6 +42,13 @@ public class UnixSshConnectionFactory extends ConnectionFactory
     {
         return connectUsingPassword(host,port, (PasswordAuthenticationOptions) authOptions);
     }
+
+    @Override
+    public PublicKey getPublicKey(String host, int port) throws Exception
+    {
+        throw new UnsupportedOperationException("can't get publick key without authenticate");
+    }
+
     private void writeRepository(String host,int port,OutputStream stream)
     {
         Iterator<VerificationEntry> itr = repository.getIterator(host);

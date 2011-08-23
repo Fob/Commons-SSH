@@ -17,11 +17,13 @@ package net.sf.commons.ssh.ganymed;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.PublicKey;
 import java.util.HashSet;
 import java.util.Set;
 
 import ch.ethz.ssh2.ServerHostKeyVerifier;
 import net.sf.commons.ssh.*;
+import net.sf.commons.ssh.utils.KeyUtils;
 import net.sf.commons.ssh.verification.VerificationRepository;
 
 /**
@@ -141,6 +143,21 @@ public class GanymedConnectionFactory extends ConnectionFactory {
 	}
 
 	return new GanymedConnection(connection);
+    }
+
+    @Override
+    public PublicKey getPublicKey(String host, int port) throws Exception
+    {
+        ch.ethz.ssh2.Connection connection = new ch.ethz.ssh2.Connection(host, port);
+        try
+        {
+            connection.connect(null, getConnectTimeout(), getKexTimeout());
+            return KeyUtils.getKeyFromBytes(connection.getConnectionInfo().serverHostKey);
+        }
+        finally
+        {
+            connection.close();
+        }
     }
 
 }

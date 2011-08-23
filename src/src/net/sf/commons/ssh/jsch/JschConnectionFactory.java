@@ -18,6 +18,7 @@ package net.sf.commons.ssh.jsch;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.security.PublicKey;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
@@ -169,6 +170,12 @@ public class JschConnectionFactory extends ConnectionFactory {
 
 	//return new JschConnection(getSoTimeout(), connection);
         return new JschConnection(0, connection);
+    }
+
+    @Override
+    public PublicKey getPublicKey(String host, int port) throws Exception
+    {
+        throw new UnsupportedOperationException("can't get publick key without authenticate");
     }
 
 }

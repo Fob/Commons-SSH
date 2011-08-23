@@ -6,6 +6,7 @@ import net.sf.commons.ssh.verification.VerificationRepository;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -55,6 +56,12 @@ public class SSHJConnectionFactory extends ConnectionFactory
             throw new RuntimeException(e);
         }
         return new SSHJConnection(client);
+    }
+
+    @Override
+    public PublicKey getPublicKey(String host, int port) throws Exception
+    {
+        throw new UnsupportedOperationException("can't get publick key without authenticate");
     }
 
     private void connectUsingPassword(Object client,PasswordAuthenticationOptions authOptions) throws NoSuchMethodException, InvocationTargetException,

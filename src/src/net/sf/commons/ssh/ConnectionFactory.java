@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketOptions;
 import java.net.SocketTimeoutException;
+import java.security.PublicKey;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.Set;
@@ -335,4 +336,7 @@ public abstract class ConnectionFactory
     {
         properties.setProperty(key,value);
     }
+
+    public abstract PublicKey getPublicKey(String host,int port) throws Exception;
+
 }

@@ -17,6 +17,7 @@ package net.sf.commons.ssh.j2ssh;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.PublicKey;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,6 +31,7 @@ import com.sshtools.j2ssh.authentication.PasswordAuthenticationClient;
 import com.sshtools.j2ssh.authentication.PublicKeyAuthenticationClient;
 import com.sshtools.j2ssh.transport.IgnoreHostKeyVerification;
 import com.sshtools.j2ssh.transport.publickey.SshPrivateKeyFile;
+import net.sf.commons.ssh.utils.KeyUtils;
 import net.sf.commons.ssh.verification.VerificationRepository;
 
 /**
@@ -182,6 +184,21 @@ public class J2sshConnectionFactory extends ConnectionFactory
         connection.setSendIgnore(isSendIgnore());
 
         return new J2sshConnection(connection);
+    }
+
+    @Override
+    public PublicKey getPublicKey(String host, int port) throws Exception
+    {
+        SshClient connection = new SshClient();
+        try
+        {
+            connection.connect(host, port, new IgnoreHostKeyVerification());
+            return KeyUtils.getKeyFromBytes(connection.getServerHostKey().getEncoded());
+        }
+        finally
+        {
+            connection.disconnect();
+        }
     }
 
     /**

@@ -53,4 +53,5 @@ public interface Features {
 
     final String SOCKET_TIMEOUT = "SocketTimeout";
     final String CONNECTION_TIMEOUT = "ConnectionTimeout";
+    final String GET_PUBLIC_KEY = "getPublicKey";
 }
