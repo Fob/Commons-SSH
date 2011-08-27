@@ -5,9 +5,15 @@ import net.sf.commons.ssh.connector.Connector;
 import net.sf.commons.ssh.connector.SupportedFeatures;
 import net.sf.commons.ssh.directory.Description;
 import net.sf.commons.ssh.directory.Directory;
+import net.sf.commons.ssh.options.Configurable;
+import net.sf.commons.ssh.options.InitialPropertiesBuilder;
+import net.sf.commons.ssh.options.MapConfigurable;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public final class Manager
@@ -59,12 +65,20 @@ public final class Manager
 				if (!featuresSet.containsAll(features))
 					throw new Exception("Connector " + description.toString() + " \nsupport features: " + featuresSet
 							+ "\nrequired features: " + features);
-
-				return connectorClass.newInstance();
+				if(properties == null)
+				{
+					properties = new MapConfigurable();
+					InitialPropertiesBuilder.getInstance().setSynchronizedConfigurable((Configurable)properties, true);
+				}
+				Constructor constructor = connectorClass.getConstructor(net.sf.commons.ssh.options.Properties.class);
+				return (Connector) constructor.newInstance(properties);
 			}
 			catch (Exception e)
 			{
-				LogUtils.info(log, "Can't load library:\n{0}", description.dumpInfo(), e);
+				Throwable cause = e;
+				if(e instanceof InvocationTargetException)
+					cause = e.getCause();
+				LogUtils.info(log,cause, "Can''t load library:\n{0}", description.dumpInfo());
 			}
 		}
 		// no connector loaded

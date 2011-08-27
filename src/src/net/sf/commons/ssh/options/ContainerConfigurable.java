@@ -29,7 +29,6 @@ public abstract class ContainerConfigurable extends AbstractConfigurable impleme
 			configContainer = new ConcurrentHashMap<String, Object>();
 		else
 			configContainer = new HashMap<String,Object>();
-		configureDefault(properties);
 	}
 	
 	protected abstract void configureDefault(Properties properties);

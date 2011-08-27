@@ -131,7 +131,8 @@ public class JSCHConnection extends AbstractConnection
 	@Override
 	protected void closeImpl()
 	{
-		connection.disconnect();
+		if(connection != null)
+			connection.disconnect();
 		setContainerStatus(Status.CLOSED);
 		fire(new ClosedEvent(this));
 	}
@@ -187,8 +188,7 @@ public class JSCHConnection extends AbstractConnection
 					throw new AuthenticationException("check required parameters for " + method
 							+ " authentication method");
 				}
-
-				connection = jsch.getSession(cpb.getHost(this), PasswordPropertiesBuilder.getInstance().getLogin(this));
+				connection = jsch.getSession(PasswordPropertiesBuilder.getInstance().getLogin(this),cpb.getHost(this));
 				setupCommonConnectionParameters();
 				connection.setPassword(PasswordPropertiesBuilder.getInstance().getPassword(this));
 				break;
@@ -205,7 +205,7 @@ public class JSCHConnection extends AbstractConnection
 				
 				jsch.addIdentity(PublicKeyPropertiesBuilder.getInstance().getKey(this).toString()
 						,PublicKeyPropertiesBuilder.getInstance().getKey(this) , null, PublicKeyPropertiesBuilder.getInstance().getPassphrase(this).getBytes());
-				connection = jsch.getSession(cpb.getHost(this), PublicKeyPropertiesBuilder.getInstance().getLogin(this));
+				connection = jsch.getSession(PublicKeyPropertiesBuilder.getInstance().getLogin(this),cpb.getHost(this));
 				setupCommonConnectionParameters();
 				break;
 			default:

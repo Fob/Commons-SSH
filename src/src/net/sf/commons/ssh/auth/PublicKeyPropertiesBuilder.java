@@ -15,6 +15,7 @@ import net.sf.commons.ssh.options.Configurable;
 import net.sf.commons.ssh.options.ConvertMethod;
 import net.sf.commons.ssh.options.DefaultConverter;
 import net.sf.commons.ssh.options.Properties;
+import net.sf.commons.ssh.options.PropertiesBuilder;
 import net.sf.commons.ssh.options.PropertyType;
 import net.sf.commons.ssh.options.TypeConverter;
 
@@ -26,6 +27,40 @@ import net.sf.commons.ssh.options.TypeConverter;
  */
 public class PublicKeyPropertiesBuilder extends AuthenticationPropertiesBuilder
 {
+	/**
+	 * @author fob
+	 * @date 27.08.2011
+	 * @since 2.0
+	 */
+	public final class DefaultConverterExtension extends DefaultConverter
+	{
+		/**
+		 * @param builderCls
+		 */
+		public DefaultConverterExtension(Class<? extends PropertiesBuilder> builderCls)
+		{
+			super(builderCls);
+		}
+
+		@ConvertMethod(from = String.class,to = byte[].class)
+		public byte[] keyFromString(String file) throws IOException
+		{
+			return IOUtils.readBytesFromFile(file);
+		}
+
+		@ConvertMethod(from = InputStream.class,to = byte[].class)
+		public byte[] keyFromStream(InputStream in) throws IOException
+		{
+			return IOUtils.readBytesFromStream(in);				
+		}
+
+		@ConvertMethod(from = KeyPair.class,to = byte[].class)
+		public byte[] keyFromKeyPair(KeyPair in) throws IOException
+		{
+			return KeyUtils.serializePrivateKey(in.getPrivate());				
+		}
+	}
+
 	private static PublicKeyPropertiesBuilder instance = null;
 	
 	@PropertyType(value = byte[].class,required = true)
@@ -104,26 +139,7 @@ public class PublicKeyPropertiesBuilder extends AuthenticationPropertiesBuilder
 	@Override
 	protected TypeConverter createConverter()
 	{
-		return new DefaultConverter(this.getClass())
-		{
-			@ConvertMethod(from = String.class,to = byte[].class)
-			public byte[] keyFromString(String file) throws IOException
-			{
-				return IOUtils.readBytesFromFile(file);
-			}
-			
-			@ConvertMethod(from = InputStream.class,to = byte[].class)
-			public byte[] keyFromStream(InputStream in) throws IOException
-			{
-				return IOUtils.readBytesFromStream(in);				
-			}
-			
-			@ConvertMethod(from = KeyPair.class,to = byte[].class)
-			public byte[] keyFromKeyPair(KeyPair in) throws IOException
-			{
-				return KeyUtils.serializePrivateKey(in.getPrivate());				
-			}
-		};
+		return new DefaultConverterExtension(this.getClass());
 	}
 	
 

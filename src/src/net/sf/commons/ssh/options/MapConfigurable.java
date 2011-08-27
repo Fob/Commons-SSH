@@ -16,7 +16,7 @@ public class MapConfigurable extends AbstractConfigurable
     @Override
     protected Object getSelfProperty(String key)
     {
-        return config;
+        return config.get(key);
     }
 
     public void setProperty(String key, Object value)
@@ -29,4 +29,12 @@ public class MapConfigurable extends AbstractConfigurable
     {
         return new MapProperties(config);
     }
+
+	@Override
+	public String toString()
+	{
+		return config+super.toString();
+	}
+    
+    
 }

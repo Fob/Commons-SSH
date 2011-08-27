@@ -1,6 +1,8 @@
 package net.sf.commons.ssh.options;
 
 import net.sf.commons.ssh.common.LogUtils;
+import net.sf.commons.ssh.common.UnexpectedRuntimeException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,24 +27,38 @@ public abstract class PropertiesBuilder
 
     public Properties getDefault()
     {
-        return new MapProperties(defaultProperties);
+    	return new MapProperties(defaultProperties);
     }
 
 	public void verify(Properties config) throws IllegalPropertyException
     {
-        Field[] fields = this.getClass().getDeclaredFields();
+		Field[] fields = this.getClass().getDeclaredFields();
         for(Field field:fields)
         {
         	PropertyType annotation = field.getAnnotation(PropertyType.class);
             if(annotation!=null && annotation.required())
             {
-                if(!(field.getClass().equals(String.class)))
+                if(field.getType() != String.class)
                 {
-                    throw new UnsupportedOperationException("PropertyType Required can be aplied only to String field");
+                    throw new UnsupportedOperationException("PropertyType can be aplied only to String field, but found \n"
+                    		+field.getType().getName()+" "+field.getName());
                 }
-                String key = field.toString();
+                String key;
+				try
+				{
+					key = (String) field.get(this);
+				}
+				catch (Exception e)
+				{
+					if(e instanceof RuntimeException)
+						throw (RuntimeException) e;
+					throw new UnexpectedRuntimeException(e.getMessage(),e);
+				}
                 if(config.getProperty(key)==null)
+                {
+                	LogUtils.trace(log, "verify\n{0}", config);
                     throw new IllegalPropertyException(key,null);
+                }
             }
         }
     }

@@ -51,8 +51,8 @@ public class JSCHVerificationRepository implements HostKeyRepository
 	{
 		try
 		{
-			LogUtils.trace(log, "host [{0}] key [{1}]", host, new String(key));
 			PublicKey publicKey = KeyUtils.getKeyFromBytes(key);
+			LogUtils.trace(log, "check host [{0}] key [{1}]", host, publicKey);
 			return repository.check(host, publicKey) ? OK : NOT_INCLUDED;
 		}
 		catch (Exception e)

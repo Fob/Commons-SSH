@@ -1,5 +1,5 @@
 <factories>
-    <factory>
+    <!-- factory>
         <class-name>net.sf.commons.ssh.impl.j2ssh.J2sshConnectionFactory</class-name>
         <name>Sshtools J2SSH</name>
         <license>GNU GENERAL PUBLIC LICENSE</license>
@@ -10,17 +10,17 @@
         <name>Ganymed SSH-2 for Java</name>
         <license>BSD style license</license>
         <url>http://www.ganymed.ethz.ch/ssh2/</url>
-    </factory>
+    </factory-->
     <factory>
-        <class-name>net.sf.commons.ssh.impl.jsch.JschConnectionFactory</class-name>
+        <class-name>net.sf.commons.ssh.impl.jsch.JSCHConnector</class-name>
         <name>Java Secure Channel</name>
         <license>BSD style license</license>
         <url>http://www.jcraft.com/jsch/</url>
     </factory>
-    <factory>
+    <!-- factory>
         <class-name>net.sf.commons.ssh.impl.sshd.SshdConnectionFactory</class-name>
         <name>Apache MINA SSHD</name>
         <license>Apache 2.0 Style License</license>
         <url>http://mina.apache.org/sshd/</url>
-    </factory>
+    </factory-->
 </factories>

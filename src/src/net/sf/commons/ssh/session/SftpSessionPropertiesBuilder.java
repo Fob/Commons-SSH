@@ -5,7 +5,6 @@ import net.sf.commons.ssh.options.*;
 public class SftpSessionPropertiesBuilder extends PropertiesBuilder
 {
     private static SftpSessionPropertiesBuilder instance = null;
-    @Required
     @PropertyType(Integer.class)
     public static final String KEY_DEFAULT_PERMISSION="net.sf.commons.ssh.options.SftpSessionOptionsBuilder.defaultPermissions";
     @PropertyType(String.class)

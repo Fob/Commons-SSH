@@ -63,4 +63,12 @@ public class EventHandlerImpl implements EventHandler
 		return type;
 	}
 
+	@Override
+	public String toString()
+	{
+		return "EventHandler: type=" + getHandlerType()+ " filter = "+getEventFilter();
+	}
+	
+	
+
 }

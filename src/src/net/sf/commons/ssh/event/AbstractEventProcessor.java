@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.sf.commons.ssh.common.EventProcessorThread;
+import net.sf.commons.ssh.common.LogUtils;
 import net.sf.commons.ssh.common.Status;
 import net.sf.commons.ssh.errors.Error;
 import net.sf.commons.ssh.event.events.IncludeDefaultEvent;
@@ -31,6 +32,7 @@ public abstract class AbstractEventProcessor extends ContainerConfigurable imple
 	public AbstractEventProcessor(Properties properties)
 	{
 		super(properties);
+		configureDefault(properties);// configure default properties after initialize event processor
 	}
 
     protected void notifyThisFrom(AbstractEventProcessor processor)
@@ -56,6 +58,7 @@ public abstract class AbstractEventProcessor extends ContainerConfigurable imple
 
     protected void fire(Event event)
     {
+    	if(handlers == null || handlers.isEmpty())
         pushToProcess(event);
         processNow(event);
         if (parentEngine != null)
@@ -73,9 +76,12 @@ public abstract class AbstractEventProcessor extends ContainerConfigurable imple
     protected void pushToProcess(Event event)
     {
     	for(EventHandler handler : handlers)
+    	{
+    		LogUtils.trace(log, "pushToProcess handler ", handler);
     		if(handler.getHandlerType() == HandlerType.PUSH_TO_PROCESS && EventProcessorThread.isEnableThread() &&
     				handler.getEventFilter().check(event))
     			EventProcessorThread.getInstance().submit(event, handler);
+    	}
     }
 
     /*

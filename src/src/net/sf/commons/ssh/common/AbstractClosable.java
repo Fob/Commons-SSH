@@ -62,7 +62,7 @@ public abstract class AbstractClosable extends AbstractEventProcessor implements
 				log.info("Object is closing or closed already.");
 				return;
 			}
-			LogUtils.info(log, "Close object [{0}]", this);
+			LogUtils.info(log, "Close object [{0}]", this.getClass());
 			fire(new ClosingEvent(this, this));
 			status = Status.CLOSING;
 		}

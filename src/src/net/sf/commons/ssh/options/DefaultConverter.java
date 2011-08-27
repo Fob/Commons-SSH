@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,14 +35,16 @@ public class DefaultConverter implements TypeConverter
 	 */
 	public DefaultConverter(Class<? extends PropertiesBuilder> builderCls)
 	{
-		super();
 		this.builderCls = builderCls;
+		LogUtils.trace(log, "create converter for builder {0}", builderCls);
 		keyMapping = new HashMap<String, PropertyType>();
 		Field[] fields = builderCls.getDeclaredFields();
 		for (Field field : fields)
 		{
 			PropertyType propertyType = field.getAnnotation(PropertyType.class);
 			if (propertyType != null)
+			{
+				LogUtils.trace(log, "found anotation {0} for {1}", propertyType,field.getName());
 				try
 				{
 					keyMapping.put((String) field.get(builderCls), propertyType);
@@ -50,8 +53,9 @@ public class DefaultConverter implements TypeConverter
 				{
 					throw new IllegalArgumentException(e);
 				}
+			}
 		}
-		LogUtils.trace(log, "found mapping:\n", keyMapping);
+		LogUtils.trace(log, "found mapping:\n{0}", keyMapping);
 		
 		convertMethods = new HashMap<Class, Map<Class,Method>>();
 		Method[] methods = this.getClass().getDeclaredMethods();
@@ -62,6 +66,7 @@ public class DefaultConverter implements TypeConverter
 				continue;
 			if(method.getParameterTypes().length > 1)
 				continue;
+			LogUtils.trace(log, "found converter methods {0}:{1}", method.getName(),convertMetod);
 			Map<Class,Method> toMethods = convertMethods.get(convertMetod.to());
 			if(toMethods == null)
 				toMethods = new HashMap<Class, Method>();
@@ -69,7 +74,7 @@ public class DefaultConverter implements TypeConverter
 			convertMethods.put(convertMetod.to(), toMethods);			
 		}
 		
-		LogUtils.trace(log, "collect convert methods:\n", convertMethods);
+		LogUtils.trace(log, "collect convert methods:\n{0}", convertMethods);
 	}
 
 	/*
@@ -81,10 +86,13 @@ public class DefaultConverter implements TypeConverter
 	@Override
 	public Object convert(Object value, String key)
 	{
+		LogUtils.trace(log, "convert value = {0} key = {1}", value,key);
+		if(value == null)
+			return null;
 		PropertyType propertyType = keyMapping.get(key);
 		if(propertyType == null)
 		{
-			LogUtils.info(log, "property {0}.{1} hasn't property type", builderCls.getName(),key);
+			LogUtils.info(log, "property {0}.{1} hasn''t property type", builderCls.getName(),key);
 			return value;
 		}
 		Class valueCls = value.getClass();
@@ -93,32 +101,45 @@ public class DefaultConverter implements TypeConverter
 		
 		
 		Map<Class,Method> toMethods  = convertMethods.get(propertyType.value());
-		Method convertMethod = toMethods.get(valueCls);
-		if(convertMethod == null)
+		if(toMethods == null)
 		{
-			Class from = Object.class;
-			for(Class cls: toMethods.keySet())
-				if(cls.isAssignableFrom(valueCls) && from.isAssignableFrom(cls))
+			LogUtils.trace(log, "can''t convert to {0}", propertyType.value());
+		}
+		Method convertMethod = null;
+		if (toMethods != null)
+		{
+			convertMethod = toMethods.get(valueCls);
+			if (convertMethod == null)
+			{
+				Class from = Object.class;
+				for (Class cls : toMethods.keySet())
+					if (cls.isAssignableFrom(valueCls) && from.isAssignableFrom(cls))
 						from = cls;
-			convertMethod = toMethods.get(from);
+				convertMethod = toMethods.get(from);
+			}
 		}
 		if(convertMethod == null)
 		{
 			Object result = staticConvert(valueCls, propertyType.value(), value);
 			if(result!=null)
 				return result;
-			LogUtils.error(log, "can't found converter to convert property '{0}'='{3}' from class {1} to class {2}", key,valueCls,propertyType.value(),value);
+			LogUtils.error(log, "can''t found converter to convert property ''{0}''=''{3}'' from class {1} to class {2}", key,valueCls,propertyType.value(),value);
 			throw new IllegalArgumentException("can't found converter to convert property '"+key+"'='"+value+"' from class "+valueCls.getName()
 					+" to class "+propertyType.value().getName());
 		}
 		
 		try
 		{
+			LogUtils.trace(log, "convert using: {0}", convertMethod);
+			log.trace(this.getClass());
 			return convertMethod.invoke(this, value);
 		}
 		catch (Exception e)
 		{
-			throw new UnexpectedRuntimeException(e);
+			if(e instanceof RuntimeException)
+				throw (RuntimeException) e;
+			else
+				throw new UnexpectedRuntimeException(e);
 		}
 	}
 

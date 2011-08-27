@@ -8,6 +8,7 @@ import net.sf.commons.ssh.options.Configurable;
 import net.sf.commons.ssh.options.ConvertMethod;
 import net.sf.commons.ssh.options.DefaultConverter;
 import net.sf.commons.ssh.options.Properties;
+import net.sf.commons.ssh.options.PropertiesBuilder;
 import net.sf.commons.ssh.options.PropertyType;
 import net.sf.commons.ssh.options.TypeConverter;
 
@@ -18,6 +19,8 @@ import net.sf.commons.ssh.options.TypeConverter;
  */
 public class PasswordPropertiesBuilder extends AuthenticationPropertiesBuilder
 {
+	@PropertyType(value = String.class,required = true)
+	public static final String KEY_LOGIN = AuthenticationPropertiesBuilder.KEY_LOGIN;
 	
 	@PropertyType(value = byte[].class,required = true)
 	public static final String KEY_PASSWORD = "net.sf.commons.ssh.auth.password";
@@ -61,14 +64,23 @@ public class PasswordPropertiesBuilder extends AuthenticationPropertiesBuilder
 	@Override
 	protected TypeConverter createConverter()
 	{
-		return new DefaultConverter(this.getClass())
-			{
-				@ConvertMethod(from = String.class, to = byte[].class)
-				public byte[] stringToBytes(String value)
-				{
-					return value.getBytes();					
-				}
-			};
+		return new BuilderConverter(this.getClass());
+	}
+	
+	public class BuilderConverter extends DefaultConverter
+	{
+
+		public BuilderConverter(Class<? extends PropertiesBuilder> builderCls)
+		{
+			super(builderCls);
+		}
+		
+		@ConvertMethod(from = String.class, to = byte[].class)
+		public byte[] stringToBytes(String value)
+		{
+			return value.getBytes();					
+		}
+		
 	}
 
 }

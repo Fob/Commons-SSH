@@ -6,8 +6,7 @@ import net.sf.commons.ssh.options.*;
 public class ExecSessionPropertiesBuilder extends PropertiesBuilder
 {
     private static ExecSessionPropertiesBuilder instance = null;
-    @Required
-    @PropertyType(String.class)
+    @PropertyType(value = String.class, required = true)
     public static final String KEY_COMMAND="net.sf.commons.ssh.options.ExecSessionPropertiesBuilder.command";
 
     public synchronized static ExecSessionPropertiesBuilder getInstance()

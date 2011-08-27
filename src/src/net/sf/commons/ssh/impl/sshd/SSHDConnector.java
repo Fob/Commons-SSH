@@ -51,28 +51,4 @@ public class SSHDConnector extends AbstractConnector
 	}
 
 	
-	/* (non-Javadoc)
-	 * @see net.sf.commons.ssh.connector.Connector#createConnection()
-	 */
-	@Override
-	public Connection createConnection()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected void closeImpl()
-	{
-		client.stop();
-		isClosed.set(true);
-		fire(new ClosedEvent(this));
-	}
-
-	@Override
-	protected boolean isClosedImpl()
-	{
-		return isClosed.get();
-	}
-	
 }

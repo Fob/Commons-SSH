@@ -6,6 +6,6 @@ public class IllegalPropertyException extends RuntimeException
 
 	public IllegalPropertyException(String key, Object value)
 	{
-		super("Illigel property key='" + key + "' value='" + value + "'");
+		super("Illegal property key='" + key + "' value='" + value + "'");
 	}
 }
