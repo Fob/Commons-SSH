@@ -20,6 +20,7 @@
         </manifest>
     </target>
     <target name="build" depends="init,compile,meta">
+		<copy file="./src/net/sf/commons/ssh/directory/directory.xml" todir="./out/net/sf/commons/ssh/directory"/>
         <jar destfile="./bin/jdk-${java.version}/commons-ssh.jar">
             <fileset dir="./out"/>
         </jar>

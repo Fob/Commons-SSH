@@ -32,6 +32,7 @@ import org.apache.sshd.SshClient;
 import org.apache.sshd.client.ServerKeyVerifier;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
+import org.apache.sshd.client.session.ClientSessionImpl;
 
 /**
  * @author Sergey Vladimirov (vlsergey at gmail dot com)
@@ -153,18 +154,11 @@ public class SshdConnectionFactory extends ConnectionFactory
     public PublicKey getPublicKey(String host, int port) throws Exception
     {
         ClientHolder sshClient = getClient();
+        ClientSession session = null;
         try
         {
-            GetPublicKeyVerifier verifier;
-            ServerKeyVerifier sverifier = sshClient.getClient().getServerKeyVerifier();
-            if(sverifier instanceof GetPublicKeyVerifier)
-                verifier = (GetPublicKeyVerifier) sverifier;
-            else
-            {
-                verifier = new GetPublicKeyVerifier();
-                sshClient.getClient().setServerKeyVerifier(verifier);
-            }
             ConnectFuture connectFuture = sshClient.getClient().connect(host, port);
+
             if (!connectFuture.await(getConnectTimeout() == 0 ? 5 * 60000 : getConnectTimeout(), TimeUnit.MILLISECONDS))
             {
                 if (connectFuture.getException() == null)
@@ -187,13 +181,34 @@ public class SshdConnectionFactory extends ConnectionFactory
                 throw new IOException("connection was cancelled");
             }
 
-            PublicKey result = verifier.getKey(host);
-            connectFuture.cancel();
-            return result;
+            session = connectFuture.getSession();
+            if(!(session instanceof ClientSessionImpl))
+                throw new RuntimeException("Unknown session type");
+            session.waitFor(ClientSession.WAIT_AUTH | ClientSession.CLOSED,getConnectTimeout() == 0 ? 5 * 60000 : getConnectTimeout());
+            if(((ClientSessionImpl) session).getKex() == null)
+                throw new RuntimeException("Unable to get server key");
+            return ((ClientSessionImpl) session).getKex().getServerKey();
         }
         finally
         {
-            sshClient.close();
+            log.trace("close connection");
+            try
+            {
+                if(session!= null)
+                    session.close(true);
+            }
+            catch (Exception e)
+            {
+                log.warn(e);
+            }
+            try
+            {
+                sshClient.close();
+            }
+            catch (Exception e)
+            {
+                log.warn(e);
+            }
         }
     }
 

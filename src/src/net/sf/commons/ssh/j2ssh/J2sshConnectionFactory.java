@@ -151,6 +151,7 @@ public class J2sshConnectionFactory extends ConnectionFactory
         result.add(Features.SESSION_SFTP);
         result.add(Features.SOCKET_TIMEOUT);
         result.add(Features.CONNECTION_TIMEOUT);
+        result.add(Features.GET_PUBLIC_KEY);
         return result;
     }
 

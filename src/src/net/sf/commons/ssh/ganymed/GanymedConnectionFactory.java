@@ -124,6 +124,7 @@ public class GanymedConnectionFactory extends ConnectionFactory {
 	result.add(Features.SESSION_SHELL);
 	result.add(Features.SESSION_SFTP);
     result.add(Features.CONNECTION_TIMEOUT);
+    result.add(Features.GET_PUBLIC_KEY);
 	return result;
     }
 
