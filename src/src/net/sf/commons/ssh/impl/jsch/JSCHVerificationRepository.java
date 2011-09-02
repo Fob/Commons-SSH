@@ -19,7 +19,6 @@ import net.sf.commons.ssh.common.LogUtils;
 import net.sf.commons.ssh.common.UnexpectedRuntimeException;
 import net.sf.commons.ssh.verification.VerificationEntry;
 import net.sf.commons.ssh.verification.VerificationRepository;
-import net.sf.commons.ssh.errors.Error;
 
 import com.jcraft.jsch.HostKey;
 import com.jcraft.jsch.HostKeyRepository;

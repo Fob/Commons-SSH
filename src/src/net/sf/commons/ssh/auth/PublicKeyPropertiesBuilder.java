@@ -69,6 +69,8 @@ public class PublicKeyPropertiesBuilder extends AuthenticationPropertiesBuilder
 	public static final String KEY_PASSPHRASE = "net.sf.commons.ssh.auth.passphrase";
 	@PropertyType(KeyPair.class)
 	public static final String KEY_PAIR = "net.sf.commons.ssh.auth.keyPair";
+	@PropertyType(value = String.class,required = true)
+	public static final String KEY_LOGIN = AuthenticationPropertiesBuilder.KEY_LOGIN;
 	
 	protected PublicKeyPropertiesBuilder()
 	{

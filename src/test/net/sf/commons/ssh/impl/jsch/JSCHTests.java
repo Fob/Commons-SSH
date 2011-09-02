@@ -30,7 +30,13 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.apache.sshd.common.util.SecurityUtils;
 import org.junit.Test;
+
+import com.sshtools.j2ssh.SshClient;
+import com.sshtools.j2ssh.authentication.KBIAuthenticationClient;
+import com.sshtools.j2ssh.authentication.PasswordAuthenticationClient;
+import com.sshtools.j2ssh.transport.IgnoreHostKeyVerification;
 
 /**
  * @author fob
@@ -47,19 +53,20 @@ public class JSCHTests
 		ConsoleAppender appender = new ConsoleAppender(new PatternLayout("%c %p : %m%n"));
 		appender.setWriter(new OutputStreamWriter(System.out));
 		Logger.getRootLogger().addAppender(appender);
-		Connector connector=null;
+		/*Connector connector=null;
 		Connection connection=null;
 		ShellSession session = null;
 		try
 		{
-			connector = Manager.getInstance().newConnector("net.sf.commons.ssh.impl.jsch.JSCHConnector",
+			connector = Manager.getInstance().newConnector("net.sf.commons.ssh.impl.j2ssh.J2SSHConnector",
 					Arrays.asList(Feature.SSH2,Feature.SYNCHRONOUS,Feature.AUTH_CREDENTIALS,Feature.SESSION_SHELL),null);
 			connection = connector.createConnection();
 			ConnectionPropertiesBuilder.getInstance().setHost(connection, "127.0.0.1");
 			PasswordPropertiesBuilder.getInstance().setupAuthenticationMethod(connection);
 			PasswordPropertiesBuilder.getInstance().setLogin(connection, "fob");
 			PasswordPropertiesBuilder.getInstance().setPassword(connection, "0xFD#syhdrtwaGNT");
-			connection.connect(true);
+			connection.connect(false);
+			connection.authenticate();
 			System.out.println(connection.getHostKey());
 			session = connection.createShellSession();
 			session.open();
@@ -74,11 +81,21 @@ public class JSCHTests
 		}
 		finally
 		{
-			IOUtils.close(session);
+			//IOUtils.close(session);
 			IOUtils.close(connection);
 			IOUtils.close(connector);
 		}
-		System.out.println(connector.getAllErrors());
+		System.out.println(connector.getAllErrors());*/
+		SecurityUtils.isBouncyCastleRegistered();
+		SshClient client = new SshClient();
+		client.connect("192.168.1.137",22,new IgnoreHostKeyVerification());
+		
+		PasswordAuthenticationClient pwd = new PasswordAuthenticationClient();
+		pwd.setUsername("fob");
+		pwd.setPassword(new String("0xFD#syhdrtwaGNT".getBytes(),"UTF-8"));
+		
+		System.out.println(client.authenticate(pwd));
+		client.disconnect();
 	}
 
 }

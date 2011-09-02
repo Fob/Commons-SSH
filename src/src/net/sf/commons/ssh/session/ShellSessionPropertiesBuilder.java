@@ -36,7 +36,7 @@ public class ShellSessionPropertiesBuilder extends SessionPropertiesBuilder
         defaultProperties.put(KEY_TERMINAL_ROWS,Integer.valueOf(24));
         defaultProperties.put(KEY_TERMINAL_TYPE,"ansi");
         defaultProperties.put(KEY_TERMINAL_WIDTH, Integer.valueOf(0));
-        defaultProperties.put(KEY_SEPARATE_ERROR_STREAM, false);
+        defaultProperties.put(KEY_SEPARATE_ERROR_STREAM, true);
     }
 
     public int getTerminalCols(Properties opt)

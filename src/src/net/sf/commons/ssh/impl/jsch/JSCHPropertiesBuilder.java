@@ -10,5 +10,6 @@ package net.sf.commons.ssh.impl.jsch;
  */
 public class JSCHPropertiesBuilder
 {
+	//TODO
 
 }

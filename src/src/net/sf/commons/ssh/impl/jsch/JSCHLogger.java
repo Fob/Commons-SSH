@@ -3,10 +3,11 @@
  */
 package net.sf.commons.ssh.impl.jsch;
 
-import net.sf.commons.ssh.errors.AbstractErrorHolder;
 
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Logger;
 
 /**
@@ -16,18 +17,22 @@ import com.jcraft.jsch.Logger;
  */
 public class JSCHLogger implements Logger
 {
-	private Log log;
-	private AbstractErrorHolder holder;
+	private Log log = LogFactory.getLog(JSch.class);
 	
+	private static JSCHLogger instance = null;
 
-	/**
-	 * @param log
-	 */
-	public JSCHLogger(Log log,AbstractErrorHolder holder)
+	protected JSCHLogger()
 	{
-		super();
-		this.log = log;
-		this.holder = holder;
+		
+	}
+
+	public synchronized static JSCHLogger getInstance()
+	{
+		if (instance == null)
+		{
+			instance = new JSCHLogger();
+		}
+		return instance;
 	}
 
 	/**

@@ -9,8 +9,6 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
-import javax.rmi.CORBA.Tie;
-
 import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSchException;
 
