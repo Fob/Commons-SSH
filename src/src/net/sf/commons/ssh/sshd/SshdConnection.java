@@ -16,9 +16,12 @@
 package net.sf.commons.ssh.sshd;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.sf.commons.ssh.*;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sshd.ClientChannel;
 import org.apache.sshd.ClientSession;
 import org.apache.sshd.SshClient;
@@ -30,9 +33,12 @@ import org.apache.sshd.client.channel.ChannelSession;
  * @since 1.3
  */
 class SshdConnection extends Connection {
+    private static final Log log = LogFactory.getLog(SshdConnection.class);
     private final ClientSession clientSession;
 
     private final SshdConnectionFactory.ClientHolder sshClient;
+
+    private AtomicBoolean isClosed = new AtomicBoolean(false);
 
     SshdConnection(SshdConnectionFactory.ClientHolder sshClient, ClientSession clientSession) {
 	this.sshClient = sshClient;
@@ -40,12 +46,32 @@ class SshdConnection extends Connection {
     }
 
     public void close() throws IOException {
-	clientSession.close(false);
 
-	if ((clientSession.waitFor(ClientSession.CLOSED, 1000) & ClientSession.CLOSED) == 0)
-	    clientSession.close(true);
+        if(isClosed.get())
+            return;
+        isClosed.set(true);
+        try
+        {
+            clientSession.close(false);
 
-	sshClient.close();
+            if ((clientSession.waitFor(ClientSession.CLOSED, 1000) & ClientSession.CLOSED) == 0)
+                clientSession.close(true);
+
+        }
+        catch (Exception e)
+        {
+            log.error(e);
+        }
+        finally {
+            try
+            {
+                sshClient.close();
+            }
+            catch (Exception e)
+            {
+                log.error(e);
+            }
+        }
     }
 
     public boolean isClosed() {
