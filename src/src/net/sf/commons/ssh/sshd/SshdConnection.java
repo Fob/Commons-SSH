@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.sf.commons.ssh.*;
 
+import net.sf.commons.ssh.utils.LogUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sshd.ClientChannel;
@@ -43,6 +44,7 @@ class SshdConnection extends Connection {
     SshdConnection(SshdConnectionFactory.ClientHolder sshClient, ClientSession clientSession) {
 	this.sshClient = sshClient;
 	this.clientSession = clientSession;
+        log.trace("create session");
     }
 
     public void close() throws IOException {
@@ -75,7 +77,7 @@ class SshdConnection extends Connection {
     }
 
     public boolean isClosed() {
-	int ret = clientSession.waitFor(ClientSession.CLOSED, 0);
+	int ret = clientSession.waitFor(ClientSession.CLOSED | ClientSession.TIMEOUT, 1L);
 	return (ret & ClientSession.CLOSED) != 0;
     }
 
@@ -98,6 +100,8 @@ class SshdConnection extends Connection {
     public ShellSession openShellSession(ShellSessionOptions shellSessionOptions)
 	    throws IOException {
 	try {
+
+        LogUtils.trace(log,"open shell connection isClosed={0}",isClosed());
 	    ChannelSession channelSession = (ChannelSession) clientSession
 		    .createChannel(ClientChannel.CHANNEL_SHELL);
 

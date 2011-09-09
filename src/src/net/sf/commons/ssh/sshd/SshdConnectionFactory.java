@@ -26,10 +26,15 @@ import java.util.concurrent.TimeUnit;
 
 import net.sf.commons.ssh.*;
 
+import net.sf.commons.ssh.utils.LogUtils;
 import net.sf.commons.ssh.verification.VerificationRepository;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.sshd.ClientSession;
 import org.apache.sshd.SshClient;
 import org.apache.sshd.client.ServerKeyVerifier;
+import org.apache.sshd.client.SessionFactory;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
 import org.apache.sshd.client.session.ClientSessionImpl;
@@ -43,6 +48,7 @@ public class SshdConnectionFactory extends ConnectionFactory
     public static final String CONNECTION_GROUP = "net.sf.commons.ssh.sshd.SshdConnectionFactory.connectionGroup";
     public static final String PROCESSOR_COUNT = "net.sf.commons.ssh.sshd.SshdConnectionFactory.processorCount";
     public static final String THREAD_SAFE_ENABLE = "net.sf.commons.ssh.sshd.SshdConnectionFactory.threadSafeEnable";
+    public static final String STREAM_WAIT = "net.sf.commons.ssh.sshd.SshdConnectionFactory.streamWait";
     private static final Map<String,ClientHolder> clients = new ConcurrentHashMap<String,ClientHolder>();
     private SSHDServerKeyVerifier verifier = null;
     /**
@@ -90,10 +96,11 @@ public class SshdConnectionFactory extends ConnectionFactory
             }
             if(!authFuture.isSuccess())
                 throw new RuntimeException("connection failed",connectFuture.getException());
-               // ret = clientSession.waitFor(ClientSession.WAIT_AUTH
+
+            int ret = clientSession.waitFor(ClientSession.AUTHED | ClientSession.TIMEOUT,1);
                 //        | ClientSession.CLOSED | ClientSession.AUTHED , 0);
             //}
-            log.trace("authenticated");
+            log.trace("authenticated "+((ret & ClientSession.AUTHED)!=0));
             return clientSession;
         }
         catch (Exception exc)
@@ -184,7 +191,7 @@ public class SshdConnectionFactory extends ConnectionFactory
             session = connectFuture.getSession();
             if(!(session instanceof ClientSessionImpl))
                 throw new RuntimeException("Unknown session type");
-            session.waitFor(ClientSession.WAIT_AUTH | ClientSession.CLOSED,getConnectTimeout() == 0 ? 5 * 60000 : getConnectTimeout());
+            session.waitFor(ClientSession.WAIT_AUTH | ClientSession.CLOSED | ClientSession.TIMEOUT,getConnectTimeout() == 0 ? 5 * 60000 : getConnectTimeout());
             if(((ClientSessionImpl) session).getKex() == null)
                 throw new RuntimeException("Unable to get server key");
             return ((ClientSessionImpl) session).getKex().getServerKey();
@@ -215,7 +222,7 @@ public class SshdConnectionFactory extends ConnectionFactory
     protected ClientHolder getClient()
     {
         String connectionGroup = getProperty(CONNECTION_GROUP);
-
+        log.trace("connection group "+connectionGroup);
 
         if(connectionGroup == null)
         {
@@ -224,20 +231,22 @@ public class SshdConnectionFactory extends ConnectionFactory
             client.start();
             return new ClientHolder(null,client);
         }
-
+        LogUtils.trace(log,"getClient from {0}",clients);
         ClientHolder holder = clients.get(connectionGroup);
         if(holder == null)
         {
             SshClient client = SshClient.setUpDefaultClient();
             setupHackedProperties(client);
             client.start();
-            holder = new ClientHolder(connectionGroup,client).borrowClient();
+            holder = new ClientHolder(connectionGroup,client);
         }
+        holder.borrowClient();
         return holder;
     }
 
     public static class ClientHolder
     {
+        private static final Log  log = LogFactory.getLog(ClientHolder.class);
         String group;
         SshClient client;
         int count;
@@ -261,16 +270,19 @@ public class SshdConnectionFactory extends ConnectionFactory
 
         public ClientHolder borrowClient()
         {
+            log.trace("borrow client");
             count++;
             if(count == 1)
             {
                 clients.put(group,this);
             }
+            LogUtils.trace(log,"client {0}: all clients {1}",this,clients);
             return this;
         }
 
         public void close()
         {
+            log.trace("close client");
             count--;
             if(count<=0)
             {
@@ -278,6 +290,13 @@ public class SshdConnectionFactory extends ConnectionFactory
                 if(group!=null)
                     clients.remove(group);
             }
+            LogUtils.trace(log,"client {0}: all clients {1}",this,clients);
+        }
+
+        @Override
+        public String toString()
+        {
+            return "group " + getGroup()+" count "+count;
         }
     }
 
@@ -285,13 +304,15 @@ public class SshdConnectionFactory extends ConnectionFactory
     {
         String processorCount = getProperty(PROCESSOR_COUNT);
         String threadSafeEnable = getProperty(THREAD_SAFE_ENABLE);
-
+        String waitTime = getProperty(STREAM_WAIT);
         try
         {
             if(processorCount != null)
                 client.setNioProcessorCount(Integer.valueOf(processorCount));
             if(threadSafeEnable != null && Boolean.valueOf(threadSafeEnable))
                 client.setPumpingMethod(org.apache.sshd.client.PumpingMethod.SELF);
+            if(!StringUtils.isBlank(waitTime))
+                client.setStreamWaitTime(Long.valueOf(waitTime));
         }
         catch (NumberFormatException e)
         {
@@ -299,5 +320,4 @@ public class SshdConnectionFactory extends ConnectionFactory
         }
 
     }
-
 }

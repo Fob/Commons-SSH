@@ -18,12 +18,16 @@ package net.sf.commons.ssh.sshd;
 import java.io.*;
 
 import net.sf.commons.ssh.Session;
-import net.sf.commons.ssh.utils.AutoflushPipeOutputStream;
 
+import net.sf.commons.ssh.utils.LogUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.sshd.ClientChannel;
 import org.apache.sshd.ClientSession;
 import org.apache.sshd.client.channel.ChannelSession;
+import org.apache.sshd.client.future.OpenFuture;
+import net.sf.commons.ssh.utils.PipedInputStream;
+import net.sf.commons.ssh.utils.PipedOutputStream;
 
 /**
  * Commons SSH wrapper for {@link ChannelSession}
@@ -34,7 +38,7 @@ import org.apache.sshd.client.channel.ChannelSession;
 abstract class SshdAbstractSession implements Session {
     private final ChannelSession channelSession;
 
-    private final PipedInputStream inputStream;
+    private InputStream inputStream;
 
     protected final Log log = LogFactory.getLog(this.getClass());
 
@@ -47,17 +51,19 @@ abstract class SshdAbstractSession implements Session {
 	this.channelSession = channelSession;
 
 	this.inputStream = new PipedInputStream();
-	final PipedOutputStream out = new AutoflushPipeOutputStream(inputStream);
+	final PipedOutputStream out = new PipedOutputStream((PipedInputStream) inputStream);
 	channelSession.setOut(out);
 	channelSession.setErr(out);
+    this.inputStream = new SSHDInputStream(inputStream);
 
-	this.outputStream = new AutoflushPipeOutputStream();
+	this.outputStream = new PipedOutputStream();
 	channelSession.setIn(new PipedInputStream(this.outputStream));
 
 	if (appendToInputBeforeOpen != null)
 	    outputStream.write(appendToInputBeforeOpen);
 
-	channelSession.open().await();
+	OpenFuture openFuture = channelSession.open();
+        openFuture.await();
     }
 
     public void close() throws IOException {
@@ -81,11 +87,114 @@ abstract class SshdAbstractSession implements Session {
 	log.trace("isClosed()");
 
 	final boolean result = (channelSession
-		.waitFor(ChannelSession.CLOSED, 0) & ChannelSession.CLOSED) != 0;
+		.waitFor(ChannelSession.CLOSED, 1) & ChannelSession.CLOSED) != 0;
 
 	if (log.isTraceEnabled())
 	    log.trace("isClosed(): result = " + result);
 
 	return result;
+    }
+
+    private class SSHDInputStream extends InputStream
+    {
+        private InputStream stream;
+
+        private SSHDInputStream(InputStream stream)
+        {
+            this.stream = stream;
+        }
+
+        @Override
+        public int read() throws IOException
+        {
+            return stream.read();
+        }
+
+        @Override
+        public int read(byte[] bytes)
+                throws IOException
+        {
+            return stream.read(bytes);
+        }
+
+        @Override
+        public int read(byte[] bytes, int i, int i1)
+                throws IOException
+        {
+            return stream.read(bytes, i, i1);
+        }
+
+        @Override
+        public long skip(long l)
+                throws IOException
+        {
+            return stream.skip(l);
+        }
+
+        @Override
+        public void close()
+                throws IOException
+        {
+            stream.close();
+        }
+
+        @Override
+        public void mark(int i)
+        {
+            stream.mark(i);
+        }
+
+        @Override
+        public void reset()
+                throws IOException
+        {
+            stream.reset();
+        }
+
+        @Override
+        public boolean markSupported()
+        {
+            return stream.markSupported();
+        }
+
+        @Override
+        public int available() throws IOException
+        {
+            int available = stream.available();
+            LogUtils.trace(log,"available bytes from network {0}",available);
+            if(available>0)
+                return available;
+            if(available<0)
+                throw new RuntimeException("EOF Received");
+            if(available == 0)
+            {
+                int st = channelSession.waitFor(ClientChannel.CLOSED | ClientChannel.EOF | ClientChannel.TIMEOUT,1);
+                if((st & ClientChannel.CLOSED)!=0)
+                    throw new RuntimeException("Channel Closed");//return -1;
+                if((st & ClientChannel.EOF)!=0)
+                    throw new RuntimeException("EOF Reached");//return -1;
+                return 0;
+            }
+            throw new RuntimeException("EOF Reached,unknown state");
+        }
+    }
+
+    private class SSHDOutputStream extends PipedOutputStream
+    {
+        private SSHDOutputStream()
+        {
+        }
+
+        private SSHDOutputStream(PipedInputStream sink)
+                throws IOException
+        {
+            super(sink);
+        }
+
+        @Override
+        public void flush() throws IOException
+        {
+            channelSession.pumpInputStream();
+        }
     }
 }

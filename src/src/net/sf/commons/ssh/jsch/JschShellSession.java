@@ -18,7 +18,8 @@ package net.sf.commons.ssh.jsch;
 import java.io.*;
 
 import net.sf.commons.ssh.ShellSession;
-import net.sf.commons.ssh.utils.AutoflushPipeOutputStream;
+import net.sf.commons.ssh.utils.PipedInputStream;
+import net.sf.commons.ssh.utils.PipedOutputStream;
 
 import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSchException;
@@ -37,12 +38,12 @@ class JschShellSession extends JschAbstractSession implements ShellSession {
 	super(session);
 
 	this.inputStream = new PipedInputStream();
-	final AutoflushPipeOutputStream out = new AutoflushPipeOutputStream(
+	final PipedOutputStream out = new PipedOutputStream(
 		this.inputStream);
 	session.setOutputStream(out);
 	session.setExtOutputStream(out);
 
-	this.outputStream = new AutoflushPipeOutputStream();
+	this.outputStream = new PipedOutputStream();
 	session.setInputStream(new PipedInputStream(this.outputStream));
 
 	session.connect(soTimeout);
