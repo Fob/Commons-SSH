@@ -12,7 +12,6 @@ import com.sshtools.j2ssh.connection.Channel;
 import com.sshtools.j2ssh.connection.ChannelEventListener;
 import com.sshtools.j2ssh.connection.ChannelState;
 import com.sshtools.j2ssh.session.SessionChannelClient;
-import com.sshtools.j2ssh.util.InvalidStateException;
 
 import net.sf.commons.ssh.common.Status;
 import net.sf.commons.ssh.common.UnexpectedRuntimeException;
@@ -147,6 +146,7 @@ public class J2SSHShellSession extends AbstractSession implements ShellSession
 	protected void closeImpl() throws IOException
 	{
 		session.close();
+		
 		ChannelState state = session.getState();
 		try
 		{

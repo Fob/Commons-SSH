@@ -194,4 +194,13 @@ public class Error
 	{
 		return severity;
 	}
+
+	@Override
+	public String toString()
+	{
+		
+		return getLevel()+":"+errorMessage();
+	}
+	
+	
 }

@@ -56,6 +56,7 @@ public class J2SSHConnection extends AbstractConnection
 	{
 		super(properties);
 		connection = new SshClient();
+		connection.addEventHandler(new J2SSHConnectionAdapter(this));
 		setContainerStatus(Status.CREATED);
 	}
 
@@ -293,5 +294,6 @@ public class J2SSHConnection extends AbstractConnection
 		result.setKey(key);
 		return result;
 	}
+
 
 }

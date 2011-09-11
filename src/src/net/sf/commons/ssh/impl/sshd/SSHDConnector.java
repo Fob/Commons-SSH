@@ -3,15 +3,17 @@
  */
 package net.sf.commons.ssh.impl.sshd;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.io.IOException;
 
 import org.apache.sshd.SshClient;
+import org.apache.sshd.client.SessionFactory;
 
-import net.sf.commons.ssh.Feature;
+import net.sf.commons.ssh.common.Status;
 import net.sf.commons.ssh.connection.Connection;
 import net.sf.commons.ssh.connector.AbstractConnector;
 import net.sf.commons.ssh.connector.SupportedFeatures;
 import net.sf.commons.ssh.event.events.ClosedEvent;
+import net.sf.commons.ssh.options.InitialPropertiesBuilder;
 import net.sf.commons.ssh.options.Properties;
 
 /**
@@ -23,7 +25,6 @@ import net.sf.commons.ssh.options.Properties;
 public class SSHDConnector extends AbstractConnector
 {
 	private SshClient client;
-	private AtomicBoolean isClosed = new AtomicBoolean(false);
 
 	/**
 	 * @param properties
@@ -32,23 +33,68 @@ public class SSHDConnector extends AbstractConnector
 	{
 		super(properties);
 		client = SshClient.setUpDefaultClient();
+		client.setSessionFactory(new SessionFactory());
 		setupProperties();
+		setContainerStatus(Status.CREATED);
 		client.start();
+		setContainerStatus(Status.INPROGRESS);
 	}
 	
 	private void setupProperties()
 	{
-		Integer processorCount = SSHDPropertiesBuilder.getInstance().getNioProcessorCount(this);
-		String method = SSHDPropertiesBuilder.getInstance().getPumpingMethod(this);
-		Long timeout = SSHDPropertiesBuilder.getInstance().getPumpingStreamTimeout(this);
+		Integer processorCount = SSHDPropertiesBuilder.Connector.getInstance().getNioProcessorCount(this);
+		String method = SSHDPropertiesBuilder.Connector.getInstance().getPumpingMethod(this);
+		Long timeout = SSHDPropertiesBuilder.Connector.getInstance().getPumpingStreamTimeout(this);
 		if(processorCount != null)
 			client.setNioProcessorCount(processorCount);
 		if(timeout!=null)
 			client.setStreamWaitTime(timeout);
 		if(method!=null)
 			client.setPumpingMethod(org.apache.sshd.client.PumpingMethod.valueOf(method));
-		//method.
 	}
 
+	/**
+	 * @see net.sf.commons.ssh.connector.Connector#createConnection()
+	 */
+	@Override
+	public Connection createConnection()
+	{
+		Connection connection;
+		if(InitialPropertiesBuilder.getInstance().isAsynchronous(this))
+			connection = null;
+		else
+			connection = new SSHDConnectionSync(this,client);
+		registerChild(connection);
+		return connection;
+	}
+
+	/**
+	 * @see net.sf.commons.ssh.common.Closable#isClosed()
+	 */
+	@Override
+	public boolean isClosed()
+	{
+		return getContainerStatus()==Status.CLOSED;
+	}
+
+	/**
+	 * @see net.sf.commons.ssh.common.AbstractClosable#closeImpl()
+	 */
+	@Override
+	protected void closeImpl() throws IOException
+	{
+		client.stop();
+		setContainerStatus(Status.CLOSED);
+		fire(new ClosedEvent(this));		
+	}
+
+	@Override
+	protected void configureDefault(Properties properties)
+	{
+		super.configureDefault(properties);
+		includeDefault(SSHDPropertiesBuilder.Connection.getInstance().getDefault());
+	}
+	
+	
 	
 }

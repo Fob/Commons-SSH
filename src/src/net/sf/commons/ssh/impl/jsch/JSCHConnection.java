@@ -4,6 +4,7 @@
 package net.sf.commons.ssh.impl.jsch;
 
 
+import java.io.IOException;
 import java.security.PublicKey;
 import java.util.Set;
 

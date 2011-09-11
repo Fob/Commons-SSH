@@ -28,4 +28,5 @@ public interface Connection extends Container
     ShellSession openShellSession() throws IOException;
     ExecSession openExecSession(String command) throws IOException;
     SFTPSession openSFTPSession() throws IOException;
+    
 }

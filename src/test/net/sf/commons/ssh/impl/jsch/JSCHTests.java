@@ -53,12 +53,12 @@ public class JSCHTests
 		ConsoleAppender appender = new ConsoleAppender(new PatternLayout("%c %p : %m%n"));
 		appender.setWriter(new OutputStreamWriter(System.out));
 		Logger.getRootLogger().addAppender(appender);
-		/*Connector connector=null;
+		Connector connector=null;
 		Connection connection=null;
 		ShellSession session = null;
 		try
 		{
-			connector = Manager.getInstance().newConnector("net.sf.commons.ssh.impl.j2ssh.J2SSHConnector",
+			connector = Manager.getInstance().newConnector("net.sf.commons.ssh.impl.ganymed.GanymedConnector",
 					Arrays.asList(Feature.SSH2,Feature.SYNCHRONOUS,Feature.AUTH_CREDENTIALS,Feature.SESSION_SHELL),null);
 			connection = connector.createConnection();
 			ConnectionPropertiesBuilder.getInstance().setHost(connection, "127.0.0.1");
@@ -77,16 +77,17 @@ public class JSCHTests
 			Thread.sleep(1000);
 			byte[] buffer = new byte[st.available()];
 			st.read(buffer);
-			System.out.println(new String(buffer));
+			System.out.println("output\n"+new String(buffer));
+			buffer = new byte[st.available()];
 		}
 		finally
 		{
-			//IOUtils.close(session);
+			IOUtils.close(session);
 			IOUtils.close(connection);
 			IOUtils.close(connector);
 		}
-		System.out.println(connector.getAllErrors());*/
-		SecurityUtils.isBouncyCastleRegistered();
+		System.out.println(connector.getAllErrors());
+/*		SecurityUtils.isBouncyCastleRegistered();
 		SshClient client = new SshClient();
 		client.connect("192.168.1.137",22,new IgnoreHostKeyVerification());
 		
@@ -95,7 +96,7 @@ public class JSCHTests
 		pwd.setPassword(new String("0xFD#syhdrtwaGNT".getBytes(),"UTF-8"));
 		
 		System.out.println(client.authenticate(pwd));
-		client.disconnect();
+		client.disconnect();*/
 	}
 
 }

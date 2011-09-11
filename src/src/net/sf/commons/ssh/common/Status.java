@@ -20,5 +20,22 @@ public enum Status
 	OPENNED,
 	INPROGRESS,
 	CLOSING,
-	CLOSED
+	CLOSED;
+	
+	public boolean between(Status s1,Status s2)
+	{
+		return compareTo(s1)>0 && compareTo(s2)<0;		
+	}
+	public boolean betweenLeft(Status s1,Status s2)
+	{
+		return compareTo(s1)>=0 && compareTo(s2)<0;		
+	}
+	public boolean betweenRight(Status s1,Status s2)
+	{
+		return compareTo(s1)>0 && compareTo(s2)<=0;		
+	}
+	public boolean betweenBoth(Status s1,Status s2)
+	{
+		return compareTo(s1)>=0 && compareTo(s2)<=0;		
+	}
 }
