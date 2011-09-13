@@ -15,13 +15,16 @@
  */
 package net.sf.commons.ssh.jsch;
 
-import java.io.*;
-
 import net.sf.commons.ssh.ExecSession;
-import net.sf.commons.ssh.utils.AutoflushPipeOutputStream;
 
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
+import net.sf.commons.ssh.utils.PipedInputStream;
+import net.sf.commons.ssh.utils.PipedOutputStream;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * @since 1.0
@@ -40,12 +43,12 @@ class JschExecSession extends JschAbstractSession implements ExecSession {
 
 	this.session = session;
 
-	this.inputStream = new PipedInputStream();
-	PipedOutputStream out = new AutoflushPipeOutputStream(this.inputStream);
+	this.inputStream = new PipedInputStream(1024,1024*1024*2,1024,false);
+	PipedOutputStream out = new PipedOutputStream(this.inputStream);
 	session.setOutputStream(out);
 
-	this.outputStream = new AutoflushPipeOutputStream();
-	PipedInputStream in = new PipedInputStream(this.outputStream);
+    PipedInputStream in = new PipedInputStream(1024,1024,1024,false);
+	this.outputStream = new PipedOutputStream(in);
 	session.setInputStream(in);
 
 	session.connect(soTimeout);

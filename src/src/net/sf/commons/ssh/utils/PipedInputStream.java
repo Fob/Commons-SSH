@@ -1,8 +1,9 @@
 package net.sf.commons.ssh.utils;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InterruptedIOException;
+import java.nio.ByteBuffer;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.logging.Log;
@@ -13,311 +14,408 @@ import org.apache.commons.logging.LogFactory;
  */
 public class PipedInputStream extends InputStream
 {
-    private static final Log log = LogFactory.getLog(PipedInputStream.class);
-    
-    private static final int DEFAULT_PIPE_SIZE = 1024;
-    
-    protected static AtomicLong counter = new AtomicLong();
-    
-    protected final long id;
-    
-    protected final String name;
-    
-    boolean closedByWriter = false;
-    
-    volatile boolean closedByReader = false;
-    
-    boolean connected = false;
-    
-    protected byte buffer[];
+	private static final Log log = LogFactory.getLog(PipedInputStream.class);
 
-    /**
-     * The index of the position in the circular buffer at which the
-     * next byte of data will be stored when received from the connected
-     * piped output stream. <code>in&lt;0</code> implies the buffer is empty,
-     * <code>in==out</code> implies the buffer is full
-     */
-    protected int in = -1;
+	private static final int DEFAULT_PIPE_SIZE = 1024;
 
-    /**
-     * The index of the position in the circular buffer at which the next
-     * byte of data will be read by this piped input stream.
-     */
-    protected int out = 0;
-    
-    public PipedInputStream(int bufferSize)
-    {
-        super();
-        buffer = new byte[bufferSize];
-        id = counter.incrementAndGet();
-        name = "pIS-" + id;
-    }
-    
-    public PipedInputStream()
-    {
-        this(DEFAULT_PIPE_SIZE);
-    }
-    
-    public PipedInputStream(PipedOutputStream src) throws IOException
-    {
-        this();
-        src.connect(this);
-    }
-    
-    @Override
-    public int read() throws IOException
-    {
-        if (log.isTraceEnabled())
-            trace("Reading one byle...");
-        
-        synchronized (buffer)
-        {
-            if (!connected)
-                throw new IOException("Pipe not connected");
-            else if (closedByReader)
-                throw new IOException("Pipe closed");
+	protected static AtomicLong counter = new AtomicLong();
 
-            while (in < 0)
-            {
-                if (closedByWriter)
-                    return -1;
-    
-                buffer.notifyAll();
-                try
-                {
-                    buffer.wait(1000);
-                }
-                catch (InterruptedException ex)
-                {
-                    throw new InterruptedIOException();
-                }
-            }
-            
-            int ret = buffer[out++] & 0xFF;
-            if (out >= buffer.length)
-                out = 0;
-            if (in == out)
-                in = -1; /* now empty */
-            
-            if (log.isTraceEnabled())
-                trace("One byte was read");
-            
-            return ret;
-        }
-    }
-    
-    public int read(byte b[], int off, int len) throws IOException
-    {
-        if (log.isTraceEnabled())
-            trace("Read " + len + " byles");
-        
-        if (b == null)
-            throw new NullPointerException();
-        else if (off < 0 || len < 0 || len > b.length - off)
-            throw new IndexOutOfBoundsException();
-        else if (len == 0)
-            return 0;
+	protected final long id;
 
-        synchronized (buffer)
-        {
-            /* possibly wait on the first character */
-            int c = read();
-            if (c < 0)
-                return -1;
-            
-            b[off] = (byte) c;
-            int rlen = 1;
-            while ((in >= 0) && (len > 1))
-            {
-                int available;
+	protected final String name;
 
-                if (in > out)
-                    available = Math.min((buffer.length - out), (in - out));
-                else
-                    available = buffer.length - out;
+	boolean closedByWriter = false;
 
-                // A byte is read before hand outside the loop
-                if (available > (len - 1))
-                    available = len - 1;
-                
-                System.arraycopy(buffer, out, b, off + rlen, available);
-                out += available;
-                rlen += available;
-                len -= available;
+	volatile boolean closedByReader = false;
 
-                if (out >= buffer.length)
-                    out = 0;
-                if (in == out)
-                    in = -1; /* now empty */
-            }
-            
-            return rlen;
-        }
-    }
+	boolean connected = false;
 
-    @Override
-    public int read(byte[] bytes) throws IOException
-    {
-        return read(bytes, 0, bytes.length);
-    }
+	protected ByteBuffer getBuffer;
+	protected ByteBuffer putBuffer;
+	ByteBuffer initialBuffer;
+	protected LinkedList<ByteBuffer> putBuffers;
 
-    public void receive(int b) throws IOException
-    {
-        synchronized (buffer)
-        {
-            checkStateForReceive();
-            
-            if (in == out)
-                awaitSpace();
-            
-            if (in < 0)
-            {
-                in = 0;
-                out = 0;
-            }
-            
-            buffer[in++] = (byte) (b & 0xFF);
-            
-            if (in >= buffer.length)
-                in = 0;
-        }
-    }
-    
-    public void receive(byte b[], int off, int len) throws IOException
-    {
-        synchronized (buffer)
-        {
-            checkStateForReceive();
-            
-            int bytesToTransfer = len;
-            while (bytesToTransfer > 0)
-            {
-                if (in == out)
-                    awaitSpace();
-                
-                int nextTransferAmount = 0;
-                if (out < in)
-                {
-                    nextTransferAmount = buffer.length - in;
-                }
-                else if (in < out)
-                {
-                    if (in == -1)
-                    {
-                        in = out = 0;
-                        nextTransferAmount = buffer.length - in;
-                    }
-                    else
-                    {
-                        nextTransferAmount = out - in;
-                    }
-                }
-                
-                if (nextTransferAmount > bytesToTransfer)
-                    nextTransferAmount = bytesToTransfer;
-                
-                assert (nextTransferAmount > 0);
-                System.arraycopy(b, off, buffer, in, nextTransferAmount);
-                bytesToTransfer -= nextTransferAmount;
-                off += nextTransferAmount;
-                in += nextTransferAmount;
-                
-                if (in >= buffer.length)
-                    in = 0;
-            }
-        }
-    }
-    
-    public void connect(PipedOutputStream src) throws IOException
-    {
-        src.connect(this);
-    }
-    
-    private void awaitSpace() throws IOException
-    {
-        if (log.isTraceEnabled())
-            trace("Await space");
-        
-        while (in == out)
-        {
-            checkStateForReceive();
 
-            try
-            {
-                buffer.wait(1000);
-            }
-            catch (InterruptedException ex)
-            {
-                throw new InterruptedIOException();
-            }
-        }
-        
-        if (log.isTraceEnabled())
-            trace("Free " + getAvailableSpace() + " bytes are available for writing");
-    }
-    
-    private void checkStateForReceive() throws IOException
-    {
-        if (!connected)
-            throw new IOException("Pipe not connected");
-        else if (closedByWriter || closedByReader)
-            throw new IOException("Pipe closed");
-    }
-    
-    private int getAvailableSpace()
-    {
-        if (in == -1)
-            return buffer.length;
-        
-        if (in <= out)
-            return out - in;
-        
-        return buffer.length - in + out;
-    }
-    
-    public void receivedLast()
-    {
-        synchronized (buffer)
-        {
-            closedByWriter = true;
-            buffer.notifyAll();
-        }
-    }
-    
-    @Override
-    public void close() throws IOException
-    {
-        synchronized (buffer)
-        {
-            closedByReader = true;
-            in = -1;
-            buffer.notifyAll();
-        }
-    }
-    
-    @Override
-    public int available() throws IOException
-    {
-        int available;
-        synchronized (buffer)
-        {
-            available = buffer.length - getAvailableSpace();
-        }
-        
-        if (log.isTraceEnabled())
-            trace(available + " bytes are available for reading");
-        
-        return available;
-    }
-    
-    @Override
-    public String toString()
-    {
-        return "PipedInputStream " + name;
-    }
-    
-    protected void trace(String msg)
-    {
-        log.trace(name + ": " + msg);
-    }
+	protected int initialSize = DEFAULT_PIPE_SIZE;
+	protected int maximumSize = DEFAULT_PIPE_SIZE;
+	protected int stepSize = DEFAULT_PIPE_SIZE;
+	protected boolean direct;
+	protected int currentSize;
+
+
+	public int getInitialSize()
+	{
+		return initialSize;
+	}
+
+	public int getMaximumSize()
+	{
+		return maximumSize;
+	}
+
+	public int getStepSize()
+	{
+		return stepSize;
+	}
+
+	public PipedInputStream(int initialSize, int maximumSize, int stepSize, boolean direct)
+	{
+		super();
+		this.initialSize = initialSize;
+		this.maximumSize = maximumSize;
+		this.stepSize = stepSize;
+		id = counter.incrementAndGet();
+		name = "pIS-" + id;
+		if ((maximumSize < initialSize && maximumSize > 0) || initialSize < 0 || maximumSize < 0 || stepSize < 0)
+			throw new IllegalArgumentException("illegal maximum or initial size");
+		putBuffers = new LinkedList<ByteBuffer>();
+		this.direct = direct;
+
+		initialBuffer = allocate(initialSize);
+		putBuffers.add(initialBuffer);
+		getBuffer = initialBuffer.duplicate();
+		putBuffer = initialBuffer.duplicate();
+		getBuffer.limit(0);
+
+		currentSize = initialSize;
+
+		LogUtils.trace(log, "pipe created with buffer initial size {0} maximum size {1} step size {2}", initialSize,
+				maximumSize, stepSize);
+	}
+
+	protected ByteBuffer allocate(int size)
+	{
+		if (direct)
+			return ByteBuffer.allocateDirect(size);
+		else
+			return ByteBuffer.allocate(size);
+	}
+
+	public PipedInputStream()
+	{
+		this(DEFAULT_PIPE_SIZE, 0, DEFAULT_PIPE_SIZE, false);
+	}
+
+	public PipedInputStream(PipedOutputStream src) throws IOException
+	{
+		this();
+		src.connect(this);
+	}
+
+	@Override
+	public synchronized int read() throws IOException
+	{
+		if (log.isTraceEnabled())
+			trace("Reading one byte...");
+
+		if (!connected)
+			throw new IOException("Pipe not connected");
+		else if (closedByReader)
+			throw new IOException("Pipe closed");
+		int ret;
+		for (;;)
+		{
+			int remaining = getBuffer.remaining();
+
+			if (remaining == 0)
+			{
+				if (!getData(true))
+				{
+					return -1;
+				}
+			}
+			else
+			{
+				ret = getBuffer.get() & 0xFF;
+				if (putBuffers.getFirst() == putBuffers.getLast())
+					if (putBuffer.limit() < getBuffer.position())
+						putBuffer.limit(getBuffer.position());
+				this.notifyAll();
+				return ret;
+			}
+		}
+	}
+
+	private boolean getData(boolean wait) throws IOException
+	{
+		if (getBuffer.position() == getBuffer.capacity() && putBuffers.size() > 1)
+		{
+			if (putBuffers.getFirst() != putBuffers.getLast())
+				currentSize -= getBuffer.capacity();
+			putBuffers.removeFirst();
+			getBuffer = putBuffers.getFirst().duplicate();
+			getBuffer.position(0);
+			if (putBuffers.getFirst() == putBuffers.getLast())
+			{
+				getBuffer.limit(putBuffer.position());
+			}
+			else
+				getBuffer.limit(getBuffer.capacity());
+			LogUtils.trace(log, "getData switch buffer:: \n{0}", this);
+			return true;
+		}
+		try
+		{
+			if (closedByWriter)
+				return false;
+			if (wait)
+			{
+				LogUtils.trace(log, "{0} wait new data", name);
+				this.wait();
+			}
+			return true;
+		}
+		catch (InterruptedException e)
+		{
+            throw new IOException("interrupt read waiting");
+		}
+	}
+
+	public synchronized int read(byte b[], int off, int len) throws IOException
+	{
+		if (log.isTraceEnabled())
+			trace("Read " + len + " byles");
+
+		if (b == null)
+			throw new NullPointerException();
+		else if (off < 0 || len < 0 || len > b.length - off)
+			throw new IndexOutOfBoundsException();
+		else if (len == 0)
+			return 0;
+
+		if (!connected)
+			throw new IOException("Pipe not connected");
+		else if (closedByReader)
+			throw new IOException("Pipe closed");
+		int rlen = 0;
+		for (;;)
+		{
+			int remaining = getBuffer.remaining();
+
+			if (remaining > 0)
+			{
+				int clen = Math.min(remaining, len);
+				getBuffer.get(b, off, clen);
+				off += clen;
+				len -= clen;
+				rlen += clen;
+				notifyOutput();
+				if (len == 0)
+				{
+					return rlen;
+				}
+			}
+			if (remaining == 0)
+			{
+				if (!getData(rlen == 0))
+				{
+					if (rlen == 0)
+						return -1;
+					notifyOutput();
+					return rlen;
+				}
+				if (getBuffer.remaining() == 0 & rlen > 0)
+				{
+					notifyOutput();
+					return rlen;
+				}
+			}
+		}
+	}
+
+	private void notifyOutput()
+	{
+		if (putBuffers.getFirst() == putBuffers.getLast())
+			if (putBuffer.limit() < getBuffer.position())
+				putBuffer.limit(getBuffer.position());
+		this.notifyAll();
+	}
+
+	@Override
+	public synchronized int read(byte[] bytes) throws IOException
+	{
+		return read(bytes, 0, bytes.length);
+	}
+
+	public synchronized void receive(int b) throws IOException
+	{
+		checkStateForReceive();
+		for (;;)
+		{
+			if (putBuffer.remaining() == 0)
+			{
+				getPutSpace();
+				checkStateForReceive();
+			}
+			else
+			{
+				putBuffer.put((byte) (b & 0xFF));
+				if (putBuffers.getFirst() == putBuffers.getLast())
+					if (getBuffer.limit() < putBuffer.position())
+					{
+						getBuffer.limit(putBuffer.position());
+					}
+				this.notifyAll();
+				LogUtils.trace(log, "{2} byte received getBuffer:{0} putBuffer:{1}", getBuffer, putBuffer, name);
+				return;
+			}
+		}
+	}
+
+	public synchronized void receive(byte b[], int off, int len) throws IOException
+	{
+		checkStateForReceive();
+		for (;;)
+		{
+			LogUtils.trace(log, "{0} try to write bytes offset {1} len {2}", name, off, len);
+			int remaining = putBuffer.remaining();
+			if (remaining == 0)
+			{
+				getPutSpace();
+				checkStateForReceive();
+			}
+			else
+			{
+				if (remaining <= len)
+				{
+					putBuffer.put(b, off, remaining);
+					off += remaining;
+					len -= remaining;
+				}
+				else
+				{
+					putBuffer.put(b, off, len);
+					len = 0;
+				}
+				if (putBuffers.getFirst() == putBuffers.getLast())
+					if (getBuffer.limit() < putBuffer.position())
+					{
+						getBuffer.limit(putBuffer.position());
+					}
+				this.notifyAll();
+				LogUtils.trace(log, "{2} byte received getBuffer:{0} putBuffer:{1}", getBuffer, putBuffer, name);
+				if (len == 0)
+					return;
+			}
+
+		}
+	}
+
+	public synchronized void connect(PipedOutputStream src) throws IOException
+	{
+		src.connect(this);
+	}
+
+	private void getPutSpace() throws IOException
+	{
+		if (log.isTraceEnabled())
+			trace("Get space");
+		if (putBuffers.getFirst() == putBuffers.getLast()
+				&& (putBuffer.limit() < putBuffer.capacity() || putBuffers.size() > 1))
+		{
+
+			try
+			{
+				this.wait();
+			}
+			catch (InterruptedException e)
+			{
+				throw new IOException("Wait buffer interrupting");
+			}
+			return;
+		}
+		if (!putBuffers.contains(initialBuffer))
+		{
+			putBuffers.addLast(initialBuffer);
+			putBuffer = initialBuffer.duplicate();
+			currentSize += putBuffer.capacity();
+			LogUtils.trace(log, "{0} use initial buffer", name);
+			return;
+		}
+		if (maximumSize > currentSize || maximumSize == 0)
+		{
+			LogUtils.trace(log, "{0} create new buffer", name);
+			ByteBuffer newBuffer = allocate(Math.min(maximumSize - currentSize, stepSize));
+			putBuffers.addLast(newBuffer);
+			putBuffer = newBuffer.duplicate();
+			currentSize += putBuffer.capacity();
+			return;
+		}
+		LogUtils.trace(log, "{0} use first buffer", name);
+		ByteBuffer firstBuffer = putBuffers.getFirst();
+		putBuffers.addLast(firstBuffer);
+		putBuffer = firstBuffer.duplicate();
+		putBuffer.position(0);
+		putBuffer.limit(getBuffer.position());
+		//System.out.println("======= getPutSpace ======== \n"+this);
+	}
+
+	private void checkStateForReceive() throws IOException
+	{
+		if (!connected)
+			throw new IOException("Pipe not connected");
+		else if (closedByWriter || closedByReader)
+			throw new IOException("Pipe closed");
+	}
+
+	public synchronized void receivedLast()
+	{
+		closedByWriter = true;
+		this.notifyAll();
+	}
+
+	@Override
+	public synchronized void close() throws IOException
+	{
+
+		closedByReader = true;
+		this.notifyAll();
+	}
+
+	@Override
+	public synchronized int available() throws IOException
+	{
+		int result = 0;
+		if (closedByReader)
+			return -1;
+		result += getBuffer.remaining();
+		if (putBuffers.size() > 1)
+		{
+			if (putBuffers.size() > 2)
+			{
+				Iterator<ByteBuffer> it = putBuffers.iterator();
+				it.next();
+				while (it.hasNext())
+				{
+					ByteBuffer b = it.next();
+					if (it.hasNext())
+					{
+						result += b.capacity();
+					}
+				}
+
+			}
+			result += putBuffer.position();
+		}
+		if(result ==0 && closedByWriter)
+			return -1;
+		return result;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "PipedInputStream " + name + "\ncurrent size " + currentSize + "\nBuffers: " + putBuffers
+				+ "\ngetBuffer: " + getBuffer + "\nputBuffer: " + putBuffer;
+	}
+
+	protected void trace(String msg)
+	{
+		log.trace(name + ": " + msg);
+	}
+
+	public synchronized boolean ready() throws IOException
+	{
+		return getBuffer.remaining()>0 || putBuffers.size()>2 || putBuffer.position()>0 || closedByWriter || closedByReader;
+	}
 }

@@ -37,14 +37,15 @@ class JschShellSession extends JschAbstractSession implements ShellSession {
 	    throws IOException, JSchException {
 	super(session);
 
-	this.inputStream = new PipedInputStream();
+	this.inputStream = new PipedInputStream(1024,1024*1024*2,1024,false);
 	final PipedOutputStream out = new PipedOutputStream(
 		this.inputStream);
 	session.setOutputStream(out);
 	session.setExtOutputStream(out);
 
-	this.outputStream = new PipedOutputStream();
-	session.setInputStream(new PipedInputStream(this.outputStream));
+    PipedInputStream in = new PipedInputStream(1024,1024,1024,false);
+	this.outputStream = new PipedOutputStream(in);
+	session.setInputStream(in);
 
 	session.connect(soTimeout);
     }

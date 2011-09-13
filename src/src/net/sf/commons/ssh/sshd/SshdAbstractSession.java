@@ -50,14 +50,15 @@ abstract class SshdAbstractSession implements Session {
 
 	this.channelSession = channelSession;
 
-	this.inputStream = new PipedInputStream();
+	this.inputStream = new PipedInputStream(1024,1024*1024*2,1024,false);
 	final PipedOutputStream out = new PipedOutputStream((PipedInputStream) inputStream);
 	channelSession.setOut(out);
 	channelSession.setErr(out);
     this.inputStream = new SSHDInputStream(inputStream);
 
-	this.outputStream = new PipedOutputStream();
-	channelSession.setIn(new PipedInputStream(this.outputStream));
+	PipedInputStream in = new PipedInputStream(1024,1024,0,false);
+    this.outputStream = new PipedOutputStream(in);
+	channelSession.setIn(in);
 
 	if (appendToInputBeforeOpen != null)
 	    outputStream.write(appendToInputBeforeOpen);
