@@ -9,6 +9,7 @@ import java.util.List;
 
 import net.sf.commons.ssh.utils.KeyUtils;
 import net.sf.commons.ssh.utils.LogUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -34,8 +35,9 @@ public class JSCHVerificationRepository implements HostKeyRepository
 	 */
 	public JSCHVerificationRepository(VerificationRepository repository)
 	{
-		super();
-		this.repository = repository;
+        super();
+		log.trace("create delegating verification repository for JSCH");
+        this.repository = repository;
 	}
 
 	/**
@@ -46,7 +48,11 @@ public class JSCHVerificationRepository implements HostKeyRepository
 		try
 		{
             LogUtils.trace(log,"host [{0}] key [{1}]",host,new String(key));
-			PublicKey publicKey = KeyUtils.getKeyFromBytes(key);
+			if(StringUtils.contains(host,":"))
+                host = StringUtils.substringBetween(host,"[","]");
+            LogUtils.trace(log,"host alias {0}",host);
+            PublicKey publicKey = KeyUtils.getKeyFromBytes(key);
+            LogUtils.trace(log,"resolved key {1}",publicKey);
 			return repository.check(host, publicKey)?OK:NOT_INCLUDED;
 		}
 		catch (Exception e)
