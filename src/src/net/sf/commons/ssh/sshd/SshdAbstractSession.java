@@ -20,6 +20,7 @@ import java.io.*;
 import net.sf.commons.ssh.Session;
 
 import net.sf.commons.ssh.utils.LogUtils;
+import net.sf.commons.ssh.utils.SoftBufferAllocator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sshd.ClientChannel;
@@ -50,13 +51,13 @@ abstract class SshdAbstractSession implements Session {
 
 	this.channelSession = channelSession;
 
-	this.inputStream = new PipedInputStream(1024,1024*1024*2,1024,false);
+	this.inputStream = new PipedInputStream(1024,1024*1024*2,1024,2,new SoftBufferAllocator());
 	final PipedOutputStream out = new PipedOutputStream((PipedInputStream) inputStream);
 	channelSession.setOut(out);
 	channelSession.setErr(out);
     this.inputStream = new SSHDInputStream(inputStream);
 
-	PipedInputStream in = new PipedInputStream(1024,1024,0,false);
+	PipedInputStream in = new PipedInputStream(1024,1024,0,2, new SoftBufferAllocator());
     this.outputStream = new PipedOutputStream(in);
 	channelSession.setIn(in);
 

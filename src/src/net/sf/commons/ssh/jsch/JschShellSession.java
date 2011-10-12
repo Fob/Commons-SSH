@@ -23,6 +23,7 @@ import net.sf.commons.ssh.utils.PipedOutputStream;
 
 import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSchException;
+import net.sf.commons.ssh.utils.SoftBufferAllocator;
 
 /**
  * @since 1.0
@@ -37,13 +38,13 @@ class JschShellSession extends JschAbstractSession implements ShellSession {
 	    throws IOException, JSchException {
 	super(session);
 
-	this.inputStream = new PipedInputStream(1024,1024*1024*2,1024,false);
+	this.inputStream = new PipedInputStream(1024,1024*1024*2,1024,2,new SoftBufferAllocator());
 	final PipedOutputStream out = new PipedOutputStream(
 		this.inputStream);
 	session.setOutputStream(out);
 	session.setExtOutputStream(out);
 
-    PipedInputStream in = new PipedInputStream(1024,1024,1024,false);
+    PipedInputStream in = new PipedInputStream(1024,1024,1024,2,new SoftBufferAllocator());
 	this.outputStream = new PipedOutputStream(in);
 	session.setInputStream(in);
 

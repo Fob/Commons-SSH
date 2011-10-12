@@ -21,6 +21,7 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSchException;
 import net.sf.commons.ssh.utils.PipedInputStream;
 import net.sf.commons.ssh.utils.PipedOutputStream;
+import net.sf.commons.ssh.utils.SoftBufferAllocator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,11 +44,11 @@ class JschExecSession extends JschAbstractSession implements ExecSession {
 
 	this.session = session;
 
-	this.inputStream = new PipedInputStream(1024,1024*1024*2,1024,false);
+	this.inputStream = new PipedInputStream(1024,1024*1024*2,1024,2,new SoftBufferAllocator());
 	PipedOutputStream out = new PipedOutputStream(this.inputStream);
 	session.setOutputStream(out);
 
-    PipedInputStream in = new PipedInputStream(1024,1024,1024,false);
+    PipedInputStream in = new PipedInputStream(1024,1024,1024,2,new SoftBufferAllocator());
 	this.outputStream = new PipedOutputStream(in);
 	session.setInputStream(in);
 
