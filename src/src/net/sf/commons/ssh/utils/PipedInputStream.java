@@ -1,4 +1,6 @@
 package net.sf.commons.ssh.utils;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -8,6 +10,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /**
  * @author Konstantin Aleksandrov (mail@aleksandrov.pro)
@@ -272,7 +276,7 @@ public class PipedInputStream extends InputStream
 		checkStateForReceive();
 		for (;;)
 		{
-			LogUtils.trace(log, "{0} try to write bytes {3} offset {1} len {2}", name, off, len,new String(b));
+			LogUtils.trace(log, "{0} try to write bytes {3} offset {1} len {2}", name, off, len,new String(b,off,len));
 			int remaining = putBuffer.remaining();
 			if (remaining == 0)
 			{
@@ -392,7 +396,7 @@ public class PipedInputStream extends InputStream
 	}
 
 	@Override
-	public String toString()
+	public synchronized String toString()
 	{
 		return "PipedInputStream " + name + "\ncurrent size " + currentSize + "\nBuffers: " + putBuffers
 				+ "\ngetBuffer: " + getBuffer + "\nputBuffer: " + putBuffer;
@@ -407,4 +411,59 @@ public class PipedInputStream extends InputStream
 	{
 		return getBuffer.remaining()>0 || putBuffers.size()>2 || putBuffer.position()>0 || closedByWriter || closedByReader;
 	}
+
+    /*public static void main(String[] args) throws IOException
+    {
+        Logger.getRootLogger().setLevel(Level.WARN);
+        final PipedInputStream in = new PipedInputStream(1024,2*1024*1024,1024,2,new SoftBufferAllocator());
+        PipedOutputStream out = new PipedOutputStream(in);
+
+        new Thread()
+        {
+            @Override
+            public void run()
+            {
+
+                byte[] bb = new byte[700];
+                try
+                {
+                    FileOutputStream ot = new FileOutputStream("./tst");
+                    while (in.available()>-1)
+                    {
+                        int k = in.read(bb);
+                        if(k>0)
+                            ot.write(bb,0,k);
+                    }
+                    in.close();
+                    ot.close();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
+        }.start();
+        FileInputStream f = new FileInputStream("c:/server816_win32.exe");
+        byte[] b = new byte[1024];
+        int c = 0;
+        int i = f.read(b,0,Long.valueOf(Math.round(Math.random()*1024)).intValue());
+        while (i>-1)
+        {
+            if(i==0)
+            {
+                i = f.read(b,0,Long.valueOf(Math.round(Math.random()*1024)).intValue());
+                continue;
+            }
+            out.write(b,0,i);
+            int n = c/1024/1024/30;
+            c+=i;
+            if(c/1024/1024/30 > n)
+                System.out.println(in+"");
+            i = f.read(b,0,Long.valueOf(Math.round(Math.random()*1024)).intValue());
+            //System.out.println(c+"");
+        }
+        System.out.println("finish out "+c);
+        f.close();
+        out.close();
+    }*/
 }
