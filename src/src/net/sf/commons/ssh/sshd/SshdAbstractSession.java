@@ -19,16 +19,15 @@ import java.io.*;
 
 import net.sf.commons.ssh.Session;
 
-import net.sf.commons.ssh.utils.LogUtils;
-import net.sf.commons.ssh.utils.SoftBufferAllocator;
+import net.sf.commons.ssh.utils.*;
+import net.sf.commons.ssh.utils.PipedInputStream;
+import net.sf.commons.ssh.utils.PipedOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.sshd.ClientChannel;
 import org.apache.sshd.ClientSession;
 import org.apache.sshd.client.channel.ChannelSession;
 import org.apache.sshd.client.future.OpenFuture;
-import net.sf.commons.ssh.utils.PipedInputStream;
-import net.sf.commons.ssh.utils.PipedOutputStream;
 
 /**
  * Commons SSH wrapper for {@link ChannelSession}
@@ -97,66 +96,12 @@ abstract class SshdAbstractSession implements Session {
 	return result;
     }
 
-    private class SSHDInputStream extends InputStream
+    private class SSHDInputStream extends DelegateInputStream
     {
-        private InputStream stream;
 
-        private SSHDInputStream(InputStream stream)
+        public SSHDInputStream(InputStream stream)
         {
-            this.stream = stream;
-        }
-
-        @Override
-        public int read() throws IOException
-        {
-            return stream.read();
-        }
-
-        @Override
-        public int read(byte[] bytes)
-                throws IOException
-        {
-            return stream.read(bytes);
-        }
-
-        @Override
-        public int read(byte[] bytes, int i, int i1)
-                throws IOException
-        {
-            return stream.read(bytes, i, i1);
-        }
-
-        @Override
-        public long skip(long l)
-                throws IOException
-        {
-            return stream.skip(l);
-        }
-
-        @Override
-        public void close()
-                throws IOException
-        {
-            stream.close();
-        }
-
-        @Override
-        public void mark(int i)
-        {
-            stream.mark(i);
-        }
-
-        @Override
-        public void reset()
-                throws IOException
-        {
-            stream.reset();
-        }
-
-        @Override
-        public boolean markSupported()
-        {
-            return stream.markSupported();
+            super(stream);
         }
 
         @Override

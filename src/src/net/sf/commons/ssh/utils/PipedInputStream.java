@@ -402,11 +402,6 @@ public class PipedInputStream extends InputStream
 		log.trace(name + ": " + msg);
 	}
 
-	public synchronized boolean ready() throws IOException
-	{
-		return getBuffer.remaining()>0 || putBuffers.size()>2 || putBuffer.position()>0 || closedByWriter || closedByReader;
-	}
-
     /*public static void main(String[] args) throws IOException
     {
         Logger.getRootLogger().setLevel(Level.WARN);

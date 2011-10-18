@@ -31,7 +31,7 @@ import com.jcraft.jsch.Channel;
 abstract class JschAbstractSession implements Session {
     protected final Log log = LogFactory.getLog(this.getClass());
 
-    private final Channel session;
+    protected final Channel session;
 
     JschAbstractSession(final Channel session) {
 	log.trace("<init>");

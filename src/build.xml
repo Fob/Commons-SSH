@@ -14,7 +14,7 @@
     <target name="meta">
         <mkdir dir="./out/META-INF"/>
         <manifest file="./out/META-INF/MANIFEST">
-                <attribute name="Implementation-Version" value="1.5.5"/>
+                <attribute name="Implementation-Version" value="1.5.6"/>
                 <attribute name="Built-By" value="${user.name}"/>
                 <attribute name="Java" value="${java.version}"/>
         </manifest>
