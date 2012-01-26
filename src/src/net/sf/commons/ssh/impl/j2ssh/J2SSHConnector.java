@@ -44,8 +44,6 @@ public class J2SSHConnector extends AbstractConnector
 			log.error("j2ssh is not available");
 			throw new UnsupportedOperationException("j2ssh is not available",e);
 		}
-		if(InitialPropertiesBuilder.getInstance().isAsynchronous(this))
-			log.warn("J2SSH library doesn't support asynchronos ssh");
 	}
 
 	/**

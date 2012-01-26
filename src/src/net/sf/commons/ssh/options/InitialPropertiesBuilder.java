@@ -21,8 +21,6 @@ public class InitialPropertiesBuilder extends PropertiesBuilder
 	public static final String SYNCHRONIZED_ERROR_HOLDER = "net.sf.commons.ssh.options.InitialPropertiesBuilder.SynchronizedErrorHolder";
 	@PropertyType(value = Boolean.class, required = true)
 	public static final String SYNCHRONIZED_CHILDEN = "net.sf.commons.ssh.options.InitialPropertiesBuilder.SynchronizedChildren";
-	@PropertyType(value = Boolean.class, required = true)
-	public static final String ASYNCHRONOUS = "net.sf.commons.ssh.options.InitialPropertiesBuilder.Asynchronous";
 	@PropertyType(value = Set.class, required = true)
 	public static final String LIBRARY_OPTIONS = "net.sf.commons.ssh.options.InitialPropertiesBuilder.options";
 
@@ -31,7 +29,6 @@ public class InitialPropertiesBuilder extends PropertiesBuilder
 		defaultProperties.put(SYNCHRONIZED_CONFIGURABLE, true);
 		defaultProperties.put(SYNCHRONIZED_ERROR_HOLDER, true);
 		defaultProperties.put(SYNCHRONIZED_CHILDEN, true);
-		defaultProperties.put(ASYNCHRONOUS, false);
 		defaultProperties.put(LIBRARY_OPTIONS, new HashSet());
 	}
 
@@ -74,16 +71,6 @@ public class InitialPropertiesBuilder extends PropertiesBuilder
 	public boolean isSynchronizedChildren(Properties opt)
 	{
 		return (Boolean) getProperty(opt, SYNCHRONIZED_CHILDEN);
-	}
-
-	public boolean isAsynchronous(Properties opt)
-	{
-		return (Boolean) getProperty(opt, ASYNCHRONOUS);
-	}
-
-	public void setAsynchronous(Configurable opt, boolean flag)
-	{
-		opt.setProperty(ASYNCHRONOUS, flag);
 	}
 
 	public Set<String> getLibraryOptions(Properties config)

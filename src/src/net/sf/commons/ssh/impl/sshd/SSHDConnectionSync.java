@@ -72,7 +72,7 @@ public class SSHDConnectionSync extends AbstractConnection
 	public boolean isConnected()
 	{
 		
-		int status = connection.waitFor(ClientSessionImpl.WAIT_AUTH, 0);
+		int status = connection.waitFor(ClientSessionImpl.WAIT_AUTH, 1);
 		Status cStatus = getContainerStatus();
 		return (status & ClientSessionImpl.WAIT_AUTH) !=0 && 
 				(cStatus.betweenBoth(Status.CONNECTED, Status.INPROGRESS));
@@ -84,7 +84,7 @@ public class SSHDConnectionSync extends AbstractConnection
 	@Override
 	public boolean isAuthenticated()
 	{
-		int status = connection.waitFor(ClientSessionImpl.AUTHED, 0);
+		int status = connection.waitFor(ClientSessionImpl.AUTHED, 1);
 		Status cStatus = getContainerStatus();
 		return (status & ClientSessionImpl.AUTHED) !=0 && 
 				(cStatus.betweenBoth(Status.AUTHENTICATED, Status.INPROGRESS));
@@ -96,7 +96,7 @@ public class SSHDConnectionSync extends AbstractConnection
 	@Override
 	public ShellSession createShellSession()
 	{
-		ShellSession session = new SSHDShellSync();
+		ShellSession session = new SSHDShellSync(this,connection);
 		registerChild(session);
 		return session;
 	}
@@ -125,7 +125,7 @@ public class SSHDConnectionSync extends AbstractConnection
 	@Override
 	public boolean isClosed()
 	{
-		int status = connection.waitFor(ClientSessionImpl.CLOSED, 0);
+		int status = connection.waitFor(ClientSessionImpl.CLOSED, 1);
 		return (status & ClientSessionImpl.CLOSED) !=0 && getContainerStatus()==Status.CLOSED;
 	}
 

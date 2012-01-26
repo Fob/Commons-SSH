@@ -59,11 +59,7 @@ public class SSHDConnector extends AbstractConnector
 	@Override
 	public Connection createConnection()
 	{
-		Connection connection;
-		if(InitialPropertiesBuilder.getInstance().isAsynchronous(this))
-			connection = null;
-		else
-			connection = new SSHDConnectionSync(this,client);
+		Connection connection = new SSHDConnectionSync(this,client);
 		registerChild(connection);
 		return connection;
 	}

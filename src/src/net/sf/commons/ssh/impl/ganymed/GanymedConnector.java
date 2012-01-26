@@ -45,8 +45,6 @@ public class GanymedConnector extends AbstractConnector
 			log.error("ganymed is not available");
 			throw new UnsupportedOperationException("ganymed is not available",e);
 		}
-		if(InitialPropertiesBuilder.getInstance().isAsynchronous(this))
-			log.warn("Ganymed library doesn't support asynchronos ssh");
 	}
 
 	/**

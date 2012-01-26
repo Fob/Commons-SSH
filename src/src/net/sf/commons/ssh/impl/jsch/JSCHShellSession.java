@@ -185,6 +185,7 @@ public class JSCHShellSession extends AbstractSession implements ShellSession
 		}
 		setContainerStatus(Status.OPENNED);
 		fire(new OpennedEvent(this));
+        setContainerStatus(Status.INPROGRESS);
 	}
 
 }

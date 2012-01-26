@@ -56,25 +56,6 @@ public class JSCHConnector extends AbstractConnector
 	{
 		super(properties);
 		JSch.setLogger(JSCHLogger.getInstance());
-		InitialPropertiesBuilder.getInstance().setAsynchronous(this, false);
-		this.addListener(new EventListener()
-			{
-
-				@Override
-				public void handle(Event event) throws EventHandlingException
-				{
-					SetPropertyEvent setEvent = (SetPropertyEvent) event;
-					if (setEvent.getKey().equals(InitialPropertiesBuilder.ASYNCHRONOUS))
-					{
-						Boolean newValue = setEvent.getNewValue() instanceof Boolean ? (Boolean) setEvent.getNewValue()
-								: Boolean.valueOf((String) setEvent.getNewValue());
-						if (newValue)
-							throw new EventHandlingException(
-									"This library not supported asychronous mode, Use Feature.Asynchronous");
-					}
-
-				}
-			}, new EventTypeFilter(EventType.SET_PROPERTY));
 		jsch = new JSch();
 		setupVerification();
 		this.addListener(

@@ -34,7 +34,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
-import org.apache.sshd.common.util.SecurityUtils;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.openssl.PasswordFinder;
@@ -172,8 +171,6 @@ public class KeyUtils
 
 	public static KeyPair getPrivateKeyFromStream(InputStream stream, final String passphrase) throws IOException
 	{
-		if (!SecurityUtils.isBouncyCastleRegistered())
-			return null;
 		PEMReader reader;
 		if (passphrase == null)
 			reader = new PEMReader(new InputStreamReader(stream));
