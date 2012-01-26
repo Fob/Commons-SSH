@@ -5,6 +5,7 @@ package net.sf.commons.ssh.impl.sshd;
 
 import java.io.IOException;
 
+import net.sf.commons.ssh.common.PipePropertiesBuilder;
 import org.apache.sshd.SshClient;
 import org.apache.sshd.client.SessionFactory;
 
@@ -89,6 +90,7 @@ public class SSHDConnector extends AbstractConnector
 	{
 		super.configureDefault(properties);
 		includeDefault(SSHDPropertiesBuilder.Connection.getInstance().getDefault());
+        includeDefault(PipePropertiesBuilder.getInstance().getDefault());
 	}
 	
 	

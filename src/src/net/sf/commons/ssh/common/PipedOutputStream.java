@@ -15,6 +15,8 @@ public class PipedOutputStream extends OutputStream
 {
     private static final Log log = LogFactory.getLog(PipedOutputStream.class);
 
+    private Runnable onWrite = null;
+
     protected String name = "pOS";
 
     protected PipedInputStream sink;
@@ -47,6 +49,8 @@ public class PipedOutputStream extends OutputStream
             trace("Write one byte");
 
         sink.receive(b);
+        if(onWrite!=null)
+            onWrite.run();
     }
 
     @Override
@@ -56,6 +60,8 @@ public class PipedOutputStream extends OutputStream
             trace("Write " + len + " bytes");
 
         sink.receive(b, off, len);
+        if(onWrite!=null)
+            onWrite.run();
     }
 
     @Override
@@ -74,5 +80,15 @@ public class PipedOutputStream extends OutputStream
     protected void trace(String msg)
     {
         log.trace(name + ": " + msg);
+    }
+
+    public Runnable getOnWrite()
+    {
+        return onWrite;
+    }
+
+    public void setOnWrite(Runnable onWrite)
+    {
+        this.onWrite = onWrite;
     }
 }

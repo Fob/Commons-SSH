@@ -6,6 +6,7 @@ package net.sf.commons.ssh.impl.sshd;
 import net.sf.commons.ssh.common.*;
 import net.sf.commons.ssh.event.events.ClosedEvent;
 import net.sf.commons.ssh.event.events.OpennedEvent;
+import net.sf.commons.ssh.event.events.ReadAvailableEvent;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.AbstractSession;
 import net.sf.commons.ssh.session.ShellSession;
@@ -61,8 +62,30 @@ public class SSHDShellSync extends AbstractSession implements ShellSession
         stdOut = new PipedInputStream(initialSize,maximumSize,stepSize,modifier,allocator);
         stdErr = new PipedInputStream(initialSize,maximumSize,stepSize,modifier,allocator);
 
-        channel.setOut(new PipedOutputStream(stdOut));
-        channel.setErr(new PipedOutputStream(stdErr));
+        final SSHDShellSync shell = this;
+        final PipedOutputStream stdOutPipe = new PipedOutputStream(stdOut);
+        stdOutPipe.setOnWrite(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                fire(new ReadAvailableEvent(shell,stdOut,false));
+            }
+        });
+
+
+        final PipedOutputStream stdErrPipe = new PipedOutputStream(stdErr);
+        stdErrPipe.setOnWrite(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                fire(new ReadAvailableEvent(shell,stdErr,true));
+            }
+        });
+
+        channel.setOut(stdOutPipe);
+        channel.setErr(stdErrPipe);
 
         OpenFuture future = null;
         try
