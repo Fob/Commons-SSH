@@ -108,7 +108,7 @@ public class SSHDShellSync extends AbstractSession implements ShellSession
         if(future.isCanceled())
             throw new IOException("opening was canceled");
         if(!future.isOpened())
-            throw new IOException("can't open shell session");
+            throw new IOException("can't open shell session",future.getException());
         setContainerStatus(Status.OPENNED);
         fire(new OpennedEvent(this));
         setContainerStatus(Status.INPROGRESS);

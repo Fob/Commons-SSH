@@ -3,7 +3,7 @@
  */
 package net.sf.commons.ssh.impl.jsch;
 
-import static org.junit.Assert.*;
+//import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +31,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.sshd.common.util.SecurityUtils;
-import org.junit.Test;
+//import org.junit.Test;
 
 import com.sshtools.j2ssh.SshClient;
 import com.sshtools.j2ssh.authentication.KBIAuthenticationClient;
@@ -58,13 +58,13 @@ public class JSCHTests
 		ShellSession session = null;
 		try
 		{
-			connector = Manager.getInstance().newConnector("net.sf.commons.ssh.impl.ganymed.GanymedConnector",
+			connector = Manager.getInstance().newConnector("net.sf.commons.ssh.impl.sshd.SSHDConnector",
 					Arrays.asList(Feature.SSH2,Feature.SYNCHRONOUS,Feature.AUTH_CREDENTIALS,Feature.SESSION_SHELL),null);
 			connection = connector.createConnection();
-			ConnectionPropertiesBuilder.getInstance().setHost(connection, "127.0.0.1");
+			ConnectionPropertiesBuilder.getInstance().setHost(connection, "devapp046.netcracker.com");
 			PasswordPropertiesBuilder.getInstance().setupAuthenticationMethod(connection);
-			PasswordPropertiesBuilder.getInstance().setLogin(connection, "fob");
-			PasswordPropertiesBuilder.getInstance().setPassword(connection, "0xFD#syhdrtwaGNT");
+			PasswordPropertiesBuilder.getInstance().setLogin(connection, "netcrk");
+			PasswordPropertiesBuilder.getInstance().setPassword(connection, "crknet");
 			connection.connect(false);
 			connection.authenticate();
 			System.out.println(connection.getHostKey());

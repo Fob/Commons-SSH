@@ -5,6 +5,7 @@ package net.sf.commons.ssh.impl.sshd;
 
 import java.io.IOException;
 
+import net.sf.commons.ssh.Feature;
 import net.sf.commons.ssh.common.PipePropertiesBuilder;
 import org.apache.sshd.SshClient;
 import org.apache.sshd.client.SessionFactory;
@@ -22,7 +23,8 @@ import net.sf.commons.ssh.options.Properties;
  * @date 31.07.2011
  * @since 2.0
  */
-@SupportedFeatures({})
+@SupportedFeatures({Feature.AUTH_CREDENTIALS,Feature.AUTH_PUBLICKEY,Feature.AUTHENTICATE_TIMEOUT,Feature.CONNECT_WITHOUT_AUTHENTICATE,
+        Feature.CONNECTION_TIMEOUT,Feature.ERROR_STREAM,Feature.SESSION_SHELL,Feature.SOCKET_TIMEOUT,Feature.SSH2,Feature.SYNCHRONOUS})
 public class SSHDConnector extends AbstractConnector
 {
 	private SshClient client;

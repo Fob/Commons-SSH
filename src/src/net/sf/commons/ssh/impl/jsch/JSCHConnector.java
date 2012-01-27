@@ -5,6 +5,7 @@ package net.sf.commons.ssh.impl.jsch;
 
 import java.io.IOException;
 
+import net.sf.commons.ssh.common.PipePropertiesBuilder;
 import org.apache.commons.lang.StringUtils;
 
 import com.jcraft.jsch.JSch;
@@ -150,6 +151,7 @@ public class JSCHConnector extends AbstractConnector
 	protected void configureDefault(Properties properties)
 	{
 		super.configureDefault(properties);
+        includeDefault(PipePropertiesBuilder.getInstance().getDefault());
 		InitialPropertiesBuilder ipb = InitialPropertiesBuilder.getInstance();
 		ipb.addLibraryOption(this, "kex");
 		ipb.addLibraryOption(this, "server_host_key");
