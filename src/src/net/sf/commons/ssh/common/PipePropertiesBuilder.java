@@ -55,7 +55,7 @@ public class PipePropertiesBuilder extends PropertiesBuilder
         return (Integer) getProperty(conf, MODIFIER_SIZE);
     }
 
-    public BufferAllocator etAllocator(Properties conf)
+    public BufferAllocator getAllocator(Properties conf)
     {
         return (BufferAllocator) getProperty(conf, ALLOCATOR);
     }
