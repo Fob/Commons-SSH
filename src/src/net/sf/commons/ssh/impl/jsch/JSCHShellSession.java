@@ -91,7 +91,13 @@ public class JSCHShellSession extends AbstractSession implements ShellSession
 		return err;
 	}
 
-	/**
+    @Override
+    public boolean isEOF() throws IOException
+    {
+        return session.isEOF();
+    }
+
+    /**
 	 * @see net.sf.commons.ssh.common.AbstractClosable#closeImpl()
 	 */
 	@Override
@@ -144,13 +150,13 @@ public class JSCHShellSession extends AbstractSession implements ShellSession
 		//fire events
 		final AbstractEventProcessor thisSession = this;
 		libraryOut.setOnWrite(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					fire(new ReadAvailableEvent(thisSession, in, false));
-				}
-			});
+        {
+            @Override
+            public void run()
+            {
+                fire(new ReadAvailableEvent(thisSession, in, false));
+            }
+        });
 		
 		session.setOutputStream(libraryOut);
 		if (sspb.isSeparateErrorStream(this))
@@ -158,13 +164,13 @@ public class JSCHShellSession extends AbstractSession implements ShellSession
 			err = new PipedInputStream(initialSize,maximumSize,stepSize,modifier,allocator);
 			libraryErr = new PipedOutputStream((PipedInputStream) err);
 			libraryErr.setOnWrite(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					fire(new ReadAvailableEvent(thisSession, err, false));
-				}
-			});
+            {
+                @Override
+                public void run()
+                {
+                    fire(new ReadAvailableEvent(thisSession, err, false));
+                }
+            });
 			session.setExtOutputStream(libraryErr);
 		}
 		else

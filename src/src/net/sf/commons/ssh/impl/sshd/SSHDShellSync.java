@@ -148,6 +148,13 @@ public class SSHDShellSync extends AbstractSession implements ShellSession
     }
 
     @Override
+    public boolean isEOF() throws IOException
+    {
+        int status = channel.waitFor(ClientChannel.EOF,1);
+        return (status & ClientChannel.EOF) != 0;
+    }
+
+    @Override
     public boolean isOpened()
     {
 		Status status = getContainerStatus();

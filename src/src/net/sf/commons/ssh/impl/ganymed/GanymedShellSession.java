@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import ch.ethz.ssh2.ChannelCondition;
 import ch.ethz.ssh2.Connection;
 import ch.ethz.ssh2.Session;
 import net.sf.commons.ssh.options.Properties;
@@ -86,7 +87,14 @@ public class GanymedShellSession extends AbstractSession implements ShellSession
 			return session.getStdout();
 	}
 
-	/**
+    @Override
+    public boolean isEOF() throws IOException
+    {
+        int status = session.waitForCondition(ChannelCondition.EOF,1);
+        return (status & ChannelCondition.EOF) != 0;
+    }
+
+    /**
 	 * @see net.sf.commons.ssh.session.AbstractSession#openImpl()
 	 */
 	@Override

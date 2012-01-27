@@ -99,7 +99,13 @@ public class J2SSHShellSession extends AbstractSession implements ShellSession
 			return session.getInputStream();
 	}
 
-	/**
+    @Override
+    public boolean isEOF() throws IOException
+    {
+        return session.isRemoteEOF();
+    }
+
+    /**
 	 * @see net.sf.commons.ssh.session.AbstractSession#openImpl()
 	 */
 	@Override

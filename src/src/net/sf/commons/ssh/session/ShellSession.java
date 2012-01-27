@@ -32,4 +32,6 @@ public interface ShellSession extends Session
      * @throws IOException
      */
     InputStream getErrorStream() throws IOException;
+
+    boolean isEOF() throws IOException;
 }
