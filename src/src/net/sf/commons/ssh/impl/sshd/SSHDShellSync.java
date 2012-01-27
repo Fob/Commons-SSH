@@ -10,6 +10,7 @@ import net.sf.commons.ssh.event.events.ReadAvailableEvent;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.AbstractSession;
 import net.sf.commons.ssh.session.ShellSession;
+import net.sf.commons.ssh.session.ShellSessionPropertiesBuilder;
 import org.apache.sshd.ClientChannel;
 import org.apache.sshd.ClientSession;
 import org.apache.sshd.client.channel.ChannelSession;
@@ -49,6 +50,7 @@ public class SSHDShellSync extends AbstractSession implements ShellSession
     @Override
     protected void openImpl() throws IOException
     {
+        final boolean isSeparateErrorStream = ShellSessionPropertiesBuilder.getInstance().isSeparateErrorStream(this);
         final Integer initialSize = PipePropertiesBuilder.getInstance().getInitialSize(this);
         final Integer maximumSize = PipePropertiesBuilder.getInstance().getMaximumSize(this);
         final Integer stepSize = PipePropertiesBuilder.getInstance().getStepSize(this);
@@ -73,19 +75,24 @@ public class SSHDShellSync extends AbstractSession implements ShellSession
             }
         });
 
-
-        final PipedOutputStream stdErrPipe = new PipedOutputStream(stdErr);
-        stdErrPipe.setOnWrite(new Runnable()
+        if (isSeparateErrorStream)
         {
-            @Override
-            public void run()
+            final PipedOutputStream stdErrPipe = new PipedOutputStream(stdErr);
+            stdErrPipe.setOnWrite(new Runnable()
             {
-                fire(new ReadAvailableEvent(shell,stdErr,true));
-            }
-        });
+                @Override
+                public void run()
+                {
+                    fire(new ReadAvailableEvent(shell, stdErr, true));
+                }
+            });
+            channel.setErr(stdErrPipe);
+        }
+        else
+            channel.setErr(stdOutPipe);
 
         channel.setOut(stdOutPipe);
-        channel.setErr(stdErrPipe);
+
 
         OpenFuture future = null;
         try
