@@ -48,12 +48,12 @@ public class SSHDConnector extends AbstractConnector
 		Integer processorCount = SSHDPropertiesBuilder.Connector.getInstance().getNioProcessorCount(this);
 		String method = SSHDPropertiesBuilder.Connector.getInstance().getPumpingMethod(this);
 		Long timeout = SSHDPropertiesBuilder.Connector.getInstance().getPumpingStreamTimeout(this);
-		if(processorCount != null)
-			client.setNioProcessorCount(processorCount);
-		if(timeout!=null)
-			client.setStreamWaitTime(timeout);
-		if(method!=null)
-			client.setPumpingMethod(org.apache.sshd.client.PumpingMethod.valueOf(method));
+		//if(processorCount != null)
+		//	client.setNioProcessorCount(processorCount);
+		//if(timeout!=null)
+		//	client.setStreamWaitTime(timeout);
+		//if(method!=null)
+		//	client.setPumpingMethod(org.apache.sshd.client.PumpingMethod.valueOf(method));
 	}
 
 	/**
