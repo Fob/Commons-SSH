@@ -1,24 +1,65 @@
 package net.sf.commons.ssh;
 
 
-
-
-public enum Feature
-{
+/**
+ * All Available Features
+ */
+public enum Feature {
+    /**
+     * GSS API authentication feature
+     */
+    AUTH_GSS_API,
+    /**
+     * Password authentication feature
+     */
     AUTH_CREDENTIALS,
-    AUTH_PUBLICKEY,
+    /**
+     * Public key authentication feature
+     */
+    AUTH_PUBLIC_KEY,
+    /**
+     * None Authentication feature
+     */
     AUTH_NONE,
-    SESSION_EXEC,
-    SESSION_SFTP,
-    SESSION_SHELL ,
-    SESSION_SUBSYSTEM,
+
+    /**
+     * Shell session feature
+     */
+    SESSION_SHELL,
+    /**
+     * Socket timeout supports
+     */
     SOCKET_TIMEOUT,
-    CONNECTION_TIMEOUT ,
+    /**
+     * Connection timeout supports
+     */
+    CONNECTION_TIMEOUT,
+    /**
+     * Authentication timeout supports
+     */
     AUTHENTICATE_TIMEOUT,
+    /**
+     * Asynchronous mode
+     */
     ASYNCHRONOUS,
+    /**
+     * Synchronous mode
+     */
     SYNCHRONOUS,
+    /**
+     * Separate Std error stream
+     */
     ERROR_STREAM,
+    /**
+     * SSH1 protocol supports
+     */
     SSH1,
+    /**
+     * SSH2 protocol supports
+     */
     SSH2,
-    CONNECT_WITHOUT_AUTHENTICATE;
+    /**
+     * Library provide api to connect to devices without authenticate
+     */
+    CONNECT_WITHOUT_AUTHENTICATE
 }

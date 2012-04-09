@@ -9,124 +9,177 @@ import net.sf.commons.ssh.directory.Directory;
 import net.sf.commons.ssh.options.Configurable;
 import net.sf.commons.ssh.options.InitialPropertiesBuilder;
 import net.sf.commons.ssh.options.MapConfigurable;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.crypto.KeyAgreement;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.util.*;
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-public final class Manager
-{
+/**
+ * This class set global library preferences and create Connector by features.
+ *
+ * @author Alexey Polbitsyn aka fob
+ * @since 2.0
+ */
+public final class Manager {
     private static final Log log = LogFactory.getLog(Manager.class);
     private static Manager instance = null;
 
-    protected Manager()
-    {
+    protected Manager() {
         log.trace("register BC provider");
-        try
-        {
-            if (java.security.Security.getProvider("BC") == null)
-            {
+        try {
+            if (java.security.Security.getProvider("BC") == null) {
                 java.security.Security.addProvider(new BouncyCastleProvider());
                 MessageDigest.getInstance("MD5", "BC");
                 KeyAgreement.getInstance("DH", "BC");
             }
         }
-        catch (Exception e)
-        {
-            throw new UnexpectedRuntimeException("Registration BC Security provider failed",e);
+        catch (Exception e) {
+            throw new UnexpectedRuntimeException("Registration BC Security provider failed", e);
         }
 
     }
 
-    public synchronized static Manager getInstance()
-    {
-        if (instance == null)
-        {
+    /**
+     * Getting Manager singleton instance.
+     *
+     * @return Manager
+     */
+    public synchronized static Manager getInstance() {
+        if (instance == null) {
             instance = new Manager();
         }
 
         return instance;
     }
 
-    public Connector newConnector(Collection<Feature> features, net.sf.commons.ssh.options.Properties properties)
-    {
+    /**
+     * Search connector in {@link Directory} by features and create it.
+     *
+     * @param features   founded {@link Connector} should supports all {@link Feature} from this collection.
+     * @param properties initial {@link net.sf.commons.ssh.options.Properties} for {@link Connector}
+     * @return Instance of {@link Connector}
+     * @throws ConnectorResolvingException {@link ConnectorResolvingException} if connector haven't been created.
+     */
+    public Connector newConnector(@NotNull Set<Feature> features, @Nullable net.sf.commons.ssh.options.Properties properties) throws ConnectorResolvingException {
         return newConnector(Directory.getInstance().getDescriptions(), features, properties);
     }
 
-    public Connector newConnector(String factory, Collection<Feature> features, net.sf.commons.ssh.options.Properties properties)
-    {
-        return newConnector(Arrays.asList(factory), features, properties);
+    /**
+     * Check connector by features and create it.
+     *
+     * @param connectorClass connector class to create. It should implements {@link Connector}
+     * @param features       {@link Connector} should supports all {@link Feature} from this collection.
+     * @param properties     initial {@link net.sf.commons.ssh.options.Properties} for {@link Connector}
+     * @return Instance of {@link Connector}
+     * @throws ConnectorResolvingException {@link ConnectorResolvingException} if connector haven't been created.
+     */
+    public Connector newConnector(@NotNull String connectorClass, @NotNull Set<Feature> features, @Nullable net.sf.commons.ssh.options.Properties properties)
+            throws ConnectorResolvingException {
+        return newConnector(new HashSet<String>(Arrays.asList(connectorClass)), features, properties);
     }
 
-    public Connector newConnector(List<String> factories, Collection<Feature> features, net.sf.commons.ssh.options.Properties properties)
-    {
-        return newConnector(Directory.getInstance().getDescriptions(factories), features, properties);
+    /**
+     * Check connector by features and create it.
+     *
+     * @param connectorClass connector class to create. It should implements {@link Connector}
+     * @param features       {@link Connector} should supports all {@link Feature} from this collection.
+     * @param properties     initial {@link net.sf.commons.ssh.options.Properties} for {@link Connector}
+     * @return Instance of {@link Connector}
+     * @throws ConnectorResolvingException {@link ConnectorResolvingException} if connector haven't been created.
+     */
+    public Connector newConnector(@NotNull String connectorClass, @NotNull Feature[] features, @Nullable net.sf.commons.ssh.options.Properties properties)
+            throws ConnectorResolvingException {
+        return newConnector(new HashSet<String>(Arrays.asList(connectorClass)), new HashSet<Feature>(Arrays.asList(features)), properties);
     }
 
+    /**
+     * Chose connector by features and create it.
+     *
+     * @param classes    connector classes to chose from.
+     * @param features   chosen {@link Connector} should supports all {@link Feature} from this collection.
+     * @param properties properties initial {@link net.sf.commons.ssh.options.Properties} for {@link Connector}
+     * @return Instance of {@link Connector}
+     * @throws ConnectorResolvingException {@link ConnectorResolvingException} if connector haven't been created.
+     */
+    public Connector newConnector(@NotNull Set<String> classes, @NotNull Set<Feature> features, @Nullable net.sf.commons.ssh.options.Properties properties)
+            throws ConnectorResolvingException {
+        return newConnector(Directory.getInstance().getDescriptions(classes), features, properties);
+    }
+
+    /**
+     * Chose connector by features and create it.
+     *
+     * @param classes    connector classes to chose from.
+     * @param features   chosen {@link Connector} should supports all {@link Feature} from this collection.
+     * @param properties properties initial {@link net.sf.commons.ssh.options.Properties} for {@link Connector}
+     * @return Instance of {@link Connector}
+     * @throws ConnectorResolvingException {@link ConnectorResolvingException} if connector haven't been created.
+     */
+    public Connector newConnector(@NotNull String[] classes, @NotNull Feature[] features, @Nullable net.sf.commons.ssh.options.Properties properties)
+            throws ConnectorResolvingException {
+        return newConnector(new HashSet<String>(Arrays.asList(classes)), new HashSet<Feature>(Arrays.asList(features)), properties);
+    }
+
+    //create connector method
     @SuppressWarnings("unchecked")
-    private Connector newConnector(Collection<Description> factories, Collection<Feature> features, net.sf.commons.ssh.options.Properties properties)
-    {
-        LogUtils.info(log, "Try to create Connector with features {1} from: \n{0}", factories, features);
-
-        for (Description description : factories)
-        {
-            try
-            {
+    private Connector newConnector(Collection<Description> classes, Set<Feature> features, @Nullable net.sf.commons.ssh.options.Properties properties)
+            throws ConnectorResolvingException {
+        LogUtils.debug(log, "Try to create Connector with features {1} from: \n{0}", classes, features);
+        ConnectorResolvingException resolvingException = new ConnectorResolvingException(features);
+        for (Description description : classes) {
+            try {
 
                 Class<? extends Connector> connectorClass = (Class<? extends Connector>) Class.forName(description
                         .getClassName());
+                Set<Feature> featuresSet = new HashSet<Feature>();
                 SupportedFeatures supportedFeatures = connectorClass.getAnnotation(SupportedFeatures.class);
                 if (supportedFeatures == null)
-                {
-                    throw new Exception("Connector doesn't support any features");
+                    LogUtils.info(log, "connector {0} doesn't supports any features", description);
+                else
+                    featuresSet.addAll(Arrays.asList(supportedFeatures.value()));
+                //check features
+                if (!featuresSet.containsAll(features)) {
+                    LogUtils.info(log, "Connector {0}\n support features {1} \nrequired features {2}", description, featuresSet, features);
+                    resolvingException.addDescription(description, MessageFormat
+                            .format("    support features {1}\n    required features {2}", description, featuresSet, features));
+                    continue;
                 }
-                List<Feature> featuresSet = Arrays.asList(supportedFeatures.value());
-                if (!featuresSet.containsAll(features))
-                {
-                    throw new Exception("Connector " + description.toString() + " \nsupport features: " + featuresSet
-                            + "\nrequired features: " + features);
-                }
-                if (properties == null)
-                {
+                //set default properties
+                if (properties == null) {
                     properties = new MapConfigurable();
                     InitialPropertiesBuilder.getInstance().setSynchronizedConfigurable((Configurable) properties, true);
                 }
-                Constructor constructor = connectorClass.getConstructor(net.sf.commons.ssh.options.Properties.class);
-                return (Connector) constructor.newInstance(properties);
+                return connectorClass.getConstructor(net.sf.commons.ssh.options.Properties.class).newInstance(properties);
             }
-            catch (Exception e)
-            {
+            catch (ClassCastException e) {
+                LogUtils.info(log, e, "Connector should implements Connector");
+                resolvingException.addDescription(description, e.getMessage());
+            }
+            catch (Exception e) {
+
                 Throwable cause = e;
-                if (e instanceof InvocationTargetException)
-                {
+                if (e instanceof InvocationTargetException) {
                     cause = e.getCause();
                 }
-                LogUtils.info(log, cause, "Can''t load library:\n{0}", description.dumpInfo());
+                LogUtils.info(log, cause, "Can''t load connector:\n{0}", description.dumpInfo());
+                resolvingException.addDescription(description, e.getMessage());
             }
         }
         // no connector loaded
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer
-                .append("Either unable to load any of SSH connectors or none of them does support all required features. "
-                        + "SSH implementation libraries supported by Commons SSH:");
-        for (final Iterator<Description> iterator = factories.iterator(); iterator.hasNext();)
-        {
-            final Description description = iterator.next();
-
-            stringBuffer.append("\n* ");
-            stringBuffer.append(description.dumpInfo());
-        }
-        final String message = stringBuffer.toString();
-        log.error(message);
-        throw new ConnectorResolvingException(factories, features);
+        if (log.isInfoEnabled())
+            log.info(resolvingException.getMessage());
+        throw resolvingException;
     }
+
 
 }
