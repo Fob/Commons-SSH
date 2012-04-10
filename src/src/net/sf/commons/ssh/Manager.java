@@ -8,7 +8,7 @@ import net.sf.commons.ssh.directory.Description;
 import net.sf.commons.ssh.directory.Directory;
 import net.sf.commons.ssh.options.Configurable;
 import net.sf.commons.ssh.options.InitialPropertiesBuilder;
-import net.sf.commons.ssh.options.MapConfigurable;
+import net.sf.commons.ssh.options.impl.MapConfigurable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -34,6 +34,9 @@ public final class Manager {
     private static final Log log = LogFactory.getLog(Manager.class);
     private static Manager instance = null;
 
+    /**
+     * creating manager instance,setting security providers
+     */
     protected Manager() {
         log.trace("register BC provider");
         try {

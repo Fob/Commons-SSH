@@ -1,7 +1,7 @@
 package net.sf.commons.ssh.options;
 
 /**
- * Properties container class.
+ * Properties container class.Read Only configuration.
  *
  * @author Alexey Polbitsyn aka fob
  * @since 2.0
@@ -16,7 +16,7 @@ public interface Properties {
     Object getProperty(String key);
 
     /**
-     * Set append set of default properties to this container.
+     * Set default properties to this configuration.
      *
      * @param configurable default {@link Properties}
      */

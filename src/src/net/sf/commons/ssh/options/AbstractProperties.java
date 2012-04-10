@@ -1,5 +1,7 @@
 package net.sf.commons.ssh.options;
 
+import net.sf.commons.ssh.options.impl.PropertiesWrapper;
+
 /**
  * Base implementation of {@link Properties}
  */
@@ -34,13 +36,18 @@ public abstract class AbstractProperties implements Properties {
     /**
      * {@link Properties#getProperty(String)} implementation
      *
-     * @param configurable default {@link Properties}
+     * @param properties default {@link Properties}
      */
-    public void includeDefault(Properties configurable) {
+    public void includeDefault(Properties properties) {
+        PropertiesWrapper defaultProperties = new PropertiesWrapper(properties);
+
         if (parent == null)
-            parent = configurable;
-        else
-            parent.includeDefault(configurable);
+            parent = defaultProperties;
+        else {
+            PropertiesWrapper parentProperties = new PropertiesWrapper(parent);
+            parentProperties.parent = defaultProperties;
+            parent = parentProperties;
+        }
     }
 
     @Override

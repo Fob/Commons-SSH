@@ -25,7 +25,7 @@ public class ConnectorResolvingException extends Exception {
     }
 
     /**
-     * Return set of {@link net.sf.commons.ssh.connector.Connector} descriptions{@see Description} with fail messages. Detailed exceptions will be in logs.
+     * Return set of {@link net.sf.commons.ssh.connector.Connector} descriptions{@link Description} with fail messages. Detailed exceptions will be in logs.
      *
      * @return Map of descriptions - messages
      */

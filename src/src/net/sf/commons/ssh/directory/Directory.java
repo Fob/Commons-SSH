@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.util.*;
 
 /**
+ * Contains predefined library descriptions
+ *
  * @author Sergey Vidyuk (svidyuk at gmail dot com)
  * @since 1.0
  */
@@ -95,6 +97,7 @@ public class Directory {
         return result;
     }
 
+    //load descriptions
     private Map<String, Description> load() throws ParserConfigurationException, SAXException,
             IOException {
         final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
