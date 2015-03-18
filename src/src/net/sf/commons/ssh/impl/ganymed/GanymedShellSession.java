@@ -31,7 +31,7 @@ public class GanymedShellSession extends AbstractSession implements ShellSession
 	 * @param properties
 	 * @throws IOException 
 	 */
-	public GanymedShellSession(Properties properties,Connection connection) throws IOException
+	public GanymedShellSession(Properties properties, Connection connection) throws IOException
 	{
 		super(properties);
 		session = connection.openSession();

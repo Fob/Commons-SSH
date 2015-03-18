@@ -4,6 +4,8 @@ package net.sf.commons.ssh.connection;
 import net.sf.commons.ssh.auth.AuthenticationMethod;
 import net.sf.commons.ssh.options.*;
 
+import java.net.Proxy;
+
 
 public class ConnectionPropertiesBuilder extends PropertiesBuilder
 {
@@ -18,6 +20,8 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
     public static final String KEY_SOCKET_TIMEOUT = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.soTimeout";
     @PropertyType(Long.class)
     public static final String KEY_CONNECT_TIMEOUT = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.connectTimeout";
+    @PropertyType(Proxy.class)
+    public static final String KEY_PROXY = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.proxy";
     @PropertyType(value = String.class, required = true)
     public static final String KEY_HOST = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.host";
 	@PropertyType(value = AuthenticationMethod.class, required = true)
@@ -100,7 +104,17 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
     {
         setProperty(opt,KEY_HOST, value);
     }
-    
+
+    public Proxy getProxy(Properties opt)
+    {
+        return (Proxy) getProperty(opt, KEY_PROXY);
+    }
+
+    public void setProxy(Configurable opt, Proxy value)
+    {
+        setProperty(opt, KEY_PROXY, value);
+    }
+
 	public void setAuthenticationMethod(Configurable config,AuthenticationMethod value)
 	{
 		setProperty(config, KEY_AUTHENTICATION_METHOD, value);

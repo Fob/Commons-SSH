@@ -61,5 +61,9 @@ public enum Feature {
     /**
      * Library provide api to connect to devices without authenticate
      */
-    CONNECT_WITHOUT_AUTHENTICATE
+    CONNECT_WITHOUT_AUTHENTICATE,
+    /**
+     * Support proxying
+     */
+    PROXY
 }

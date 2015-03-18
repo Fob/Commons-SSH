@@ -158,7 +158,7 @@ public class J2SSHConnection extends AbstractConnection
 		Boolean forwarding = J2SSHPropertiesBuilder.Connection.getInstance().getDefaultForwarding(this);
 		if(forwarding!=null)
 			connection.setUseDefaultForwarding(forwarding);
-		
+
 		try
 		{
 			LogUtils.trace(log, "connect to host={0} port={1}", host,port);

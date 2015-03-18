@@ -4,14 +4,12 @@
 package net.sf.commons.ssh.impl.jsch;
 
 
-import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.security.PublicKey;
 import java.util.Set;
 
-import com.jcraft.jsch.ChannelShell;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
+import com.jcraft.jsch.*;
 
 import net.sf.commons.ssh.auth.AuthenticationMethod;
 import net.sf.commons.ssh.auth.PasswordPropertiesBuilder;
@@ -240,6 +238,9 @@ public class JSCHConnection extends AbstractConnection
 
 		int port = ConnectionPropertiesBuilder.getInstance().getPort(this);
 		connection.setPort(port);
+        Proxy proxy = ConnectionPropertiesBuilder.getInstance().getProxy(this);
+        if (proxy != null)
+            connection.setProxy(convertToJschProxy(proxy));
 		Set<String> libraryOptions = InitialPropertiesBuilder.getInstance().getLibraryOptions(this);
 		LogUtils.trace(log, "push options {0} to library", libraryOptions);
 		for(String option: libraryOptions)
@@ -251,5 +252,17 @@ public class JSCHConnection extends AbstractConnection
 			connection.setConfig(option, (String)value);
 		}
 	}
+
+    private com.jcraft.jsch.Proxy convertToJschProxy(Proxy src) {
+        InetSocketAddress isa = (InetSocketAddress)src.address();
+        switch (src.type()) {
+            case SOCKS :
+                return new ProxySOCKS5(isa.getHostName(), isa.getPort());
+            case HTTP:
+                return new ProxyHTTP(isa.getHostName(), isa.getPort());
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
 
 }

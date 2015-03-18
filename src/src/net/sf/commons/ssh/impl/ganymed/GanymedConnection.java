@@ -4,9 +4,13 @@
 package net.sf.commons.ssh.impl.ganymed;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 
+import ch.ethz.ssh2.HTTPProxyData;
+import ch.ethz.ssh2.ProxyData;
 import net.sf.commons.ssh.auth.AuthenticationMethod;
 import net.sf.commons.ssh.auth.PasswordPropertiesBuilder;
 import net.sf.commons.ssh.auth.PublicKeyPropertiesBuilder;
@@ -159,7 +163,11 @@ public class GanymedConnection extends AbstractConnection
 		if(connectTimeout == null)
 			connectTimeout = 0L;
 		GanymedVerificationRepository delegateRepository = repository == null ? null : new GanymedVerificationRepository(repository);
-		
+
+        Proxy proxy = cpb.getProxy(this);
+        if (proxy != null) {
+            connection.setProxyData(convertToGanymedProxy(proxy));
+        }
 		try
 		{
 			setupConnectionParameters();
@@ -274,5 +282,16 @@ public class GanymedConnection extends AbstractConnection
 		}
 		
 	}
+
+
+    private ProxyData convertToGanymedProxy(Proxy src) {
+        InetSocketAddress isa = (InetSocketAddress)src.address();
+        switch (src.type()) {
+            case HTTP:
+                return new HTTPProxyData(isa.getHostName(), isa.getPort());
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
 
 }
