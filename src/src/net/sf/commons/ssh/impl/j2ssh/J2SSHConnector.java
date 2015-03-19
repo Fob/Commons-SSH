@@ -36,7 +36,7 @@ public class J2SSHConnector extends AbstractConnector {
             Class.forName("com.sshtools.j2ssh.SshClient");
         }
         catch (ClassNotFoundException e) {
-            log.error("j2ssh is not available");
+            log.info("j2ssh is not available");
             throw new UnsupportedOperationException("j2ssh is not available", e);
         }
     }

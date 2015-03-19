@@ -141,7 +141,6 @@ public final class Manager {
         ConnectorResolvingException resolvingException = new ConnectorResolvingException(features);
         for (Description description : classes) {
             try {
-
                 Class<? extends Connector> connectorClass = (Class<? extends Connector>) Class.forName(description
                         .getClassName());
                 Set<Feature> featuresSet = new HashSet<Feature>();

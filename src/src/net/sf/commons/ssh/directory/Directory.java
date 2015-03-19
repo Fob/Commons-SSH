@@ -86,12 +86,15 @@ public class Directory {
      * @param classes List of classes implements {@link net.sf.commons.ssh.connector.Connector}
      * @return return associated collection od {@link Description}
      */
-    public Set<Description> getDescriptions(Set<String> classes) {
+    public Collection<Description> getDescriptions(Set<String> classes) {
+        if (classes == null)
+            return getDescriptions();
         Set<Description> result = new HashSet<Description>(classes.size());
         for (String cls : classes) {
             Description description = descriptions.get(cls);
             if (description == null)
                 description = new Description(cls);
+
             result.add(description);
         }
         return result;

@@ -37,7 +37,7 @@ public class GanymedConnector extends AbstractConnector {
             Class.forName("ch.ethz.ssh2.Connection");
         }
         catch (ClassNotFoundException e) {
-            log.error("ganymed is not available");
+            log.info("ganymed is not available");
             throw new UnsupportedOperationException("ganymed is not available", e);
         }
     }
