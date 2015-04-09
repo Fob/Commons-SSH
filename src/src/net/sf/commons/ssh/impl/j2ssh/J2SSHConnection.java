@@ -162,7 +162,7 @@ public class J2SSHConnection extends AbstractConnection
 		try
 		{
 			LogUtils.trace(log, "connect to host={0} port={1}", host,port);
-			connection.connect(host, port, repository == null?new IgnoreHostKeyVerification():new J2SSHHostKeyVerification(repository));
+			connection.connect(host, port, repository == null ? new IgnoreHostKeyVerification():new J2SSHHostKeyVerification(repository));
 		}
 		catch (IOException e)
 		{

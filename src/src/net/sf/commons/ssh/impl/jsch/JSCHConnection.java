@@ -4,8 +4,6 @@
 package net.sf.commons.ssh.impl.jsch;
 
 
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.security.PublicKey;
 import java.util.Set;
 
@@ -18,11 +16,7 @@ import net.sf.commons.ssh.common.KeyUtils;
 import net.sf.commons.ssh.common.LogUtils;
 import net.sf.commons.ssh.common.Status;
 import net.sf.commons.ssh.common.UnexpectedRuntimeException;
-import net.sf.commons.ssh.connection.AbstractConnection;
-import net.sf.commons.ssh.connection.AuthenticationException;
-import net.sf.commons.ssh.connection.ConnectionException;
-import net.sf.commons.ssh.connection.ConnectionPropertiesBuilder;
-import net.sf.commons.ssh.connection.HostCheckingException;
+import net.sf.commons.ssh.connection.*;
 import net.sf.commons.ssh.event.events.AuthenticatedEvent;
 import net.sf.commons.ssh.event.events.ClosedEvent;
 import net.sf.commons.ssh.event.events.ConnectedEvent;
@@ -238,9 +232,9 @@ public class JSCHConnection extends AbstractConnection
 
 		int port = ConnectionPropertiesBuilder.getInstance().getPort(this);
 		connection.setPort(port);
-        Proxy proxy = ConnectionPropertiesBuilder.getInstance().getProxy(this);
-        if (proxy != null)
-            connection.setProxy(convertToJschProxy(proxy));
+
+		initProxy();
+
 		Set<String> libraryOptions = InitialPropertiesBuilder.getInstance().getLibraryOptions(this);
 		LogUtils.trace(log, "push options {0} to library", libraryOptions);
 		for(String option: libraryOptions)
@@ -253,16 +247,39 @@ public class JSCHConnection extends AbstractConnection
 		}
 	}
 
-    private com.jcraft.jsch.Proxy convertToJschProxy(Proxy src) {
-        InetSocketAddress isa = (InetSocketAddress)src.address();
-        switch (src.type()) {
-            case SOCKS :
-                return new ProxySOCKS5(isa.getHostName(), isa.getPort());
-            case HTTP:
-                return new ProxyHTTP(isa.getHostName(), isa.getPort());
-            default:
-                throw new UnsupportedOperationException();
-        }
-    }
+	private void initProxy() {
+		ProxyType proxyType = ConnectionPropertiesBuilder.getInstance().getProxyType(this);
+		String proxyHost = ConnectionPropertiesBuilder.getInstance().getProxyHost(this);
+		Integer proxyPort = ConnectionPropertiesBuilder.getInstance().getProxyPort(this);
+		if (proxyType != null) {
+			switch (proxyType) {
+				case HTTP:
+					ProxyHTTP proxyHTTP = new ProxyHTTP(proxyHost, proxyPort);
+					proxyHTTP.setUserPasswd(
+							ConnectionPropertiesBuilder.getInstance().getProxyUser(this),
+							ConnectionPropertiesBuilder.getInstance().getProxyPasswd(this)
+					);
+					connection.setProxy(proxyHTTP);
+					return;
+				case SOCKS4:
+					ProxySOCKS4 proxySOCKS4 = new ProxySOCKS4(proxyHost, proxyPort);
+					proxySOCKS4.setUserPasswd(
+							ConnectionPropertiesBuilder.getInstance().getProxyUser(this),
+							ConnectionPropertiesBuilder.getInstance().getProxyPasswd(this)
+					);
+					connection.setProxy(proxySOCKS4);
 
+					return;
+				case SOCKS5:
+					ProxySOCKS5 proxySOCKS5 = new ProxySOCKS5(proxyHost, proxyPort);
+					proxySOCKS5.setUserPasswd(
+							ConnectionPropertiesBuilder.getInstance().getProxyUser(this),
+							ConnectionPropertiesBuilder.getInstance().getProxyPasswd(this)
+					);
+					connection.setProxy(proxySOCKS5);
+			}
+		} else {
+			log.debug("ProxyType is unspecified");
+		}
+	}
 }

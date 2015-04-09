@@ -33,7 +33,8 @@ import java.io.IOException;
         {
                 Feature.SSH2, Feature.SYNCHRONOUS, Feature.AUTH_CREDENTIALS, Feature.AUTH_PUBLIC_KEY,
                 Feature.CONNECTION_TIMEOUT, Feature.SOCKET_TIMEOUT, Feature.SESSION_SHELL, Feature.ERROR_STREAM,
-                Feature.AUTH_NONE, Feature.AUTHENTICATE_TIMEOUT, Feature.AUTHENTICATE_TIMEOUT, Feature.PROXY
+                Feature.AUTH_NONE, Feature.AUTHENTICATE_TIMEOUT, Feature.AUTHENTICATE_TIMEOUT, Feature.SOCKS4_PROXY,
+                Feature.SOCKS5_PROXY, Feature.HTTP_PROXY
         })
 public class JSCHConnector extends AbstractConnector {
 

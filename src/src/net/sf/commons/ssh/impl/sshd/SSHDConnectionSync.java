@@ -6,8 +6,7 @@ package net.sf.commons.ssh.impl.sshd;
 import java.io.IOException;
 import java.security.PublicKey;
 
-  
-import org.apache.sshd.ClientSession;
+
 import org.apache.sshd.SshClient;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
@@ -71,7 +70,7 @@ public class SSHDConnectionSync extends AbstractConnection
 	@Override
 	public boolean isConnected()
 	{
-		
+
 		int status = connection.waitFor(ClientSessionImpl.WAIT_AUTH, 1);
 		Status cStatus = getContainerStatus();
 		return (status & ClientSessionImpl.WAIT_AUTH) !=0 && 

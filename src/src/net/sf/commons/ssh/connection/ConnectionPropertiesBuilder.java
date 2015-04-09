@@ -20,8 +20,16 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
     public static final String KEY_SOCKET_TIMEOUT = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.soTimeout";
     @PropertyType(Long.class)
     public static final String KEY_CONNECT_TIMEOUT = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.connectTimeout";
-    @PropertyType(Proxy.class)
-    public static final String KEY_PROXY = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.proxy";
+    @PropertyType(ProxyType.class)
+    public static final String KEY_PROXY_TYPE = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.proxyType";
+    @PropertyType(String.class)
+    public static final String KEY_PROXY_HOST = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.proxyHost";
+    @PropertyType(Integer.class)
+    public static final String KEY_PROXY_PORT = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.proxyPort";
+    @PropertyType(String.class)
+    public static final String KEY_PROXY_USER = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.proxyUser";
+    @PropertyType(String.class)
+    public static final String KEY_PROXY_PASSWD = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.proxyPasswd";
     @PropertyType(value = String.class, required = true)
     public static final String KEY_HOST = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.host";
 	@PropertyType(value = AuthenticationMethod.class, required = true)
@@ -92,7 +100,7 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
 
     public void setConnectTimeout(Configurable opt, Long value)
     {
-        setProperty(opt,KEY_CONNECT_TIMEOUT, value);
+        setProperty(opt, KEY_CONNECT_TIMEOUT, value);
     }
 
     public String getHost(Properties opt)
@@ -105,14 +113,46 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
         setProperty(opt,KEY_HOST, value);
     }
 
-    public Proxy getProxy(Properties opt)
+    public ProxyType getProxyType(Properties opt)
     {
-        return (Proxy) getProperty(opt, KEY_PROXY);
+        return (ProxyType) getProperty(opt, KEY_PROXY_TYPE);
     }
 
-    public void setProxy(Configurable opt, Proxy value)
+    public void setProxyType(Configurable opt, ProxyType value)
     {
-        setProperty(opt, KEY_PROXY, value);
+        setProperty(opt, KEY_PROXY_TYPE, value);
+    }
+
+    public String getProxyHost(Properties opt) {
+        return (String)getProperty(opt, KEY_PROXY_HOST);
+    }
+
+    public void setProxyHost(Configurable opt, String value) {
+        setProperty(opt, KEY_PROXY_HOST, value);
+    }
+
+    public Integer getProxyPort(Properties opt) {
+        return (Integer)getProperty(opt, KEY_PROXY_PORT);
+    }
+
+    public void setProxyPort(Configurable opt, Integer value) {
+        setProperty(opt, KEY_PROXY_PORT, value);
+    }
+
+    public String getProxyUser(Properties opt) {
+        return (String)getProperty(opt, KEY_PROXY_USER);
+    }
+
+    public void setProxyUser(Configurable opt, String value) {
+        setProperty(opt, KEY_PROXY_USER, value);
+    }
+
+    public String getProxyPasswd(Properties opt) {
+        return (String)getProperty(opt, KEY_PROXY_PASSWD);
+    }
+
+    public void setProxyPasswd(Configurable opt, String value) {
+        setProperty(opt, KEY_PROXY_PASSWD, value);
     }
 
 	public void setAuthenticationMethod(Configurable config,AuthenticationMethod value)

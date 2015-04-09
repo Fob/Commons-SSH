@@ -44,9 +44,9 @@ public class ShellSessionPropertiesBuilder extends SessionPropertiesBuilder
         return (Integer)getProperty(opt, KEY_TERMINAL_COLS);
     }
 
-    public void setTerminalCols(Configurable options,int terminalCols)
+    public void setTerminalCols(Configurable options, int terminalCols)
     {
-        options.setProperty(KEY_TERMINAL_COLS,terminalCols);
+        options.setProperty(KEY_TERMINAL_COLS, terminalCols);
     }
 
     public int getTerminalHeight(Properties opt)

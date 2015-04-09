@@ -4,24 +4,17 @@
 package net.sf.commons.ssh.impl.ganymed;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 
 import ch.ethz.ssh2.HTTPProxyData;
-import ch.ethz.ssh2.ProxyData;
 import net.sf.commons.ssh.auth.AuthenticationMethod;
 import net.sf.commons.ssh.auth.PasswordPropertiesBuilder;
 import net.sf.commons.ssh.auth.PublicKeyPropertiesBuilder;
 import net.sf.commons.ssh.common.KeyUtils;
 import net.sf.commons.ssh.common.Status;
 import net.sf.commons.ssh.common.UnexpectedRuntimeException;
-import net.sf.commons.ssh.connection.AbstractConnection;
-import net.sf.commons.ssh.connection.AuthenticationException;
-import net.sf.commons.ssh.connection.ConnectionException;
-import net.sf.commons.ssh.connection.ConnectionPropertiesBuilder;
-import net.sf.commons.ssh.connection.HostCheckingException;
+import net.sf.commons.ssh.connection.*;
 import net.sf.commons.ssh.event.events.AuthenticatedEvent;
 import net.sf.commons.ssh.event.events.ClosedEvent;
 import net.sf.commons.ssh.event.events.ConnectedEvent;
@@ -164,9 +157,19 @@ public class GanymedConnection extends AbstractConnection
 			connectTimeout = 0L;
 		GanymedVerificationRepository delegateRepository = repository == null ? null : new GanymedVerificationRepository(repository);
 
-        Proxy proxy = cpb.getProxy(this);
-        if (proxy != null) {
-            connection.setProxyData(convertToGanymedProxy(proxy));
+        ProxyType proxyType = cpb.getProxyType(this);
+        if (proxyType != null)
+		switch (proxyType) {
+			case HTTP:
+				String proxyHost = ConnectionPropertiesBuilder.getInstance().getProxyHost(this);
+				Integer proxyPort = ConnectionPropertiesBuilder.getInstance().getProxyPort(this);
+				String proxyUser = ConnectionPropertiesBuilder.getInstance().getProxyUser(this);
+				String proxyPasswd = ConnectionPropertiesBuilder.getInstance().getProxyPasswd(this);
+				HTTPProxyData proxyData = new HTTPProxyData(proxyHost, proxyPort, proxyUser, proxyPasswd);
+				connection.setProxyData(proxyData);
+				return;
+			default:
+				throw new UnsupportedOperationException("ProxyType " + proxyType + " is unsupported by Ganymed implementation. Please specify needed features properly.");
         }
 		try
 		{
@@ -245,7 +248,7 @@ public class GanymedConnection extends AbstractConnection
 		
 		try
 		{
-			boolean authenticated = connection.authenticateWithPassword(PasswordPropertiesBuilder.getInstance().getLogin(this), 
+			boolean authenticated = connection.authenticateWithPassword(PasswordPropertiesBuilder.getInstance().getLogin(this),
 					new String(PasswordPropertiesBuilder.getInstance().getPassword(this)));
 			if(!authenticated)
 				throw new AuthenticationException("Authentication failed");
@@ -282,16 +285,4 @@ public class GanymedConnection extends AbstractConnection
 		}
 		
 	}
-
-
-    private ProxyData convertToGanymedProxy(Proxy src) {
-        InetSocketAddress isa = (InetSocketAddress)src.address();
-        switch (src.type()) {
-            case HTTP:
-                return new HTTPProxyData(isa.getHostName(), isa.getPort());
-            default:
-                throw new UnsupportedOperationException();
-        }
-    }
-
 }

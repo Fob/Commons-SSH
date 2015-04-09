@@ -63,7 +63,16 @@ public enum Feature {
      */
     CONNECT_WITHOUT_AUTHENTICATE,
     /**
-     * Support proxying
+     * Support HTTP proxing
      */
-    PROXY
+    HTTP_PROXY,
+    /**
+     * Support SOCKS4 proxing
+     */
+    SOCKS4_PROXY,
+    /**
+     * Support SOCKS5 proxing
+     */
+    SOCKS5_PROXY
+
 }
