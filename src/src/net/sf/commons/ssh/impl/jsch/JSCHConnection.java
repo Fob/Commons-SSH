@@ -168,7 +168,7 @@ public class JSCHConnection extends AbstractConnection
 			switch (method)
 			{
 			case NONE:
-				connection = jsch.getSession(cpb.getHost(this),"nobody");
+				connection = jsch.getSession("nobody", cpb.getHost(this));
 				setupCommonConnectionParameters();
 				break;
 			case PASSWORD:
