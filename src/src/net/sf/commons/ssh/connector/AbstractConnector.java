@@ -4,6 +4,7 @@
 package net.sf.commons.ssh.connector;
 
 import net.sf.commons.ssh.Feature;
+import net.sf.commons.ssh.auth.AuthenticationMethod;
 import net.sf.commons.ssh.common.AbstractContainer;
 import net.sf.commons.ssh.common.UnexpectedRuntimeException;
 import net.sf.commons.ssh.connection.*;
@@ -22,8 +23,11 @@ import java.util.Set;
 
 /**
  * @author fob
+ * @author ankulikov
  *         Date 24.07.2011
  * @since 2.0
+ *
+ * //SEP2015 - add check for property 'isNeedAuthentication'
  */
 public abstract class AbstractConnector extends AbstractContainer<Connection> implements Connector {
 
@@ -71,7 +75,9 @@ public abstract class AbstractConnector extends AbstractContainer<Connection> im
         catch (CloneNotSupportedException e) {
             throw new UnexpectedRuntimeException(e.getMessage(), e);
         }
-        connection.connect(true);
+
+        boolean auth =  ConnectionPropertiesBuilder.getInstance().isNeedAuthentication(connectionProperties);
+        connection.connect(auth);
         return connection;
     }
 

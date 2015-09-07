@@ -46,6 +46,16 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.12</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jcl</artifactId>
+            <version>1.7.12</version>
+        </dependency>
+        <dependency>
             <groupId>commons-vfs</groupId>
             <artifactId>commons-vfs</artifactId>
             <version>1.0</version>
