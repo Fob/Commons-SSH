@@ -77,7 +77,7 @@ public class Directory {
      * @return read-only list of {@link Description}s
      */
     public Collection<Description> getDescriptions() {
-        return descriptions.values();
+        return Collections.unmodifiableCollection(descriptions.values());
     }
 
     /**
