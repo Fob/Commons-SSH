@@ -34,6 +34,8 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
     public static final String KEY_HOST = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.host";
 	@PropertyType(value = AuthenticationMethod.class, required = true)
 	public static final String KEY_AUTHENTICATION_METHOD = "net.sf.commons.ssh.auth.authenticationMethod";
+    @PropertyType(value = Boolean.class)
+    public static final String KEY_NEED_AUTHENTICATION = "net.sf.commons.ssh.auth.needAuthentication";
     @PropertyType(Long.class)
     public static final String KEY_AUTHENTICATE_TIMEOUT = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.authTimeout";
 
@@ -41,6 +43,7 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
     {
         defaultProperties.put(KEY_PORT, Integer.valueOf(22));
         defaultProperties.put(KEY_HOST,"127.0.0.1");
+        defaultProperties.put(KEY_NEED_AUTHENTICATION, true);
         defaultProperties.put(KEY_AUTHENTICATION_METHOD, AuthenticationMethod.PASSWORD);
     }
 
@@ -174,5 +177,16 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
     {
         setProperty(opt,KEY_AUTHENTICATE_TIMEOUT, value);
     }
+
+    public void setNeedAuthentication(Configurable opt, Boolean needAuthentication) {
+        setProperty(opt, KEY_NEED_AUTHENTICATION, needAuthentication);
+    }
+
+    public Boolean isNeedAuthentication(Properties opt) {
+        Object result =  getProperty(opt, KEY_NEED_AUTHENTICATION);
+        return result == null ? true: (Boolean) result;
+    }
+
+
     
 }
