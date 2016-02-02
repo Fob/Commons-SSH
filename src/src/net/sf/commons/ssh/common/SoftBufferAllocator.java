@@ -3,12 +3,13 @@ package net.sf.commons.ssh.common;
 import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class SoftBufferAllocator extends BufferAllocator
 {
 
-    protected LinkedList<SoftReference<ByteBuffer>> cache = new LinkedList<SoftReference<ByteBuffer>>();
+    protected BlockingQueue<SoftReference<ByteBuffer>> cache = new ArrayBlockingQueue<SoftReference<ByteBuffer>>(16);
 
 
     public SoftBufferAllocator()
@@ -21,7 +22,7 @@ public class SoftBufferAllocator extends BufferAllocator
         ByteBuffer result = null;
         while (cache.size()>0)
         {
-            result = cache.removeFirst().get();
+            result = cache.poll().get();
             if(result!= null)
                 return result;
         }
@@ -55,7 +56,7 @@ public class SoftBufferAllocator extends BufferAllocator
     @Override
     public void dispose(ByteBuffer buffer)
     {
-        cache.addLast(new SoftReference<ByteBuffer>(buffer));
+        cache.offer(new SoftReference<ByteBuffer>(buffer));
     }
 
     @Override
