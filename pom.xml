@@ -4,7 +4,7 @@
 
     <groupId>fob</groupId>
     <artifactId>commons-ssh</artifactId>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>2.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>commons-ssh</name>
@@ -13,6 +13,13 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>central-2</id>
+            <url>https://repo1.maven.org/maven2</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>

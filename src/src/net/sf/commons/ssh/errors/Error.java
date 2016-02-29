@@ -51,7 +51,13 @@ public class Error
 	
 	public Error(String errorMessage, Object errorProducer,ErrorLevel level,Throwable exception,String errorAction)
 	{
-		this(errorMessage, errorProducer, level, exception, errorAction, LogFactory.getLog(errorProducer.getClass()), 0);
+		this(errorMessage,
+				errorProducer,
+				level,
+				exception,
+				errorAction,
+				errorProducer != null ? LogFactory.getLog(errorProducer.getClass()) : null,
+				0);
 	}
 	
 	public Error(String errorMessage, Object errorProducer,ErrorLevel level,Throwable exception)
