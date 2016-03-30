@@ -1,5 +1,6 @@
 package net.sf.commons.ssh.impl.ussh;
 
+import net.sf.commons.ssh.common.LogUtils;
 import net.sf.commons.ssh.common.Status;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.AbstractSession;
@@ -10,7 +11,9 @@ import org.apache.commons.logging.LogFactory;
 import java.io.*;
 
 /**
- * Created by anku0315 on 28.03.2016.
+ * @author ankulikov
+ * @date 28.03.2016
+ * @since 2.0.3
  */
 public class UnixSshShellSession extends AbstractSession implements ShellSession {
     private Process sshProcess;
@@ -29,39 +32,38 @@ public class UnixSshShellSession extends AbstractSession implements ShellSession
         setContainerStatus(Status.CREATED);
     }
 
-    //TODO:
     @Override
     protected void openImpl() throws IOException {
         //Do nothing?
 
     }
 
-    //TODO: merged
+    //merged
     @Override
     protected void closeImpl() throws IOException {
         errorLog.stop();
         sshProcess.destroy();
     }
 
-    //TODO: merged
+    //merged
     @Override
     public InputStream getInputStream() throws IOException {
         return in;
     }
 
-    //TODO: merged
+    //merged
     @Override
     public OutputStream getOutputStream() throws IOException {
         return out;
     }
 
-    //TODO: merged
+    //merged
     @Override
     public InputStream getErrorStream() throws IOException {
         return sshProcess.getErrorStream();
     }
 
-    //TODO:
+    //TODO
     @Override
     public boolean isEOF() throws IOException {
         throw new UnsupportedOperationException("operation isn't supported by UNIX SSH Shell session");
@@ -73,6 +75,7 @@ public class UnixSshShellSession extends AbstractSession implements ShellSession
         return !isClosed();
     }
 
+    //merged
     @Override
     public boolean isClosed() {
         try
@@ -110,7 +113,7 @@ public class UnixSshShellSession extends AbstractSession implements ShellSession
                 {
                     if(isStopped)
                         break;
-                    log.warn("stderr:: "+errorString);
+                    LogUtils.error(log, errorString);
                 }
             }
             catch (IOException e)

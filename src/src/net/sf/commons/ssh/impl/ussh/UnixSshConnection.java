@@ -5,6 +5,7 @@ import net.sf.commons.ssh.common.IOUtils;
 import net.sf.commons.ssh.common.LogUtils;
 import net.sf.commons.ssh.common.Status;
 import net.sf.commons.ssh.connection.*;
+import net.sf.commons.ssh.event.events.ClosedEvent;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.SFTPSession;
@@ -36,13 +37,14 @@ public class UnixSshConnection extends AbstractConnection {
     private VerificationRepository repository = null;
 
 
-    //TODO
+    //TODO: nothing more?
     public UnixSshConnection(Properties properties) {
         super(properties);
     }
 
     @Override
     protected void connectImpl(boolean authenticate) throws ConnectionException, AuthenticationException, HostCheckingException {
+        setContainerStatus(Status.CONNECTING);
         String command = (String) getProperty(COMMAND_PROPERTY);
         if (command == null) {
             command = DEFAULT_COMMAND;
@@ -55,8 +57,9 @@ public class UnixSshConnection extends AbstractConnection {
                     PasswordPropertiesBuilder.getInstance().getLogin(this));
             command = StringUtils.replace(command, "#$PASSWORD$#",
                     new String(PasswordPropertiesBuilder.getInstance().getPassword(this)));
+            Long connectTimeout = connPropBuilder.getConnectTimeout(this);
             command = StringUtils.replace(command, "#$CONNECTION_TIMEOUT$#",
-                    "" + connPropBuilder.getConnectTimeout(this));
+                    connectTimeout == null?"0":"" + connectTimeout);
             if (repository == null || repository instanceof IgnoreVerificationRepository) {
                 command = StringUtils.replace(command, "#$HOST_CHECK$#", "no");
                 command = StringUtils.replace(command, "#$REPOSITORY$#", "");
@@ -85,6 +88,8 @@ public class UnixSshConnection extends AbstractConnection {
         }
         try {
             sshProcess = Runtime.getRuntime().exec(command);
+
+
         } catch (IOException e) {
             log.error("Connection Exception", e);
             throw new RuntimeException(e);
@@ -95,6 +100,7 @@ public class UnixSshConnection extends AbstractConnection {
 
     @Override
     protected void closeImpl() throws IOException {
+        setContainerStatus(Status.CLOSING);
         log.trace("close process");
         if(known_host!=null)
         {
@@ -104,6 +110,8 @@ public class UnixSshConnection extends AbstractConnection {
         }
         if(sshProcess!=null)
             sshProcess.destroy();
+        setContainerStatus(Status.CLOSED);
+        fire(new ClosedEvent(this));
     }
 
     @Override
@@ -111,13 +119,13 @@ public class UnixSshConnection extends AbstractConnection {
         throw new UnsupportedOperationException("operation isn't supported by UNIX SSH connection");
     }
 
-    //TODO
+    //TODO ?
     @Override
     public boolean isConnected() {
         throw new UnsupportedOperationException("operation isn't supported by UNIX SSH connection");
     }
 
-    //TODO
+    //TODO ?
     @Override
     public boolean isAuthenticated() {
         throw new UnsupportedOperationException("operation isn't supported by UNIX SSH connection");

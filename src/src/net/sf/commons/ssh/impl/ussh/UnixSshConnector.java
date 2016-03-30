@@ -10,11 +10,14 @@ import net.sf.commons.ssh.verification.VerificationRepository;
 
 import java.io.IOException;
 
+
 /**
- * Created by anku0315 on 28.03.2016.
+ * @author ankulikov
+ * @date 28.03.2016
+ * @since 2.0.3
  */
 //TODO: Is ASYNCHRONOUS or SYNCHRONOUS?
-@SupportedFeatures({Feature.AUTH_CREDENTIALS, Feature.SSH1, Feature.CONNECTION_TIMEOUT, Feature.CONNECT_WITHOUT_AUTHENTICATE, Feature.SESSION_SHELL, Feature.ASYNCHRONOUS, Feature.CONNECTION_TIMEOUT})
+@SupportedFeatures({Feature.AUTH_CREDENTIALS, Feature.SSH1, Feature.CONNECTION_TIMEOUT, Feature.SESSION_SHELL, Feature.ASYNCHRONOUS, Feature.CONNECTION_TIMEOUT})
 public class UnixSshConnector extends AbstractConnector {
 
     public UnixSshConnector(Properties properties) {
@@ -24,7 +27,7 @@ public class UnixSshConnector extends AbstractConnector {
 
     @Override
     protected void closeImpl() throws IOException {
-
+        setContainerStatus(Status.CLOSED);
     }
 
     //TODO: merged
