@@ -15,14 +15,14 @@
  */
 package net.sf.commons.ssh.j2ssh;
 
-import java.io.IOException;
-
-import net.sf.commons.ssh.*;
-
+import com.sshtools.j2ssh.ScpClient;
 import com.sshtools.j2ssh.SftpClient;
 import com.sshtools.j2ssh.SshClient;
 import com.sshtools.j2ssh.SshException;
 import com.sshtools.j2ssh.session.SessionChannelClient;
+import net.sf.commons.ssh.*;
+
+import java.io.IOException;
 
 /**
  * @author Sergey Vidyuk (svidyuk at gmail dot com)
@@ -69,6 +69,11 @@ class J2sshConnection extends Connection {
 	}
 	return new J2sshSftpSession(sftp);
     }
+	public ScpSession openScpSession()
+			throws IOException {
+		ScpClient scp = connection.openScpClient();
+		return new J2sshScpSession(scp);
+	}
 
     public ShellSession openShellSession(ShellSessionOptions shellSessionOptions)
 	    throws IOException {
