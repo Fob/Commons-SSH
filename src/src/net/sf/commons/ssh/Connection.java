@@ -74,6 +74,18 @@ public abstract class Connection {
     }
 
     /**
+     *
+     *
+     * @return
+     * @throws IOException
+     */
+    public ScpSession openScpSession()
+	    throws IOException {
+	throw new UnsupportedOperationException("Connection factory "
+		+ this.getClass().getName() + " doesn't support this feature");
+    }
+
+    /**
      * Opens new shell session from this connection
      * 
      * @param shellSessionOptions
