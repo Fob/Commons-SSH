@@ -21,46 +21,19 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import static net.sf.commons.ssh.directory.XmlUtil.getFromElement;
+
 /**
  * Internal representation of factories information
  *
  * @author Sergey Vidyuk (svidyuk at gmail dot com)
+ * @author anku0315 - add factory priority
  * @since 1.0
  */
 public class Description
 {
 
-    private static String getFromElement(Element element,
-                                         String subElementName, boolean required)
-    {
-        NodeList nodeList = element.getElementsByTagName(subElementName);
-        if (nodeList.getLength() == 0)
-        {
-            if (!required)
-            {
-                return null;
-            }
 
-            throw new RuntimeException(
-                    "SSH connection factory description element '"
-                            + element.getNodeName()
-                            + "' has no child with name '" + subElementName
-                            + "' which is required");
-        }
-
-        NodeList children = nodeList.item(0).getChildNodes();
-        StringBuffer value = new StringBuffer();
-        for (int i = 0; i < children.getLength(); i++)
-        {
-            Node node = children.item(i);
-            if (node instanceof Text)
-            {
-                value.append(node.getNodeValue());
-            }
-        }
-
-        return value.toString();
-    }
 
     static Description loadDescription(Element element)
     {
@@ -70,7 +43,11 @@ public class Description
         description.name = getFromElement(element, "name", true); //$NON-NLS-1$
         description.license = getFromElement(element, "license", false); //$NON-NLS-1$
         description.url = getFromElement(element, "url", true); //$NON-NLS-1$
-
+        try {
+            description.priority = Integer.valueOf(getFromElement(element, "priority", false));
+        } catch (NumberFormatException e) {
+            description.priority = 100;
+        }
         return description;
     }
 
@@ -81,6 +58,8 @@ public class Description
     private String name;
 
     private String url;
+
+    private Integer priority;
 
     private Description()
     {
@@ -94,6 +73,7 @@ public class Description
         url = "[Unknown]";
         license = "[Unknown]";
         className = connectorClass;
+        priority = 100; //by default factory is not important
     }
     /**
      * Returns information where to download library
@@ -167,6 +147,13 @@ public class Description
         return url;
     }
 
+    /**
+     * @return the priority
+     */
+    public Integer getPriority() {
+        return priority;
+    }
+
     public int hashCode()
     {
         final int prime = 31;
@@ -180,4 +167,6 @@ public class Description
     {
         return name + " [" + className + "]";
     }
+
+
 }
