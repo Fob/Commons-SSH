@@ -20,9 +20,9 @@ import java.util.Set;
 /**
  * Created by andrey on 30.03.16.
  */
-public class UnixSshTest {
+public class UnixSshTestConsole {
     public static void main(String[] args) throws IOException {
-        final Log log = LogFactory.getLog(UnixSshTest.class);
+        final Log log = LogFactory.getLog(UnixSshTestConsole.class);
 
         Set<Feature> features = new HashSet<Feature>();
         features.add(Feature.AUTH_CREDENTIALS);
