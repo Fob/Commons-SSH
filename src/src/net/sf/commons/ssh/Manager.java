@@ -17,7 +17,9 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.crypto.KeyAgreement;
 import java.lang.reflect.InvocationTargetException;
+import java.security.AccessController;
 import java.security.MessageDigest;
+import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,6 +34,8 @@ import java.util.Set;
  */
 public final class Manager {
     private static final Log log = LogFactory.getLog(Manager.class);
+    //to be compatible with 1.x version
+    public static final java.lang.String PROPERTY_NAME = "net.sf.commons.ssh.ConnectionFactory";
     private static Manager instance = null;
 
     /**
@@ -44,9 +48,9 @@ public final class Manager {
                 java.security.Security.addProvider(new BouncyCastleProvider());
                 MessageDigest.getInstance("MD5", "BC");
                 KeyAgreement.getInstance("DH", "BC");
+
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new UnexpectedRuntimeException("Registration BC Security provider failed", e);
         }
 
@@ -66,7 +70,8 @@ public final class Manager {
     }
 
     /**
-     * Search connector in {@link Directory} by features and create it.
+     * Use factory from system property if it exists
+     * or otherwise search connector in {@link Directory} by feature and create it.
      *
      * @param features   founded {@link Connector} should supports all {@link Feature} from this collection.
      * @param properties initial {@link net.sf.commons.ssh.options.Properties} for {@link Connector}
@@ -74,6 +79,9 @@ public final class Manager {
      * @throws ConnectorResolvingException {@link ConnectorResolvingException} if connector haven't been created.
      */
     public Connector newConnector(@NotNull Set<Feature> features, @Nullable net.sf.commons.ssh.options.Properties properties) throws ConnectorResolvingException {
+        String defaultFactoryClass = getFactoryFromProperty();
+        if (defaultFactoryClass != null)
+            return newConnector(defaultFactoryClass, features, properties);
         return newConnector(Directory.getInstance().getDescriptions(), features, properties);
     }
 
@@ -162,12 +170,10 @@ public final class Manager {
                     InitialPropertiesBuilder.getInstance().setSynchronizedConfigurable((Configurable) properties, true);
                 }
                 return connectorClass.getConstructor(net.sf.commons.ssh.options.Properties.class).newInstance(properties);
-            }
-            catch (ClassCastException e) {
+            } catch (ClassCastException e) {
                 LogUtils.info(log, e, "Connector should implements Connector");
                 resolvingException.addDescription(description, e.getMessage());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
 
                 Throwable cause = e;
                 if (e instanceof InvocationTargetException) {
@@ -181,6 +187,16 @@ public final class Manager {
         if (log.isInfoEnabled())
             log.info(resolvingException.getMessage());
         throw resolvingException;
+    }
+
+    private static String getFactoryFromProperty() {
+        String factoryName = (String) AccessController
+                .doPrivileged(new PrivilegedAction() {
+                    public Object run() {
+                        return System.getProperty(PROPERTY_NAME);
+                    }
+                });
+        return factoryName;
     }
 
 

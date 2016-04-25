@@ -4,29 +4,34 @@
         <name>Sshtools J2SSH</name>
         <license>GNU GENERAL PUBLIC LICENSE</license>
         <url>http://sourceforge.net/projects/sshtools/</url>
+        <priority>2</priority>
     </factory>
     <factory>
         <class-name>net.sf.commons.ssh.impl.ganymed.GanymedConnector</class-name>
         <name>Ganymed SSH-2 for Java</name>
         <license>BSD style license</license>
         <url>http://www.ganymed.ethz.ch/ssh2/</url>
+        <priority>3</priority>
     </factory>
     <factory>
         <class-name>net.sf.commons.ssh.impl.jsch.JSCHConnector</class-name>
         <name>Java Secure Channel</name>
         <license>BSD style license</license>
         <url>http://www.jcraft.com/jsch/</url>
+        <priority>1</priority>
     </factory>
     <factory>
         <class-name>net.sf.commons.ssh.impl.sshd.SSHDConnector</class-name>
         <name>Apache MINA SSHD</name>
         <license>Apache 2.0 Style License</license>
         <url>http://mina.apache.org/sshd/</url>
+        <priority>4</priority>
     </factory>
     <factory>
         <class-name>net.sf.commons.ssh.impl.ussh.UnixSshConnector</class-name>
         <name>UNIX sshpass utility</name>
         <license>GNU General Public License version 2.0</license>
         <url>http://linux.die.net/man/1/sshpass</url>
+        <priority>5</priority>
     </factory>
 </factories>
