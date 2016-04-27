@@ -19,6 +19,8 @@ public class ShellSessionPropertiesBuilder extends SessionPropertiesBuilder
     public static final String KEY_TERMINAL_WIDTH="net.sf.commons.ssh.options.ShellSessionOptionsBuilder.terminalWidth";
     @PropertyType(value = Boolean.class,required = true)
     public static final String KEY_SEPARATE_ERROR_STREAM = "net.sf.commons.ssh.options.ShellSessionOptionsBuilder.errorStream";
+//    @PropertyType(value = String.class,required = false)
+//    public static final String KEY_START_SUBSYSTEM = "net.sf.commons.ssh.options.ShellSessionOptionsBuilder.subSystem";
 
     public synchronized static ShellSessionPropertiesBuilder getInstance()
     {

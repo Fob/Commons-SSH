@@ -11,11 +11,7 @@ import net.sf.commons.ssh.event.ProducerType;
 import net.sf.commons.ssh.event.events.AuthenticatedEvent;
 import net.sf.commons.ssh.options.IllegalPropertyException;
 import net.sf.commons.ssh.options.Properties;
-import net.sf.commons.ssh.session.ExecSession;
-import net.sf.commons.ssh.session.ExecSessionPropertiesBuilder;
-import net.sf.commons.ssh.session.SFTPSession;
-import net.sf.commons.ssh.session.Session;
-import net.sf.commons.ssh.session.ShellSession;
+import net.sf.commons.ssh.session.*;
 import net.sf.commons.ssh.errors.Error;
 
 /**
@@ -48,6 +44,14 @@ public abstract class AbstractConnection extends AbstractContainer<Session> impl
 	public ShellSession openShellSession() throws IOException
 	{
 		ShellSession session = createShellSession();
+		session.open();
+		return session;
+	}
+
+	@Override
+	public SubsystemSession openSubsystemSession() throws IOException
+	{
+		SubsystemSession session = createSubsystemSession();
 		session.open();
 		return session;
 	}

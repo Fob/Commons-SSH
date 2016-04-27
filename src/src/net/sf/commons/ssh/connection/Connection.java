@@ -8,6 +8,7 @@ import net.sf.commons.ssh.common.Container;
 import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.SFTPSession;
 import net.sf.commons.ssh.session.ShellSession;
+import net.sf.commons.ssh.session.SubsystemSession;
 
 public interface Connection extends Container
 {
@@ -22,10 +23,12 @@ public interface Connection extends Container
     boolean isAuthenticating();
 
     ShellSession createShellSession();
+    SubsystemSession createSubsystemSession();
     ExecSession createExecSession();
     SFTPSession createSFTPSession();
 
     ShellSession openShellSession() throws IOException;
+    SubsystemSession openSubsystemSession() throws IOException;
     ExecSession openExecSession(String command) throws IOException;
     SFTPSession openSFTPSession() throws IOException;
     

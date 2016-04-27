@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.security.PublicKey;
 
 
+import net.sf.commons.ssh.session.*;
 import org.apache.sshd.SshClient;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
@@ -26,10 +27,6 @@ import net.sf.commons.ssh.event.events.AuthenticatedEvent;
 import net.sf.commons.ssh.event.events.ClosedEvent;
 import net.sf.commons.ssh.event.events.ConnectedEvent;
 import net.sf.commons.ssh.options.Properties;
-import net.sf.commons.ssh.session.ExecSession;
-import net.sf.commons.ssh.session.SFTPSession;
-import net.sf.commons.ssh.session.Session;
-import net.sf.commons.ssh.session.ShellSession;
 import net.sf.commons.ssh.errors.Error;
 import net.sf.commons.ssh.errors.ErrorLevel;
 
@@ -98,6 +95,12 @@ public class SSHDConnectionSync extends AbstractConnection
 		ShellSession session = new SSHDShellSync(this,connection);
 		registerChild(session);
 		return session;
+	}
+
+	@Override
+	public SubsystemSession createSubsystemSession()
+	{
+		throw new UnsupportedOperationException("createSubsystemSession is not supported");
 	}
 
 	/**

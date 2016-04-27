@@ -37,6 +37,7 @@ import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.SFTPSession;
 import net.sf.commons.ssh.session.ShellSession;
+import net.sf.commons.ssh.session.SubsystemSession;
 import net.sf.commons.ssh.verification.VerificationPropertiesBuilder;
 import net.sf.commons.ssh.verification.VerificationRepository;
 
@@ -112,6 +113,12 @@ public class J2SSHConnection extends AbstractConnection
 		ShellSession session = new J2SSHShellSession(this,connection);
 		registerChild(session);
 		return session;
+	}
+
+	@Override
+	public SubsystemSession createSubsystemSession()
+	{
+		throw new UnsupportedOperationException("createSubsystemSession is not supported");
 	}
 
 	/**

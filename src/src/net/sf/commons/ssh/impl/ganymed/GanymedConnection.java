@@ -4,6 +4,7 @@
 package net.sf.commons.ssh.impl.ganymed;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 
@@ -22,6 +23,7 @@ import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.SFTPSession;
 import net.sf.commons.ssh.session.ShellSession;
+import net.sf.commons.ssh.session.SubsystemSession;
 import net.sf.commons.ssh.verification.VerificationPropertiesBuilder;
 import net.sf.commons.ssh.verification.VerificationRepository;
 import ch.ethz.ssh2.Connection;
@@ -107,6 +109,12 @@ public class GanymedConnection extends AbstractConnection
 		}
 		registerChild(session);
 		return session;
+	}
+
+	@Override
+	public SubsystemSession createSubsystemSession()
+	{
+		throw new UnsupportedOperationException("createSubsystemSession is not supported");
 	}
 
 	/**

@@ -10,6 +10,7 @@ import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.SFTPSession;
 import net.sf.commons.ssh.session.ShellSession;
+import net.sf.commons.ssh.session.SubsystemSession;
 import net.sf.commons.ssh.verification.IgnoreVerificationRepository;
 import net.sf.commons.ssh.verification.VerificationEntry;
 import net.sf.commons.ssh.verification.VerificationRepository;
@@ -134,6 +135,12 @@ public class UnixSshConnection extends AbstractConnection {
     @Override
     public ShellSession createShellSession() {
         return new UnixSshShellSession(this, sshProcess);
+    }
+
+    @Override
+    public SubsystemSession createSubsystemSession()
+    {
+        throw new UnsupportedOperationException("createSubsystemSession is not supported");
     }
 
     @Override
