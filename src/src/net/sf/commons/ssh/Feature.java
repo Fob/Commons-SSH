@@ -26,6 +26,12 @@ public enum Feature {
      * Shell session feature
      */
     SESSION_SHELL,
+
+    /**
+     * SCP session feature
+     */
+    SESSION_SCP,
+
     /**
      * Socket timeout supports
      */
