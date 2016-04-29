@@ -115,7 +115,9 @@ public class J2SSHConnection extends AbstractConnection {
      */
     @Override
     public SFTPSession createSFTPSession() {
-        throw new UnsupportedOperationException("not supported yet");
+        SFTPSession session = new J2SSHSftpSession(this, connection);
+        registerChild(session);
+        return session;
     }
 
     /**

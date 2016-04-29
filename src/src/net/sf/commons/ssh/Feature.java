@@ -33,6 +33,11 @@ public enum Feature {
     SESSION_SCP,
 
     /**
+     * SFTP session feature
+     */
+    SESSION_SFTP,
+
+    /**
      * Socket timeout supports
      */
     SOCKET_TIMEOUT,
