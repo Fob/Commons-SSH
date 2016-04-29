@@ -7,8 +7,8 @@ import net.sf.commons.ssh.event.AbstractEventProcessor;
 import net.sf.commons.ssh.event.events.OpennedEvent;
 import net.sf.commons.ssh.event.events.ReadAvailableEvent;
 import net.sf.commons.ssh.options.Properties;
-import net.sf.commons.ssh.session.ShellSessionPropertiesBuilder;
 import net.sf.commons.ssh.session.SubsystemSession;
+import net.sf.commons.ssh.session.SubsystemSessionPropertiesBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,8 +36,11 @@ public class JSCHSubsystemSession extends JSCHSession implements SubsystemSessio
     protected void openImpl() throws IOException
     {
         log.trace("openImpl(): open jsch subsystem session");
-        ShellSessionPropertiesBuilder sspb = ShellSessionPropertiesBuilder.getInstance();
+        SubsystemSessionPropertiesBuilder sspb = SubsystemSessionPropertiesBuilder.getInstance();
         sspb.verify(this);
+        log.info("getSubsystemName: " + sspb.getSubsystemName(this));
+        ((ChannelSubsystem)session).setSubsystem(sspb.getSubsystemName(this));
+        ((ChannelSubsystem)session).setPty(true);
         ((ChannelSubsystem)session).setPtyType(sspb.getTerminalType(this), sspb.getTerminalCols(this), sspb.getTerminalRows(this),
                 sspb.getTerminalWidth(this), sspb.getTerminalHeight(this));
 
