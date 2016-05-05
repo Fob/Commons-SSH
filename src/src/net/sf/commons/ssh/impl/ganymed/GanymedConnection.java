@@ -114,7 +114,22 @@ public class GanymedConnection extends AbstractConnection
 	@Override
 	public SubsystemSession createSubsystemSession()
 	{
-		throw new UnsupportedOperationException("createSubsystemSession is not supported");
+		SubsystemSession session;
+		try
+		{
+			session = new GanymedSubsystemSession(this, connection);
+		}
+		catch (Exception e)
+		{
+			Error error = new Error("Can't create shell session", this, ErrorLevel.ERROR, e, "createSubsystemSession()", log);
+			error.writeLog();
+			pushError(error);
+			if(e instanceof RuntimeException)
+				throw (RuntimeException) e;
+			throw new RuntimeException(e.getMessage(),e);
+		}
+		registerChild(session);
+		return session;
 	}
 
 	/**

@@ -9,6 +9,7 @@ import java.security.PublicKey;
 
 import net.sf.commons.ssh.session.*;
 import org.apache.sshd.SshClient;
+import org.apache.sshd.client.channel.ChannelSession;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
 import org.apache.sshd.client.session.ClientSessionImpl;
@@ -92,7 +93,17 @@ public class SSHDConnectionSync extends AbstractConnection
 	@Override
 	public ShellSession createShellSession()
 	{
-		ShellSession session = new SSHDShellSync(this,connection);
+		ChannelSession channel;
+		try
+		{
+			channel = connection.createShellChannel();
+		}
+		catch (Exception e)
+		{
+			log.error("can't create sshd shell session");
+			throw new UnexpectedRuntimeException(e.getMessage(),e);
+		}
+		ShellSession session = new SSHDShellSync(this, channel);
 		registerChild(session);
 		return session;
 	}
@@ -100,7 +111,19 @@ public class SSHDConnectionSync extends AbstractConnection
 	@Override
 	public SubsystemSession createSubsystemSession()
 	{
-		throw new UnsupportedOperationException("createSubsystemSession is not supported");
+		ChannelSession channel;
+		try
+		{
+			channel = connection.createSubsystemChannel(SubsystemSessionPropertiesBuilder.getInstance().getSubsystemName(this));
+		}
+		catch (Exception e)
+		{
+			log.error("can't create sshd shell session");
+			throw new UnexpectedRuntimeException(e.getMessage(),e);
+		}
+		SubsystemSession session = new SSHDSubsystemSync(this, channel);
+		registerChild(session);
+		return session;
 	}
 
 	/**

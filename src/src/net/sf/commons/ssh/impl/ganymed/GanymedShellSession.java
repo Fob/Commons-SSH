@@ -25,7 +25,7 @@ import net.sf.commons.ssh.event.events.OpennedEvent;
  */
 public class GanymedShellSession extends AbstractSession implements ShellSession 
 {
-	private Session session;
+	protected Session session;
 	
 	/**
 	 * @param properties

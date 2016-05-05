@@ -110,7 +110,7 @@ public class J2SSHConnection extends AbstractConnection
 	@Override
 	public ShellSession createShellSession()
 	{
-		ShellSession session = new J2SSHShellSession(this,connection);
+		ShellSession session = new J2SSHShellSession(this, connection);
 		registerChild(session);
 		return session;
 	}
@@ -118,7 +118,9 @@ public class J2SSHConnection extends AbstractConnection
 	@Override
 	public SubsystemSession createSubsystemSession()
 	{
-		throw new UnsupportedOperationException("createSubsystemSession is not supported");
+		SubsystemSession session = new J2SSHSubsystemSession(this, connection);
+		registerChild(session);
+		return session;
 	}
 
 	/**
