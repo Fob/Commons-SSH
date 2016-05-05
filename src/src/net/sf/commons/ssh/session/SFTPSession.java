@@ -190,7 +190,7 @@ public interface SFTPSession extends Session {
      * @see SFTPFile
      */
     @SuppressWarnings("rawtypes")
-	List ls() throws IOException;
+	List<SFTPFile> ls() throws IOException;
 
     /**
      * List the contents remote directory.

@@ -9,6 +9,7 @@ import net.sf.commons.ssh.event.events.ClosedEvent;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.SFTPSession;
+import net.sf.commons.ssh.session.ScpSession;
 import net.sf.commons.ssh.session.ShellSession;
 import net.sf.commons.ssh.verification.IgnoreVerificationRepository;
 import net.sf.commons.ssh.verification.VerificationEntry;
@@ -144,6 +145,14 @@ public class UnixSshConnection extends AbstractConnection {
     @Override
     public SFTPSession createSFTPSession() {
         throw new UnsupportedOperationException("not implemented yet");
+    }
+
+    /**
+     * @see net.sf.commons.ssh.connection.Connection#createSFTPSession()
+     */
+    @Override
+    public ScpSession createScpSession() {
+        throw new UnsupportedOperationException("not supported yet");
     }
 
     @Override

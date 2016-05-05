@@ -27,6 +27,7 @@ import net.sf.commons.ssh.options.InitialPropertiesBuilder;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.SFTPSession;
+import net.sf.commons.ssh.session.ScpSession;
 import net.sf.commons.ssh.session.ShellSession;
 
 
@@ -114,6 +115,14 @@ public class JSCHConnection extends AbstractConnection
 	public SFTPSession createSFTPSession()
 	{
 		throw new UnsupportedOperationException("jsch sftp session not implemented");
+	}
+
+	/**
+	 * @see net.sf.commons.ssh.connection.Connection#createSFTPSession()
+	 */
+	@Override
+	public ScpSession createScpSession() {
+		throw new UnsupportedOperationException("not supported yet");
 	}
 
 	/*

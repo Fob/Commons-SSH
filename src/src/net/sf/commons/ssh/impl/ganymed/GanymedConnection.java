@@ -21,6 +21,7 @@ import net.sf.commons.ssh.event.events.ConnectedEvent;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.SFTPSession;
+import net.sf.commons.ssh.session.ScpSession;
 import net.sf.commons.ssh.session.ShellSession;
 import net.sf.commons.ssh.verification.VerificationPropertiesBuilder;
 import net.sf.commons.ssh.verification.VerificationRepository;
@@ -124,6 +125,14 @@ public class GanymedConnection extends AbstractConnection
 	@Override
 	public SFTPSession createSFTPSession()
 	{
+		throw new UnsupportedOperationException("not implemented yet");
+	}
+
+	/**
+	 * @see Connection#createScpSession() ()
+	 */
+	@Override
+	public ScpSession createScpSession() {
 		throw new UnsupportedOperationException("not implemented yet");
 	}
 
