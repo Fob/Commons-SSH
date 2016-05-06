@@ -21,7 +21,7 @@ import java.io.IOException;
 @SupportedFeatures(
         {
                 Feature.SSH2, Feature.SYNCHRONOUS, Feature.AUTH_CREDENTIALS, Feature.AUTH_PUBLIC_KEY,
-                Feature.CONNECTION_TIMEOUT, Feature.SESSION_SHELL, Feature.ERROR_STREAM,
+                Feature.CONNECTION_TIMEOUT, Feature.SESSION_SHELL, Feature.SESSION_SUBSYSTEM, Feature.ERROR_STREAM,
                 Feature.CONNECT_WITHOUT_AUTHENTICATE, Feature.HTTP_PROXY
         })
 public class GanymedConnector extends AbstractConnector {

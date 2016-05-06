@@ -22,7 +22,7 @@ import java.io.IOException;
  * @since 2.0
  */
 @SupportedFeatures({Feature.AUTH_CREDENTIALS, Feature.AUTH_PUBLIC_KEY, Feature.AUTHENTICATE_TIMEOUT, Feature.CONNECT_WITHOUT_AUTHENTICATE,
-        Feature.CONNECTION_TIMEOUT, Feature.ERROR_STREAM, Feature.SESSION_SHELL, Feature.SOCKET_TIMEOUT, Feature.SSH2, Feature.SYNCHRONOUS})
+        Feature.CONNECTION_TIMEOUT, Feature.ERROR_STREAM, Feature.SESSION_SHELL, Feature.SESSION_SUBSYSTEM, Feature.SOCKET_TIMEOUT, Feature.SSH2, Feature.SYNCHRONOUS})
 public class SSHDConnector extends AbstractConnector {
     private SshClient client;
 
