@@ -25,8 +25,8 @@ public class J2SSHSubsystemSession extends J2SSHShellSession implements Subsyste
     @Override
     protected void openImpl() throws IOException
     {
-        log.trace("openImpl(): open j2ssh shell session");
         SubsystemSessionPropertiesBuilder sspb = SubsystemSessionPropertiesBuilder.getInstance();
+        if (log.isTraceEnabled()) log.trace("openImpl(): open j2ssh subsystem '" + sspb.getSubsystemName(this) + "' session");
         sspb.verify(this);
         try
         {
@@ -39,7 +39,7 @@ public class J2SSHSubsystemSession extends J2SSHShellSession implements Subsyste
             if(!isSuccess)
                 throw new IOException("Can't open pseudo terminal");
             if(!session.startSubsystem(sspb.getSubsystemName(this)))
-                throw new IOException("Can't start shell");
+                throw new IOException("Can't start subsystem");
         }
         catch (Exception e)
         {

@@ -114,6 +114,8 @@ public class SSHDConnectionSync extends AbstractConnection
 		ChannelSession channel;
 		try
 		{
+			if (log.isTraceEnabled()) log.trace("starting sshd subsystem " +
+					"'" + SubsystemSessionPropertiesBuilder.getInstance().getSubsystemName(this) + "' session");
 			channel = connection.createSubsystemChannel(SubsystemSessionPropertiesBuilder.getInstance().getSubsystemName(this));
 		}
 		catch (Exception e)

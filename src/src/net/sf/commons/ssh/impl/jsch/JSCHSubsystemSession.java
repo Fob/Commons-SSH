@@ -35,10 +35,9 @@ public class JSCHSubsystemSession extends JSCHSession implements SubsystemSessio
     @Override
     protected void openImpl() throws IOException
     {
-        log.trace("openImpl(): open jsch subsystem session");
         SubsystemSessionPropertiesBuilder sspb = SubsystemSessionPropertiesBuilder.getInstance();
+        if (log.isTraceEnabled()) log.trace("openImpl(): open jsch subsystem '" + sspb.getSubsystemName(this) + "' session");
         sspb.verify(this);
-        log.info("getSubsystemName: " + sspb.getSubsystemName(this));
         ((ChannelSubsystem)session).setSubsystem(sspb.getSubsystemName(this));
         ((ChannelSubsystem)session).setPty(true);
         ((ChannelSubsystem)session).setPtyType(sspb.getTerminalType(this), sspb.getTerminalCols(this), sspb.getTerminalRows(this),

@@ -121,7 +121,7 @@ public class GanymedConnection extends AbstractConnection
 		}
 		catch (Exception e)
 		{
-			Error error = new Error("Can't create shell session", this, ErrorLevel.ERROR, e, "createSubsystemSession()", log);
+			Error error = new Error("Can't create subsystem session", this, ErrorLevel.ERROR, e, "createSubsystemSession()", log);
 			error.writeLog();
 			pushError(error);
 			if(e instanceof RuntimeException)

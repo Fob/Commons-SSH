@@ -28,8 +28,8 @@ public class GanymedSubsystemSession extends GanymedShellSession implements Subs
     protected void openImpl() throws IOException
     {
         SubsystemSessionPropertiesBuilder sspb = SubsystemSessionPropertiesBuilder.getInstance();
+        if (log.isTraceEnabled()) log.trace("openImpl(): open ganymed subsystem '" + sspb.getSubsystemName(this) + "' session");
         sspb.verify(this);
-
         session.requestPTY(sspb.getTerminalType(this),
                 sspb.getTerminalCols(this),
                 sspb.getTerminalRows(this),
