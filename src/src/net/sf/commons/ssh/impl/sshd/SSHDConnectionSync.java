@@ -201,16 +201,19 @@ public class SSHDConnectionSync extends AbstractConnection
 	@Override
 	protected void closeImpl() throws IOException
 	{
-		connection.close(false);
-		Long timeout = SSHDPropertiesBuilder.Connection.getInstance().getSyncTimeout(this);
-		int status = connection.waitFor(ClientSessionImpl.CLOSED, timeout);
-		if((status & ClientSessionImpl.CLOSED) == 0)
+		if (connection != null)
 		{
-			connection.close(true);
-			Error error = new Error("Graseful close didn't complete in "+timeout+"ms", this, ErrorLevel.WARN
-					, null, "close()",log);
-			error.writeLog();
-			pushError(error);
+			connection.close(false);
+			Long timeout = SSHDPropertiesBuilder.Connection.getInstance().getSyncTimeout(this);
+			int status = connection.waitFor(ClientSessionImpl.CLOSED, timeout);
+			if ((status & ClientSessionImpl.CLOSED) == 0)
+			{
+				connection.close(true);
+				Error error = new Error("Graseful close didn't complete in " + timeout + "ms", this, ErrorLevel.WARN
+						, null, "close()", log);
+				error.writeLog();
+				pushError(error);
+			}
 		}
 		setContainerStatus(Status.CLOSED);
 		fire(new ClosedEvent(this));
