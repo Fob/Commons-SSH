@@ -84,8 +84,7 @@ public class UnixSshConnection extends AbstractConnection {
                 command = StringUtils.replace(command, "#$HOST_CHECK$#", "yes");
                 command = StringUtils.replace(command, "#$REPOSITORY$#", "-o UserKnownHostsFile=" + StringUtils.replace(known_host.getAbsolutePath(), " ", "\\ "));
             }
-            if (log.isTraceEnabled())
-                log.trace("connect string: " + command);
+            LogUtils.trace(log, "connect string: " + command);
         }
         try {
             sshProcess = Runtime.getRuntime().exec(command);

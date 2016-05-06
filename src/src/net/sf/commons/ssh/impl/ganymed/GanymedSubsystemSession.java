@@ -1,6 +1,7 @@
 package net.sf.commons.ssh.impl.ganymed;
 
 import ch.ethz.ssh2.Connection;
+import net.sf.commons.ssh.common.LogUtils;
 import net.sf.commons.ssh.common.Status;
 import net.sf.commons.ssh.event.events.OpennedEvent;
 import net.sf.commons.ssh.options.Properties;
@@ -28,7 +29,7 @@ public class GanymedSubsystemSession extends GanymedShellSession implements Subs
     protected void openImpl() throws IOException
     {
         SubsystemSessionPropertiesBuilder sspb = SubsystemSessionPropertiesBuilder.getInstance();
-        if (log.isTraceEnabled()) log.trace("openImpl(): open ganymed subsystem '" + sspb.getSubsystemName(this) + "' session");
+        LogUtils.trace(log, "openImpl(): open ganymed subsystem " + sspb.getSubsystemName(this) + " session");
         sspb.verify(this);
         session.requestPTY(sspb.getTerminalType(this),
                 sspb.getTerminalCols(this),

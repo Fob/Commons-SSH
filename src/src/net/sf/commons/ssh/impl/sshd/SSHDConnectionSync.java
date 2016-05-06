@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.security.PublicKey;
 
 
+import net.sf.commons.ssh.common.LogUtils;
 import net.sf.commons.ssh.session.*;
 import org.apache.sshd.SshClient;
 import org.apache.sshd.client.channel.ChannelSession;
@@ -114,8 +115,7 @@ public class SSHDConnectionSync extends AbstractConnection
 		ChannelSession channel;
 		try
 		{
-			if (log.isTraceEnabled()) log.trace("starting sshd subsystem " +
-					"'" + SubsystemSessionPropertiesBuilder.getInstance().getSubsystemName(this) + "' session");
+			LogUtils.trace(log, "starting sshd subsystem " + SubsystemSessionPropertiesBuilder.getInstance().getSubsystemName(this) + " session");
 			channel = connection.createSubsystemChannel(SubsystemSessionPropertiesBuilder.getInstance().getSubsystemName(this));
 		}
 		catch (Exception e)

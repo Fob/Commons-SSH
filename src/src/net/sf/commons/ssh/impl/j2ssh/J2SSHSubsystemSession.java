@@ -1,6 +1,7 @@
 package net.sf.commons.ssh.impl.j2ssh;
 
 import com.sshtools.j2ssh.SshClient;
+import net.sf.commons.ssh.common.LogUtils;
 import net.sf.commons.ssh.common.UnexpectedRuntimeException;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.SubsystemSession;
@@ -26,7 +27,7 @@ public class J2SSHSubsystemSession extends J2SSHShellSession implements Subsyste
     protected void openImpl() throws IOException
     {
         SubsystemSessionPropertiesBuilder sspb = SubsystemSessionPropertiesBuilder.getInstance();
-        if (log.isTraceEnabled()) log.trace("openImpl(): open j2ssh subsystem '" + sspb.getSubsystemName(this) + "' session");
+        LogUtils.trace(log, "openImpl(): open j2ssh subsystem " + sspb.getSubsystemName(this) + " session");
         sspb.verify(this);
         try
         {
