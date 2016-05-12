@@ -49,6 +49,14 @@ public abstract class AbstractConnection extends AbstractContainer<Session> impl
 	}
 
 	@Override
+	public SubsystemSession openSubsystemSession() throws IOException
+	{
+		SubsystemSession session = createSubsystemSession();
+		session.open();
+		return session;
+	}
+
+	@Override
 	public ExecSession openExecSession(String command) throws IOException
 	{
 		ExecSession session = createExecSession();

@@ -38,6 +38,10 @@ public enum Feature {
     SESSION_SFTP,
 
     /**
+     * Subsystem session feature
+     */
+    SESSION_SUBSYSTEM,
+    /**
      * Socket timeout supports
      */
     SOCKET_TIMEOUT,

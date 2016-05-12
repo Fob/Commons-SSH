@@ -30,7 +30,7 @@ import net.sf.commons.ssh.session.ShellSessionPropertiesBuilder;
  */
 public class J2SSHShellSession extends AbstractSession implements ShellSession
 {
-	private SessionChannelClient session;
+	protected SessionChannelClient session;
 	/**
 	 * @param properties
 	 */

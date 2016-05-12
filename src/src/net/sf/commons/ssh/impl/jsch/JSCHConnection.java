@@ -29,6 +29,7 @@ import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.SFTPSession;
 import net.sf.commons.ssh.session.ScpSession;
 import net.sf.commons.ssh.session.ShellSession;
+import net.sf.commons.ssh.session.SubsystemSession;
 
 
 /**
@@ -95,11 +96,28 @@ public class JSCHConnection extends AbstractConnection
 		return session;
 	}
 
+	@Override
+	public SubsystemSession createSubsystemSession()
+	{
+		ChannelSubsystem channel;
+		try
+		{
+			channel = (ChannelSubsystem) connection.openChannel("subsystem");
+		}
+		catch (JSchException e)
+		{
+			throw new UnexpectedRuntimeException(e.getMessage(),e);
+		}
+		JSCHSubsystemSession session = new JSCHSubsystemSession(this, channel);
+		registerChild(session);
+		return session;
+	}
+
 	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see net.sf.commons.ssh.connection.Connection#createExecSession()
-	 */
+         * (non-Javadoc)
+         *
+         * @see net.sf.commons.ssh.connection.Connection#createExecSession()
+         */
 	@Override
 	public ExecSession createExecSession()
 	{

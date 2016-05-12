@@ -7,8 +7,13 @@ import java.io.IOException;
 import java.security.PublicKey;
 
 
+<<<<<<< HEAD
+=======
+import net.sf.commons.ssh.common.LogUtils;
+>>>>>>> 08f08be80f158ce99c694c5b8ff7eb52dba0a52c
 import net.sf.commons.ssh.session.*;
 import org.apache.sshd.SshClient;
+import org.apache.sshd.client.channel.ChannelSession;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
 import org.apache.sshd.client.session.ClientSessionImpl;
@@ -92,7 +97,36 @@ public class SSHDConnectionSync extends AbstractConnection
 	@Override
 	public ShellSession createShellSession()
 	{
-		ShellSession session = new SSHDShellSync(this,connection);
+		ChannelSession channel;
+		try
+		{
+			channel = connection.createShellChannel();
+		}
+		catch (Exception e)
+		{
+			log.error("can't create sshd shell session");
+			throw new UnexpectedRuntimeException(e.getMessage(),e);
+		}
+		ShellSession session = new SSHDShellSync(this, channel);
+		registerChild(session);
+		return session;
+	}
+
+	@Override
+	public SubsystemSession createSubsystemSession()
+	{
+		ChannelSession channel;
+		try
+		{
+			LogUtils.trace(log, "starting sshd subsystem " + SubsystemSessionPropertiesBuilder.getInstance().getSubsystemName(this) + " session");
+			channel = connection.createSubsystemChannel(SubsystemSessionPropertiesBuilder.getInstance().getSubsystemName(this));
+		}
+		catch (Exception e)
+		{
+			log.error("can't create sshd shell session");
+			throw new UnexpectedRuntimeException(e.getMessage(),e);
+		}
+		SubsystemSession session = new SSHDSubsystemSync(this, channel);
 		registerChild(session);
 		return session;
 	}
@@ -177,16 +211,19 @@ public class SSHDConnectionSync extends AbstractConnection
 	@Override
 	protected void closeImpl() throws IOException
 	{
-		connection.close(false);
-		Long timeout = SSHDPropertiesBuilder.Connection.getInstance().getSyncTimeout(this);
-		int status = connection.waitFor(ClientSessionImpl.CLOSED, timeout);
-		if((status & ClientSessionImpl.CLOSED) == 0)
+		if (connection != null)
 		{
-			connection.close(true);
-			Error error = new Error("Graseful close didn't complete in "+timeout+"ms", this, ErrorLevel.WARN
-					, null, "close()",log);
-			error.writeLog();
-			pushError(error);
+			connection.close(false);
+			Long timeout = SSHDPropertiesBuilder.Connection.getInstance().getSyncTimeout(this);
+			int status = connection.waitFor(ClientSessionImpl.CLOSED, timeout);
+			if ((status & ClientSessionImpl.CLOSED) == 0)
+			{
+				connection.close(true);
+				Error error = new Error("Graseful close didn't complete in " + timeout + "ms", this, ErrorLevel.WARN
+						, null, "close()", log);
+				error.writeLog();
+				pushError(error);
+			}
 		}
 		setContainerStatus(Status.CLOSED);
 		fire(new ClosedEvent(this));

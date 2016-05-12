@@ -12,7 +12,6 @@ import net.sf.commons.ssh.session.AbstractSession;
 import net.sf.commons.ssh.session.ShellSession;
 import net.sf.commons.ssh.session.ShellSessionPropertiesBuilder;
 import org.apache.sshd.ClientChannel;
-import org.apache.sshd.ClientSession;
 import org.apache.sshd.client.channel.ChannelSession;
 import org.apache.sshd.client.future.OpenFuture;
 
@@ -32,18 +31,10 @@ public class SSHDShellSync extends AbstractSession implements ShellSession
     private PipedInputStream stdErr;
     private PipedOutputStream stdIn;
 
-    public SSHDShellSync(Properties properties,ClientSession connection)
+    public SSHDShellSync(Properties properties, ChannelSession channel)
     {
         super(properties);
-        try
-        {
-            channel = connection.createShellChannel();
-        }
-        catch (Exception e)
-        {
-			log.error("can't create sshd shell session");
-			throw new UnexpectedRuntimeException(e.getMessage(),e);
-        }
+        this.channel = channel;
         setContainerStatus(Status.CREATED);
     }
 

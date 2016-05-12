@@ -4,6 +4,7 @@
 package net.sf.commons.ssh.impl.ganymed;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 
@@ -23,6 +24,7 @@ import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.SFTPSession;
 import net.sf.commons.ssh.session.ScpSession;
 import net.sf.commons.ssh.session.ShellSession;
+import net.sf.commons.ssh.session.SubsystemSession;
 import net.sf.commons.ssh.verification.VerificationPropertiesBuilder;
 import net.sf.commons.ssh.verification.VerificationRepository;
 import ch.ethz.ssh2.Connection;
@@ -100,6 +102,27 @@ public class GanymedConnection extends AbstractConnection
 		catch (Exception e)
 		{
 			Error error = new Error("Can't create shell session", this, ErrorLevel.ERROR, e, "createShellSession()", log);
+			error.writeLog();
+			pushError(error);
+			if(e instanceof RuntimeException)
+				throw (RuntimeException) e;
+			throw new RuntimeException(e.getMessage(),e);
+		}
+		registerChild(session);
+		return session;
+	}
+
+	@Override
+	public SubsystemSession createSubsystemSession()
+	{
+		SubsystemSession session;
+		try
+		{
+			session = new GanymedSubsystemSession(this, connection);
+		}
+		catch (Exception e)
+		{
+			Error error = new Error("Can't create subsystem session", this, ErrorLevel.ERROR, e, "createSubsystemSession()", log);
 			error.writeLog();
 			pushError(error);
 			if(e instanceof RuntimeException)

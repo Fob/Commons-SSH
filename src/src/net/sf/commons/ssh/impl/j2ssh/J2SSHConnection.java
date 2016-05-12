@@ -27,6 +27,7 @@ import net.sf.commons.ssh.session.ExecSession;
 import net.sf.commons.ssh.session.SFTPSession;
 import net.sf.commons.ssh.session.ScpSession;
 import net.sf.commons.ssh.session.ShellSession;
+import net.sf.commons.ssh.session.SubsystemSession;
 import net.sf.commons.ssh.verification.VerificationPropertiesBuilder;
 import net.sf.commons.ssh.verification.VerificationRepository;
 
@@ -173,6 +174,7 @@ public class J2SSHConnection extends AbstractConnection {
             authenticate();
     }
 
+<<<<<<< HEAD
     /**
      * @see net.sf.commons.ssh.common.AbstractClosable#closeImpl()
      */
@@ -182,6 +184,26 @@ public class J2SSHConnection extends AbstractConnection {
         setContainerStatus(Status.CLOSED);
         fire(new ClosedEvent(this));
     }
+=======
+	/**
+	 * @see net.sf.commons.ssh.connection.Connection#createShellSession()
+	 */
+	@Override
+	public ShellSession createShellSession()
+	{
+		ShellSession session = new J2SSHShellSession(this, connection);
+		registerChild(session);
+		return session;
+	}
+
+	@Override
+	public SubsystemSession createSubsystemSession()
+	{
+		SubsystemSession session = new J2SSHSubsystemSession(this, connection);
+		registerChild(session);
+		return session;
+	}
+>>>>>>> 08f08be80f158ce99c694c5b8ff7eb52dba0a52c
 
     @Override
     public void authenticateImpl() throws AuthenticationException {

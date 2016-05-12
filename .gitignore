@@ -1,0 +1,10 @@
+*.class
+null/commons-ssh-2.0.3.jar
+.idea/workspace.xml
+*.iml
+${env.OUTPUT_DIR}/classes/META-INF/LICENSE
+${env.OUTPUT_DIR}/classes/net/sf/commons/ssh/directory/directory.xml
+.idea/.name
+*.xml
+${env.OUTPUT_DIR}/maven-archiver/pom.properties
+${env.OUTPUT_DIR}/MANIFEST.MF

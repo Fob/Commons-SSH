@@ -32,9 +32,6 @@ import static net.sf.commons.ssh.directory.XmlUtil.getFromElement;
  */
 public class Description
 {
-
-
-
     static Description loadDescription(Element element)
     {
         Description description = new Description();
