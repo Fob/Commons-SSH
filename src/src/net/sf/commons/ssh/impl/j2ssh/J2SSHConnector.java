@@ -21,13 +21,8 @@ import java.io.IOException;
 @SupportedFeatures(
         {
                 Feature.SSH2, Feature.SYNCHRONOUS, Feature.AUTH_CREDENTIALS, Feature.AUTH_PUBLIC_KEY,
-<<<<<<< HEAD
                 Feature.CONNECTION_TIMEOUT, Feature.SOCKET_TIMEOUT, Feature.SESSION_SHELL, Feature.SESSION_SCP,
                 Feature.SESSION_SFTP, Feature.ERROR_STREAM, Feature.AUTHENTICATE_TIMEOUT, Feature.CONNECT_WITHOUT_AUTHENTICATE
-=======
-                Feature.CONNECTION_TIMEOUT, Feature.SOCKET_TIMEOUT, Feature.SESSION_SHELL, Feature.SESSION_SUBSYSTEM, Feature.ERROR_STREAM,
-                Feature.AUTHENTICATE_TIMEOUT, Feature.CONNECT_WITHOUT_AUTHENTICATE
->>>>>>> 08f08be80f158ce99c694c5b8ff7eb52dba0a52c
         })
 public class J2SSHConnector extends AbstractConnector {
     /**

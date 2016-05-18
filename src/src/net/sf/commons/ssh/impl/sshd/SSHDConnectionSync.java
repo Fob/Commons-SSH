@@ -6,11 +6,7 @@ package net.sf.commons.ssh.impl.sshd;
 import java.io.IOException;
 import java.security.PublicKey;
 
-
-<<<<<<< HEAD
-=======
 import net.sf.commons.ssh.common.LogUtils;
->>>>>>> 08f08be80f158ce99c694c5b8ff7eb52dba0a52c
 import net.sf.commons.ssh.session.*;
 import org.apache.sshd.SshClient;
 import org.apache.sshd.client.channel.ChannelSession;

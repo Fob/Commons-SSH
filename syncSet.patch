@@ -1,0 +1,224 @@
+Index: src/src/net/sf/commons/ssh/options/SynchronizedSet.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/src/net/sf/commons/ssh/options/SynchronizedSet.java	(revision 6d08ae284daa199779b3ab2b7e850b2306a958b2)
++++ src/src/net/sf/commons/ssh/options/SynchronizedSet.java	(revision 6d08ae284daa199779b3ab2b7e850b2306a958b2)
+@@ -0,0 +1,114 @@
++package net.sf.commons.ssh.options;
++
++import org.jetbrains.annotations.NotNull;
++
++import java.io.Serializable;
++import java.util.Collection;
++import java.util.Collections;
++import java.util.Iterator;
++import java.util.Set;
++
++/**
++ * Facade for java.util.Collections.SynchronizedCollection
++ * @author veentoo
++ * @date 5/16/2016
++ */
++public class SynchronizedSet<E> implements Set<E>, Serializable {
++
++    private static final long serialVersionUID = 9144632926913322802L;
++
++    private final Collection synchronizedCollection;
++
++    private SynchronizedSet(Collection synchronizedCollection)
++    {
++        this.synchronizedCollection = synchronizedCollection;
++    }
++
++    /**
++     * @param s non-synchronized set
++     * @return
++     */
++    public static SynchronizedSet newInstance(Set s) {
++        return new SynchronizedSet(Collections.synchronizedCollection(s));
++    }
++
++    @Override
++    public int size()
++    {
++        return synchronizedCollection.size();
++    }
++
++    @Override
++    public boolean isEmpty()
++    {
++        return synchronizedCollection.isEmpty();
++    }
++
++    @Override
++    public boolean contains(Object o)
++    {
++        return synchronizedCollection.contains(o);
++    }
++
++    @Override
++    public Iterator<E> iterator()
++    {
++        return synchronizedCollection.iterator();
++    }
++
++    @NotNull
++    @Override
++    public Object[] toArray()
++    {
++        return synchronizedCollection.toArray();
++    }
++
++    @Override
++    public boolean add(Object o)
++    {
++        return synchronizedCollection.add(o);
++    }
++
++    @Override
++    public boolean remove(Object o)
++    {
++        return synchronizedCollection.remove(o);
++    }
++
++    @Override
++    public boolean addAll(Collection c)
++    {
++        return synchronizedCollection.addAll(c);
++    }
++
++    @Override
++    public void clear()
++    {
++        synchronizedCollection.clear();
++    }
++
++    @Override
++    public boolean retainAll(Collection c)
++    {
++        return synchronizedCollection.retainAll(c);
++    }
++
++    @Override
++    public boolean removeAll(Collection c)
++    {
++        return synchronizedCollection.removeAll(c);
++    }
++
++    @Override
++    public boolean containsAll(Collection c)
++    {
++        return synchronizedCollection.containsAll(c);
++    }
++
++    @NotNull
++    @Override
++    public Object[] toArray(Object[] a)
++    {
++        return synchronizedCollection.toArray(a);
++    }
++}
+Index: src/src/net/sf/commons/ssh/options/DefaultConverter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/src/net/sf/commons/ssh/options/DefaultConverter.java	(date 1463401702000)
++++ src/src/net/sf/commons/ssh/options/DefaultConverter.java	(date 1463412487000)
+@@ -5,11 +5,8 @@
+ 
+ import java.lang.reflect.Constructor;
+ import java.lang.reflect.Field;
+-import java.lang.reflect.InvocationTargetException;
+ import java.lang.reflect.Method;
+-import java.util.Arrays;
+-import java.util.HashMap;
+-import java.util.Map;
++import java.util.*;
+ 
+ import net.sf.commons.ssh.common.LogUtils;
+ import net.sf.commons.ssh.common.UnexpectedRuntimeException;
+@@ -147,6 +144,11 @@
+ 	public String convertObjectToString(Object value)
+ 	{
+ 		return value.toString();
++	}
++
++	@ConvertMethod(from = SynchronizedSet.class, to = Set.class)
++	public Set convertSynchronizedSetToSet(SynchronizedSet c) {
++		return new HashSet(c);
+ 	}
+ 
+ 	protected Object staticConvert(Class from,Class to,Object value)
+Index: src/src/net/sf/commons/ssh/options/InitialPropertiesBuilder.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/src/net/sf/commons/ssh/options/InitialPropertiesBuilder.java	(date 1463401702000)
++++ src/src/net/sf/commons/ssh/options/InitialPropertiesBuilder.java	(date 1463412487000)
+@@ -3,7 +3,6 @@
+  */
+ package net.sf.commons.ssh.options;
+ 
+-import java.util.Collections;
+ import java.util.HashSet;
+ import java.util.Set;
+ 
+@@ -30,7 +29,7 @@
+ 		defaultProperties.put(SYNCHRONIZED_CONFIGURABLE, true);
+ 		defaultProperties.put(SYNCHRONIZED_ERROR_HOLDER, true);
+ 		defaultProperties.put(SYNCHRONIZED_CHILDREN, true);
+-		defaultProperties.put(LIBRARY_OPTIONS, Collections.synchronizedCollection(new HashSet()));
++		defaultProperties.put(LIBRARY_OPTIONS, SynchronizedSet.newInstance(new HashSet()));
+ 	}
+ 
+ 	public synchronized static InitialPropertiesBuilder getInstance()
+@@ -85,7 +84,7 @@
+ 		Set<String> options = getLibraryOptions(config);
+ 		if (options == null)
+ 		{
+-			options = new HashSet<String>();
++			options = SynchronizedSet.newInstance(new HashSet<String>());
+ 			setProperty(config, LIBRARY_OPTIONS, options);
+ 		}
+ 		if (!options.contains(value))
+@@ -94,7 +93,6 @@
+ 
+ 	public void addLibraryOption(Configurable config, HashSet<String> value)
+ 	{
+-
+ 		setProperty(config, LIBRARY_OPTIONS, value);
+ 	}
+ }
+Index: src/test/net/sf/commons/ssh/impl/FactoriesTest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/test/net/sf/commons/ssh/impl/FactoriesTest.java	(date 1463401702000)
++++ src/test/net/sf/commons/ssh/impl/FactoriesTest.java	(date 1463412487000)
+@@ -6,6 +6,9 @@
+ import net.sf.commons.ssh.connector.Connector;
+ import net.sf.commons.ssh.directory.Description;
+ import net.sf.commons.ssh.directory.Directory;
++import net.sf.commons.ssh.options.DefaultConverter;
++import net.sf.commons.ssh.options.InitialPropertiesBuilder;
++import net.sf.commons.ssh.options.SynchronizedSet;
+ import org.junit.Test;
+ 
+ import java.util.Collection;
+@@ -46,5 +49,11 @@
+         String factory = "net.sf.commons.ssh.jsch.JschConnectionFactory";
+         Connector connector = Manager.getInstance().newConnector(factory, features, null);
+         assertEquals(connector.getClass().getName(), "net.sf.commons.ssh.impl.jsch.JSCHConnector");
++    }
++
++    @Test
++    public void testSynchronizedSetConverter() throws Exception {
++        new DefaultConverter(InitialPropertiesBuilder.class)
++                .convert(SynchronizedSet.newInstance(new HashSet()), InitialPropertiesBuilder.LIBRARY_OPTIONS);
+     }
+ }

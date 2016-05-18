@@ -1,0 +1,101 @@
+Index: src/src/net/sf/commons/ssh/impl/j2ssh/J2SSHConnection.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/src/net/sf/commons/ssh/impl/j2ssh/J2SSHConnection.java	(revision e2d65c9bde0447624336943f8088031705a16e76)
++++ src/src/net/sf/commons/ssh/impl/j2ssh/J2SSHConnection.java	(revision 76e4493439bc332d3c9bc0b9cb9aed79faa62759)
+@@ -103,6 +103,14 @@
+         return session;
+     }
+ 
++    @Override
++    public SubsystemSession createSubsystemSession()
++    {
++        SubsystemSession session = new J2SSHSubsystemSession(this, connection);
++        registerChild(session);
++        return session;
++    }
++
+     /**
+      * @see net.sf.commons.ssh.connection.Connection#createExecSession()
+      */
+@@ -174,36 +182,16 @@
+             authenticate();
+     }
+ 
+-<<<<<<< HEAD
+     /**
+      * @see net.sf.commons.ssh.common.AbstractClosable#closeImpl()
+      */
+     @Override
+-    protected void closeImpl() throws IOException {
++    protected void closeImpl() throws IOException
++    {
+         connection.disconnect();
+         setContainerStatus(Status.CLOSED);
+         fire(new ClosedEvent(this));
+     }
+-=======
+-	/**
+-	 * @see net.sf.commons.ssh.connection.Connection#createShellSession()
+-	 */
+-	@Override
+-	public ShellSession createShellSession()
+-	{
+-		ShellSession session = new J2SSHShellSession(this, connection);
+-		registerChild(session);
+-		return session;
+-	}
+-
+-	@Override
+-	public SubsystemSession createSubsystemSession()
+-	{
+-		SubsystemSession session = new J2SSHSubsystemSession(this, connection);
+-		registerChild(session);
+-		return session;
+-	}
+->>>>>>> 08f08be80f158ce99c694c5b8ff7eb52dba0a52c
+ 
+     @Override
+     public void authenticateImpl() throws AuthenticationException {
+Index: src/src/net/sf/commons/ssh/impl/j2ssh/J2SSHConnector.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/src/net/sf/commons/ssh/impl/j2ssh/J2SSHConnector.java	(revision e2d65c9bde0447624336943f8088031705a16e76)
++++ src/src/net/sf/commons/ssh/impl/j2ssh/J2SSHConnector.java	(revision 76e4493439bc332d3c9bc0b9cb9aed79faa62759)
+@@ -21,13 +21,8 @@
+ @SupportedFeatures(
+         {
+                 Feature.SSH2, Feature.SYNCHRONOUS, Feature.AUTH_CREDENTIALS, Feature.AUTH_PUBLIC_KEY,
+-<<<<<<< HEAD
+-                Feature.CONNECTION_TIMEOUT, Feature.SOCKET_TIMEOUT, Feature.SESSION_SHELL, Feature.SESSION_SCP,
++                Feature.CONNECTION_TIMEOUT, Feature.SOCKET_TIMEOUT, Feature.SESSION_SHELL, Feature.SESSION_SUBSYSTEM, Feature.SESSION_SCP,
+                 Feature.SESSION_SFTP, Feature.ERROR_STREAM, Feature.AUTHENTICATE_TIMEOUT, Feature.CONNECT_WITHOUT_AUTHENTICATE
+-=======
+-                Feature.CONNECTION_TIMEOUT, Feature.SOCKET_TIMEOUT, Feature.SESSION_SHELL, Feature.SESSION_SUBSYSTEM, Feature.ERROR_STREAM,
+-                Feature.AUTHENTICATE_TIMEOUT, Feature.CONNECT_WITHOUT_AUTHENTICATE
+->>>>>>> 08f08be80f158ce99c694c5b8ff7eb52dba0a52c
+         })
+ public class J2SSHConnector extends AbstractConnector {
+     /**
+Index: src/src/net/sf/commons/ssh/impl/sshd/SSHDConnectionSync.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/src/net/sf/commons/ssh/impl/sshd/SSHDConnectionSync.java	(revision e2d65c9bde0447624336943f8088031705a16e76)
++++ src/src/net/sf/commons/ssh/impl/sshd/SSHDConnectionSync.java	(revision 76e4493439bc332d3c9bc0b9cb9aed79faa62759)
+@@ -7,10 +7,7 @@
+ import java.security.PublicKey;
+ 
+ 
+-<<<<<<< HEAD
+-=======
+ import net.sf.commons.ssh.common.LogUtils;
+->>>>>>> 08f08be80f158ce99c694c5b8ff7eb52dba0a52c
+ import net.sf.commons.ssh.session.*;
+ import org.apache.sshd.SshClient;
+ import org.apache.sshd.client.channel.ChannelSession;
