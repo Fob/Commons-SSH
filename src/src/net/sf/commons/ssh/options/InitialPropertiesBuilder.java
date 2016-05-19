@@ -30,7 +30,7 @@ public class InitialPropertiesBuilder extends PropertiesBuilder
 		defaultProperties.put(SYNCHRONIZED_CONFIGURABLE, true);
 		defaultProperties.put(SYNCHRONIZED_ERROR_HOLDER, true);
 		defaultProperties.put(SYNCHRONIZED_CHILDREN, true);
-		defaultProperties.put(LIBRARY_OPTIONS, Collections.synchronizedCollection(new HashSet()));
+		defaultProperties.put(LIBRARY_OPTIONS, new HashSet());
 	}
 
 	public synchronized static InitialPropertiesBuilder getInstance()
