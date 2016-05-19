@@ -8,7 +8,6 @@ import com.sshtools.j2ssh.authentication.AuthenticationProtocolState;
 import com.sshtools.j2ssh.authentication.PasswordAuthenticationClient;
 import com.sshtools.j2ssh.authentication.PublicKeyAuthenticationClient;
 import com.sshtools.j2ssh.authentication.SshAuthenticationClient;
-import com.sshtools.j2ssh.configuration.SshConnectionProperties;
 import com.sshtools.j2ssh.transport.IgnoreHostKeyVerification;
 import com.sshtools.j2ssh.transport.publickey.SshPrivateKey;
 import com.sshtools.j2ssh.transport.publickey.rsa.SshRsaPrivateKey;
@@ -174,7 +173,6 @@ public class J2SSHConnection extends AbstractConnection {
             authenticate();
     }
 
-<<<<<<< HEAD
     /**
      * @see net.sf.commons.ssh.common.AbstractClosable#closeImpl()
      */
@@ -184,17 +182,10 @@ public class J2SSHConnection extends AbstractConnection {
         setContainerStatus(Status.CLOSED);
         fire(new ClosedEvent(this));
     }
-=======
 	/**
 	 * @see net.sf.commons.ssh.connection.Connection#createShellSession()
 	 */
-	@Override
-	public ShellSession createShellSession()
-	{
-		ShellSession session = new J2SSHShellSession(this, connection);
-		registerChild(session);
-		return session;
-	}
+
 
 	@Override
 	public SubsystemSession createSubsystemSession()
@@ -203,7 +194,6 @@ public class J2SSHConnection extends AbstractConnection {
 		registerChild(session);
 		return session;
 	}
->>>>>>> 08f08be80f158ce99c694c5b8ff7eb52dba0a52c
 
     @Override
     public void authenticateImpl() throws AuthenticationException {
