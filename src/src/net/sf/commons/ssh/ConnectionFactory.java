@@ -332,6 +332,10 @@ public abstract class ConnectionFactory
             return result;
     }
 
+    public Properties getProperties() {
+        return properties;
+    }
+
     public void setProperty(String key,String value)
     {
         properties.setProperty(key,value);

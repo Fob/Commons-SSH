@@ -70,7 +70,7 @@ public class JschConnectionFactory extends ConnectionFactory {
 
         connection.setPassword(authOptions.password);
 
-	    Properties properties = new Properties();
+	    Properties properties = getProperties();
 	    if(repository == null || repository instanceof IgnoreVerificationRepository)
             properties.setProperty("StrictHostKeyChecking", "no");
         else
@@ -111,7 +111,7 @@ public class JschConnectionFactory extends ConnectionFactory {
 		    authOptions.phrase);
 	    Session connection = jsch.getSession(authOptions.login, host, port);
 
-	    Properties properties = new Properties();
+	    Properties properties = getProperties();
 	    	    if(repository == null || repository instanceof IgnoreVerificationRepository)
             properties.setProperty("StrictHostKeyChecking", "no");
         else
