@@ -365,7 +365,9 @@ public class PipedInputStream extends InputStream
 		if (!connected)
 			throw new IOException("Pipe not connected");
 		else if (closedByWriter || closedByReader)
-			throw new IOException("Pipe closed");
+			if (closedByWriter && closedByReader)
+				throw new IOException("Pipe closed by writer and reader");
+			throw new IOException("Pipe closed by " + (closedByWriter ? "writer" : "reader"));
 	}
 
 	public synchronized void receivedLast()
