@@ -31,12 +31,6 @@ public class GanymedSubsystemSession extends GanymedShellSession implements Subs
         SubsystemSessionPropertiesBuilder sspb = SubsystemSessionPropertiesBuilder.getInstance();
         LogUtils.trace(log, "openImpl(): open ganymed subsystem " + sspb.getSubsystemName(this) + " session");
         sspb.verify(this);
-        session.requestPTY(sspb.getTerminalType(this),
-                sspb.getTerminalCols(this),
-                sspb.getTerminalRows(this),
-                sspb.getTerminalWidth(this),
-                sspb.getTerminalHeight(this),
-                null);
         session.startSubSystem(sspb.getSubsystemName(this));
         session.getStderr(); // for unlock
         setContainerStatus(Status.OPENNED);
