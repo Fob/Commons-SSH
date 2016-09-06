@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package net.sf.commons.ssh.common;
 import java.io.IOException;
@@ -360,15 +360,15 @@ public class PipedInputStream extends InputStream
 		//System.out.println("======= getPutSpace ======== \n"+this);
 	}
 
-	private void checkStateForReceive() throws IOException
-	{
-		if (!connected)
-			throw new IOException("Pipe not connected");
-		else if (closedByWriter || closedByReader)
-			if (closedByWriter && closedByReader)
-				throw new IOException("Pipe closed by writer and reader");
-			throw new IOException("Pipe closed by " + (closedByWriter ? "writer" : "reader"));
-	}
+	private void checkStateForReceive() throws IOException {
+        if (!connected)
+            throw new IOException("Pipe not connected");
+        else if (closedByWriter || closedByReader) {
+            if (closedByWriter && closedByReader)
+                throw new IOException("Pipe closed by writer and reader");
+            throw new IOException("Pipe closed by " + (closedByWriter ? "writer" : "reader"));
+        }
+    }
 
 	public synchronized void receivedLast()
 	{
