@@ -21,6 +21,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
+import java.io.Serializable;
+
 import static net.sf.commons.ssh.directory.XmlUtil.getFromElement;
 
 /**
@@ -30,7 +32,7 @@ import static net.sf.commons.ssh.directory.XmlUtil.getFromElement;
  * @author anku0315 - add factory priority
  * @since 1.0
  */
-public class Description
+public class Description implements Serializable
 {
     static Description loadDescription(Element element)
     {
