@@ -11,8 +11,7 @@ import net.sf.commons.ssh.connector.AbstractConnector;
 import net.sf.commons.ssh.connector.SupportedFeatures;
 import net.sf.commons.ssh.event.events.ClosedEvent;
 import net.sf.commons.ssh.options.Properties;
-import org.apache.sshd.SshClient;
-import org.apache.sshd.client.SessionFactory;
+import org.apache.sshd.client.SshClient;
 
 import java.io.IOException;
 
@@ -32,7 +31,6 @@ public class SSHDConnector extends AbstractConnector {
     public SSHDConnector(Properties properties) {
         super(properties);
         client = SshClient.setUpDefaultClient();
-        client.setSessionFactory(new SessionFactory());
         setupProperties();
         setContainerStatus(Status.CREATED);
         client.start();
@@ -43,12 +41,12 @@ public class SSHDConnector extends AbstractConnector {
         Integer processorCount = SSHDPropertiesBuilder.Connector.getInstance().getNioProcessorCount(this);
         String method = SSHDPropertiesBuilder.Connector.getInstance().getPumpingMethod(this);
         Long timeout = SSHDPropertiesBuilder.Connector.getInstance().getPumpingStreamTimeout(this);
-        //if(processorCount != null)
-        //	client.setNioProcessorCount(processorCount);
-        //if(timeout!=null)
-        //	client.setStreamWaitTime(timeout);
-        //if(method!=null)
-        //	client.setPumpingMethod(org.apache.sshd.client.PumpingMethod.valueOf(method));
+        if(processorCount != null)
+        	client.setNioWorkers(processorCount);
+        /*if(timeout!=null)
+        	client.setStreamWaitTime(timeout);
+        if(method!=null)
+        	client.setPumpingMethod(org.apache.sshd.client.PumpingMethod.valueOf(method));*/
     }
 
     /**

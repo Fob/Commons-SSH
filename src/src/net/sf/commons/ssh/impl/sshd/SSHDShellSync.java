@@ -11,13 +11,16 @@ import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.AbstractSession;
 import net.sf.commons.ssh.session.ShellSession;
 import net.sf.commons.ssh.session.ShellSessionPropertiesBuilder;
-import org.apache.sshd.ClientChannel;
+import org.apache.sshd.client.channel.ClientChannel;
 import org.apache.sshd.client.channel.ChannelSession;
+import org.apache.sshd.client.channel.ClientChannelEvent;
 import org.apache.sshd.client.future.OpenFuture;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * @author fob
@@ -112,8 +115,8 @@ public class SSHDShellSync extends AbstractSession implements ShellSession
         IOUtils.close(stdErr);
         IOUtils.close(stdOut);
         channel.close(false);
-        int st = channel.waitFor(ClientChannel.CLOSED,SSHDPropertiesBuilder.Connection.getInstance().getSyncTimeout(this));
-        if((st & ClientChannel.CLOSED) !=0)
+        channel.waitFor(Collections.singleton(ClientChannelEvent.CLOSED),SSHDPropertiesBuilder.Connection.getInstance().getSyncTimeout(this));
+        if(getContainerStatus() != Status.CLOSED)
             channel.close(true);
 
         setContainerStatus(Status.CLOSED);
@@ -141,8 +144,8 @@ public class SSHDShellSync extends AbstractSession implements ShellSession
     @Override
     public boolean isEOF() throws IOException
     {
-        int status = channel.waitFor(ClientChannel.EOF,1);
-        return (status & ClientChannel.EOF) != 0;
+        Set<ClientChannelEvent> events = channel.waitFor(Collections.singleton(ClientChannelEvent.EOF), 1);
+        return events.contains(ClientChannelEvent.EOF);
     }
 
     @Override
@@ -155,7 +158,7 @@ public class SSHDShellSync extends AbstractSession implements ShellSession
     @Override
     public boolean isClosed()
     {
-        int st = channel.waitFor(ClientChannel.CLOSED,1);
-        return (st & ClientChannel.CLOSED) !=0 && getContainerStatus() == Status.CLOSED;
+        channel.waitFor(Collections.singleton(ClientChannelEvent.CLOSED),1);
+        return getContainerStatus() == Status.CLOSED;
     }
 }
