@@ -1,27 +1,27 @@
 package net.sf.commons.ssh.session;
 
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-
-import net.sf.commons.ssh.common.AbstractContainer;
-import net.sf.commons.ssh.common.Closable;
-import net.sf.commons.ssh.common.Container;
-import net.sf.commons.ssh.common.LogUtils;
-import net.sf.commons.ssh.common.Status;
-import net.sf.commons.ssh.common.UnexpectedRuntimeException;
+import net.sf.commons.ssh.common.*;
 import net.sf.commons.ssh.errors.Error;
 import net.sf.commons.ssh.errors.ErrorHolder;
 import net.sf.commons.ssh.errors.ErrorLevel;
 import net.sf.commons.ssh.event.ProducerType;
 import net.sf.commons.ssh.options.Properties;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+
 public abstract class AbstractSession extends AbstractContainer implements Session
 {
+
+
+	protected Properties properties;
+
     public AbstractSession(Properties properties)
     {
-        super(properties);
+		super(properties);
+		this.properties = properties;
     }
 
     @Override

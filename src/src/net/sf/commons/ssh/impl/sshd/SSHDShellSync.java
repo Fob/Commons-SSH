@@ -4,6 +4,7 @@
 package net.sf.commons.ssh.impl.sshd;
 
 import net.sf.commons.ssh.common.*;
+import net.sf.commons.ssh.connection.ConnectionPropertiesBuilder;
 import net.sf.commons.ssh.event.events.ClosedEvent;
 import net.sf.commons.ssh.event.events.OpennedEvent;
 import net.sf.commons.ssh.event.events.ReadAvailableEvent;
@@ -11,7 +12,6 @@ import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.AbstractSession;
 import net.sf.commons.ssh.session.ShellSession;
 import net.sf.commons.ssh.session.ShellSessionPropertiesBuilder;
-import org.apache.sshd.client.channel.ClientChannel;
 import org.apache.sshd.client.channel.ChannelSession;
 import org.apache.sshd.client.channel.ClientChannelEvent;
 import org.apache.sshd.client.future.OpenFuture;
@@ -51,11 +51,13 @@ public class SSHDShellSync extends AbstractSession implements ShellSession
         final Integer modifier = PipePropertiesBuilder.getInstance().getModifier(this);
         final BufferAllocator allocator = PipePropertiesBuilder.getInstance().getAllocator(this);
 
-        PipedInputStream stdInPipe = new PipedInputStream(initialSize,maximumSize,stepSize,modifier,allocator);
+        PipedInputStream stdInPipe = new PipedInputStream(initialSize, maximumSize, stepSize, modifier, allocator);
         stdIn = new PipedOutputStream(stdInPipe);
         channel.setIn(stdInPipe);
 
         stdOut = new PipedInputStream(initialSize,maximumSize,stepSize,modifier,allocator);
+        Long soTimeout = ConnectionPropertiesBuilder.getInstance().getSoTimeout(properties);
+        stdOut.setWaitTimeout(soTimeout == null? 0: soTimeout);
         stdErr = new PipedInputStream(initialSize,maximumSize,stepSize,modifier,allocator);
 
         final SSHDShellSync shell = this;

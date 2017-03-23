@@ -4,7 +4,6 @@
 package net.sf.commons.ssh.connector;
 
 import net.sf.commons.ssh.Feature;
-import net.sf.commons.ssh.auth.AuthenticationMethod;
 import net.sf.commons.ssh.common.AbstractContainer;
 import net.sf.commons.ssh.common.UnexpectedRuntimeException;
 import net.sf.commons.ssh.connection.*;
@@ -30,6 +29,8 @@ import java.util.Set;
  * //SEP2015 - add check for property 'isNeedAuthentication'
  */
 public abstract class AbstractConnector extends AbstractContainer<Connection> implements Connector {
+
+
 
     public AbstractConnector(Properties properties) {
         super(properties);
