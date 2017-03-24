@@ -2,14 +2,14 @@
  *
  */
 package net.sf.commons.ssh.common;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Konstantin Aleksandrov (mail@aleksandrov.pro)
@@ -20,9 +20,9 @@ public class PipedInputStream extends InputStream
 
 	private static final int DEFAULT_PIPE_SIZE = 1024;
 
-	protected static AtomicLong counter = new AtomicLong();
+	private static AtomicLong counter = new AtomicLong();
 
-	protected final long id;
+	final long id;
 
 	protected final String name;
 
@@ -32,20 +32,25 @@ public class PipedInputStream extends InputStream
 
 	boolean connected = false;
 
-	protected ByteBuffer getBuffer;
-	protected ByteBuffer putBuffer;
+	private long waitTimeout = 0;
+
+	private ByteBuffer getBuffer;
+	private ByteBuffer putBuffer;
 	ByteBuffer initialBuffer;
-	protected LinkedList<ByteBuffer> putBuffers;
+	private LinkedList<ByteBuffer> putBuffers;
 
 
-	protected int initialSize = DEFAULT_PIPE_SIZE;
-	protected int maximumSize = DEFAULT_PIPE_SIZE;
-	protected int stepSize = DEFAULT_PIPE_SIZE;
-    protected int modifier = 2;
+	private int initialSize = DEFAULT_PIPE_SIZE;
+	private int maximumSize = DEFAULT_PIPE_SIZE;
+	private int stepSize = DEFAULT_PIPE_SIZE;
+    private int modifier = 2;
 	protected boolean direct;
-	protected int currentSize;
-    protected BufferAllocator allocator;
+	private int currentSize;
+    private BufferAllocator allocator;
     protected int available = 0;
+
+
+
 
 	public int getInitialSize()
 	{
@@ -120,6 +125,10 @@ public class PipedInputStream extends InputStream
 				{
 					return -1;
 				}
+				remaining = getBuffer.remaining();
+				if (remaining == 0){
+					throw new IOException("Read timeout");
+				}
 			}
 			else
 			{
@@ -167,7 +176,7 @@ public class PipedInputStream extends InputStream
 			if (wait)
 			{
 				LogUtils.trace(log, "{0} wait new data", name);
-				this.wait();
+				this.wait(waitTimeout);
 			}
 			return true;
 		}
@@ -221,10 +230,17 @@ public class PipedInputStream extends InputStream
 					notifyOutput();
 					return rlen;
 				}
+
 				if (getBuffer.remaining() == 0 & rlen > 0)
 				{
 					notifyOutput();
 					return rlen;
+				}
+				else {
+					remaining = getBuffer.remaining();
+					if (remaining == 0) {
+						throw new IOException("Read timeout");
+					}
 				}
 			}
 		}
@@ -405,5 +421,9 @@ public class PipedInputStream extends InputStream
 	protected void trace(String msg)
 	{
 		log.trace(name + ": " + msg);
+	}
+
+	public void setWaitTimeout(long waitTimeout) {
+		this.waitTimeout = waitTimeout;
 	}
 }
