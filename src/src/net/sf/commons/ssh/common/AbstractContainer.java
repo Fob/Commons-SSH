@@ -6,7 +6,6 @@ import net.sf.commons.ssh.event.AbstractEventProcessor;
 import net.sf.commons.ssh.options.InitialPropertiesBuilder;
 import net.sf.commons.ssh.options.Properties;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -18,15 +17,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public abstract class AbstractContainer<T extends Container> extends AbstractErrorHolder implements Container
 {
-    protected List<T> children;
+    protected List<T> children = new CopyOnWriteArrayList<T>();;
 
 	public AbstractContainer(Properties properties)
 	{
 		super(properties);
-        if(InitialPropertiesBuilder.getInstance().isSynchronizedChildren(this))
-            children = new CopyOnWriteArrayList<T>();
-        else
-            children = new ArrayList<T>();
+
 	}
 
 	@Override
