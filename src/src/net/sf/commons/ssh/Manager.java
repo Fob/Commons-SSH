@@ -6,8 +6,6 @@ import net.sf.commons.ssh.connector.Connector;
 import net.sf.commons.ssh.connector.SupportedFeatures;
 import net.sf.commons.ssh.directory.Description;
 import net.sf.commons.ssh.directory.Directory;
-import net.sf.commons.ssh.options.Configurable;
-import net.sf.commons.ssh.options.InitialPropertiesBuilder;
 import net.sf.commons.ssh.options.impl.MapConfigurable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -167,7 +165,6 @@ public final class Manager {
                 //set default properties
                 if (properties == null) {
                     properties = new MapConfigurable();
-                    InitialPropertiesBuilder.getInstance().setSynchronizedConfigurable((Configurable) properties, true);
                 }
                 return connectorClass.getConstructor(net.sf.commons.ssh.options.Properties.class).newInstance(properties);
             } catch (ClassCastException e) {

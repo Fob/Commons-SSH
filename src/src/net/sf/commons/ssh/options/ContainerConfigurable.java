@@ -18,15 +18,11 @@ import java.util.concurrent.ConcurrentHashMap;
  *        Configurable based on Map<String,Object> container
  */
 public abstract class ContainerConfigurable extends AbstractConfigurable implements Configurable {
-    protected Map<String, Object> configContainer;
+    protected Map<String, Object> configContainer =  new ConcurrentHashMap<String, Object>();;
     protected Log log = LogFactory.getLog(this.getClass());
 
 
     public ContainerConfigurable(Properties properties) {
-        if (InitialPropertiesBuilder.getInstance().isSynchronizedConfigurable(properties))
-            configContainer = new ConcurrentHashMap<String, Object>();
-        else
-            configContainer = new HashMap<String, Object>();
     }
 
     protected abstract void configureDefault(Properties properties);
