@@ -11,7 +11,7 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
 
-import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs2.FileSystemException;
 
 import net.sf.commons.ssh.options.Configurable;
 import net.sf.commons.ssh.options.ConvertMethod;
