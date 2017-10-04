@@ -149,7 +149,7 @@ public class J2SSHConnection extends AbstractConnection {
         final int port = ConnectionPropertiesBuilder.getInstance().getPort(this);
         VerificationRepository repository = VerificationPropertiesBuilder.getInstance().getRepository(this);
 
-        Long timeout = ConnectionPropertiesBuilder.getInstance().getConnectTimeout(this);
+        Long timeout = ConnectionPropertiesBuilder.getInstance().getSoTimeout(this);
         if (timeout != null)
             connection.setSocketTimeout(timeout.intValue());
         Boolean forwarding = J2SSHPropertiesBuilder.Connection.getInstance().getDefaultForwarding(this);
@@ -166,9 +166,6 @@ public class J2SSHConnection extends AbstractConnection {
         setContainerStatus(Status.CONNECTED);
         fire(new ConnectedEvent(this));
 
-        timeout = ConnectionPropertiesBuilder.getInstance().getSoTimeout(this);
-        if (timeout != null)
-            connection.setSocketTimeout(timeout.intValue());
         if (authenticate)
             authenticate();
     }
