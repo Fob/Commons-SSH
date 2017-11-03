@@ -156,6 +156,10 @@ public class PipedInputStream extends InputStream
             {
                 allocator.dispose(putBuffers.removeFirst());
                 stepSize/=modifier;
+                //Hack for strange behaviour of stepSize
+                if (stepSize == 0){
+                	stepSize = DEFAULT_PIPE_SIZE;
+				}
             }
 
 			getBuffer = putBuffers.getFirst().duplicate();
@@ -359,7 +363,7 @@ public class PipedInputStream extends InputStream
 		}
 		if (maximumSize > currentSize || maximumSize == 0)
 		{
-			LogUtils.trace(log, "{0} create new buffer", name);
+			LogUtils.trace(log, "{0} create new buffer with size:{1}", name,stepSize);
 			ByteBuffer newBuffer = allocator.allocate(Math.min(maximumSize - currentSize, stepSize));
             stepSize*=modifier;
 			putBuffers.addLast(newBuffer);
