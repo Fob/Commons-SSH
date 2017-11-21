@@ -222,9 +222,13 @@ public class JSCHConnection extends AbstractConnection
 					throw new AuthenticationException("check required parameters for " + method
 							+ " authentication method");
 				}
-				
-				jsch.addIdentity(PublicKeyPropertiesBuilder.getInstance().getKey(this).toString()
-						,PublicKeyPropertiesBuilder.getInstance().getKey(this) , null, PublicKeyPropertiesBuilder.getInstance().getPassphrase(this).getBytes());
+
+				byte[] key = PublicKeyPropertiesBuilder.getInstance().getKey(this);
+				String passphrase = PublicKeyPropertiesBuilder.getInstance().getPassphrase(this);
+				if (passphrase!=null)
+					jsch.addIdentity(key.toString(), key, null, passphrase.getBytes());
+				else
+					jsch.addIdentity(key.toString(), key, null, null);
 				connection = jsch.getSession(PublicKeyPropertiesBuilder.getInstance().getLogin(this),cpb.getHost(this));
 				setupCommonConnectionParameters();
 				break;
