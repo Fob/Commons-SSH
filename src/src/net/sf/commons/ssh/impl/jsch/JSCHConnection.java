@@ -4,11 +4,8 @@
 package net.sf.commons.ssh.impl.jsch;
 
 
-import java.security.PublicKey;
-import java.util.Set;
-
 import com.jcraft.jsch.*;
-
+import com.jcraft.jsch.Session;
 import net.sf.commons.ssh.auth.AuthenticationMethod;
 import net.sf.commons.ssh.auth.PasswordPropertiesBuilder;
 import net.sf.commons.ssh.auth.PublicKeyPropertiesBuilder;
@@ -17,19 +14,18 @@ import net.sf.commons.ssh.common.LogUtils;
 import net.sf.commons.ssh.common.Status;
 import net.sf.commons.ssh.common.UnexpectedRuntimeException;
 import net.sf.commons.ssh.connection.*;
+import net.sf.commons.ssh.errors.Error;
+import net.sf.commons.ssh.errors.ErrorLevel;
 import net.sf.commons.ssh.event.events.AuthenticatedEvent;
 import net.sf.commons.ssh.event.events.ClosedEvent;
 import net.sf.commons.ssh.event.events.ConnectedEvent;
-import net.sf.commons.ssh.errors.Error;
-import net.sf.commons.ssh.errors.ErrorLevel;
 import net.sf.commons.ssh.options.IllegalPropertyException;
 import net.sf.commons.ssh.options.InitialPropertiesBuilder;
 import net.sf.commons.ssh.options.Properties;
-import net.sf.commons.ssh.session.ExecSession;
-import net.sf.commons.ssh.session.SFTPSession;
-import net.sf.commons.ssh.session.ScpSession;
-import net.sf.commons.ssh.session.ShellSession;
-import net.sf.commons.ssh.session.SubsystemSession;
+import net.sf.commons.ssh.session.*;
+
+import java.security.PublicKey;
+import java.util.Set;
 
 
 /**
@@ -192,48 +188,41 @@ public class JSCHConnection extends AbstractConnection
 		AuthenticationMethod method = cpb.getAuthenticationMethod(this);
 		try
 		{
-			switch (method)
-			{
-			case NONE:
-				connection = jsch.getSession("nobody", cpb.getHost(this));
-				setupCommonConnectionParameters();
-				break;
-			case PASSWORD:
-				try
-				{
-					PasswordPropertiesBuilder.getInstance().verify(this);
-				}
-				catch (IllegalPropertyException e)
-				{
-					throw new AuthenticationException("check required parameters for " + method
-							+ " authentication method");
-				}
-				connection = jsch.getSession(PasswordPropertiesBuilder.getInstance().getLogin(this),cpb.getHost(this));
-				setupCommonConnectionParameters();
-				connection.setPassword(PasswordPropertiesBuilder.getInstance().getPassword(this));
-				break;
-			case PUBLICKEY:
-				try
-				{
-					PublicKeyPropertiesBuilder.getInstance().verify(this);
-				}
-				catch (IllegalPropertyException e)
-				{
-					throw new AuthenticationException("check required parameters for " + method
-							+ " authentication method");
-				}
+			switch (method) {
+				case NONE:
+					connection = jsch.getSession("nobody", cpb.getHost(this));
+					setupCommonConnectionParameters();
+					break;
+				case PASSWORD:
+					try {
+						PasswordPropertiesBuilder.getInstance().verify(this);
+					} catch (IllegalPropertyException e) {
+						throw new AuthenticationException("check required parameters for " + method
+								+ " authentication method");
+					}
+					connection = jsch.getSession(PasswordPropertiesBuilder.getInstance().getLogin(this), cpb.getHost(this));
+					setupCommonConnectionParameters();
+					connection.setPassword(PasswordPropertiesBuilder.getInstance().getPassword(this));
+					break;
+				case PUBLICKEY:
+					try {
+						PublicKeyPropertiesBuilder.getInstance().verify(this);
+					} catch (IllegalPropertyException e) {
+						throw new AuthenticationException("check required parameters for " + method
+								+ " authentication method");
+					}
 
-				byte[] key = PublicKeyPropertiesBuilder.getInstance().getKey(this);
-				String passphrase = PublicKeyPropertiesBuilder.getInstance().getPassphrase(this);
-				if (passphrase!=null)
-					jsch.addIdentity(key.toString(), key, null, passphrase.getBytes());
-				else
-					jsch.addIdentity(key.toString(), key, null, null);
-				connection = jsch.getSession(PublicKeyPropertiesBuilder.getInstance().getLogin(this),cpb.getHost(this));
-				setupCommonConnectionParameters();
-				break;
-			default:
-				throw new UnsupportedOperationException("JSCH library doesn't support " + method + " authentication");
+					byte[] key = PublicKeyPropertiesBuilder.getInstance().getKey(this);
+					String passphrase = PublicKeyPropertiesBuilder.getInstance().getPassphrase(this);
+					if (passphrase != null)
+						jsch.addIdentity(key.toString(), key, null, passphrase.getBytes());
+					else
+						jsch.addIdentity(key.toString(), key, null, null);
+					connection = jsch.getSession(PublicKeyPropertiesBuilder.getInstance().getLogin(this), cpb.getHost(this));
+					setupCommonConnectionParameters();
+					break;
+				default:
+					throw new UnsupportedOperationException("JSCH library doesn't support " + method + " authentication");
 			}
 			Long authenticateTimeout = ConnectionPropertiesBuilder.getInstance().getAuthenticateTimeout(this);
 			if (authenticateTimeout != null)
@@ -263,7 +252,8 @@ public class JSCHConnection extends AbstractConnection
 
 		int port = ConnectionPropertiesBuilder.getInstance().getPort(this);
 		connection.setPort(port);
-
+		//due to prevent connection processing after Socket Timeout Exception
+		connection.setServerAliveCountMax(0);
 		initProxy();
 
 		Set<String> libraryOptions = InitialPropertiesBuilder.getInstance().getLibraryOptions(this);
