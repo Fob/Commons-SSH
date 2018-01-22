@@ -40,8 +40,8 @@ public class JSCHSubsystemSession extends JSCHSession implements SubsystemSessio
         sspb.verify(this);
         if (sspb.shouldAllocateTerminal(this)) {
             configureTerminal(sspb);
-
         }
+
         ((ChannelSubsystem) session).setSubsystem(sspb.getSubsystemName(this));
 
         final Integer initialSize = PipePropertiesBuilder.getInstance().getInitialSize(this);
