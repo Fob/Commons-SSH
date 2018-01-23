@@ -22,16 +22,6 @@ public class SubsystemSessionPropertiesBuilder extends ShellSessionPropertiesBui
             "net.sf.commons.ssh.options.SubsystemSessionPropertiesBuilder.pseudoTerminal";
 
 
-    SubsystemSessionPropertiesBuilder() {
-        super();
-        /*
-        we should't allocate pseudo terminal in most of subsystem sessions. Enable pseudo terminal only in specific
-        cases, e.g. you want to echo subsystem input look more:
-        https://sourceforge.net/p/jsch/mailman/jsch-users/?page=119
-        */
-        defaultProperties.put(SHOULD_ALLOCATE_PSEUDO_TERMINAL, false);
-    }
-
     public static SubsystemSessionPropertiesBuilder getInstance() {
         if (instance == null) {
             synchronized (SubsystemSessionPropertiesBuilder.class) {
@@ -56,7 +46,13 @@ public class SubsystemSessionPropertiesBuilder extends ShellSessionPropertiesBui
     }
 
     public boolean shouldAllocateTerminal(Properties opt) {
-        return (Boolean) getProperty(opt, SHOULD_ALLOCATE_PSEUDO_TERMINAL);
+         /*
+        we should't allocate pseudo terminal in most of subsystem sessions. Enable pseudo terminal only in specific
+        cases, e.g. you want to echo subsystem input look more:
+        https://sourceforge.net/p/jsch/mailman/jsch-users/?page=119
+        */
+        Boolean property = (Boolean) getProperty(opt, SHOULD_ALLOCATE_PSEUDO_TERMINAL);
+        return (property == null) ? false : property;
     }
 
 
