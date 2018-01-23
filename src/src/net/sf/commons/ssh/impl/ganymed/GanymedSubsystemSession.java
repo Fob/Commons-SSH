@@ -20,20 +20,30 @@ public class GanymedSubsystemSession extends GanymedShellSession implements Subs
      * @param connection
      * @throws IOException
      */
-    public GanymedSubsystemSession(Properties properties, Connection connection) throws IOException
-    {
+    public GanymedSubsystemSession(Properties properties, Connection connection) throws IOException {
         super(properties, connection);
     }
 
     @Override
-    protected void openImpl() throws IOException
-    {
+    protected void openImpl() throws IOException {
         SubsystemSessionPropertiesBuilder sspb = SubsystemSessionPropertiesBuilder.getInstance();
         LogUtils.trace(log, "openImpl(): open ganymed subsystem " + sspb.getSubsystemName(this) + " session");
         sspb.verify(this);
         session.startSubSystem(sspb.getSubsystemName(this));
+        if (sspb.shouldAllocateTerminal(this)) {
+            configureTerminal(sspb);
+        }
         session.getStderr(); // for unlock
         setContainerStatus(Status.OPENNED);
         fire(new OpennedEvent(this));
+    }
+
+    private void configureTerminal(SubsystemSessionPropertiesBuilder sspb) throws IOException {
+        session.requestPTY(sspb.getTerminalType(this),
+                sspb.getTerminalCols(this),
+                sspb.getTerminalRows(this),
+                sspb.getTerminalWidth(this),
+                sspb.getTerminalHeight(this),
+                null);
     }
 }
