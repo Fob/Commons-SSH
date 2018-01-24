@@ -13,6 +13,7 @@ import net.sf.commons.ssh.options.InitialPropertiesBuilder;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.SftpSessionPropertiesBuilder;
 import net.sf.commons.ssh.session.ShellSessionPropertiesBuilder;
+import net.sf.commons.ssh.session.SubsystemSessionPropertiesBuilder;
 import net.sf.commons.ssh.verification.VerificationPropertiesBuilder;
 
 import java.util.Arrays;
@@ -47,6 +48,7 @@ public abstract class AbstractConnector extends AbstractContainer<Connection> im
         includeDefault(SftpSessionPropertiesBuilder.getInstance().getDefault());
         includeDefault(SelectorPropertiesBuilder.getInstance().getDefault());
         includeDefault(VerificationPropertiesBuilder.getInstance().getDefault());
+        includeDefault(SubsystemSessionPropertiesBuilder.getInstance().getDefault());
     }
 
 
