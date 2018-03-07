@@ -4,7 +4,6 @@
 package net.sf.commons.ssh.impl.sshd;
 
 import net.sf.commons.ssh.common.*;
-import net.sf.commons.ssh.connection.ConnectionPropertiesBuilder;
 import net.sf.commons.ssh.event.events.ClosedEvent;
 import net.sf.commons.ssh.event.events.OpennedEvent;
 import net.sf.commons.ssh.event.events.ReadAvailableEvent;
@@ -56,8 +55,6 @@ public class SSHDShellSync extends AbstractSession implements ShellSession
         channel.setIn(stdInPipe);
 
         stdOut = new PipedInputStream(initialSize,maximumSize,stepSize,modifier,allocator);
-        Long soTimeout = ConnectionPropertiesBuilder.getInstance().getSoTimeout(properties);
-        stdOut.setWaitTimeout(soTimeout == null? 0: soTimeout);
         stdErr = new PipedInputStream(initialSize,maximumSize,stepSize,modifier,allocator);
 
         final SSHDShellSync shell = this;

@@ -32,7 +32,6 @@ public class PipedInputStream extends InputStream
 
 	boolean connected = false;
 
-	private long waitTimeout = 0;
 
 	private ByteBuffer getBuffer;
 	private ByteBuffer putBuffer;
@@ -125,10 +124,6 @@ public class PipedInputStream extends InputStream
 				{
 					return -1;
 				}
-				remaining = getBuffer.remaining();
-				if (remaining == 0){
-					throw new IOException("Read timeout");
-				}
 			}
 			else
 			{
@@ -180,7 +175,7 @@ public class PipedInputStream extends InputStream
 			if (wait)
 			{
 				LogUtils.trace(log, "{0} wait new data", name);
-				this.wait(waitTimeout);
+				this.wait();
 			}
 			return true;
 		}
@@ -239,12 +234,6 @@ public class PipedInputStream extends InputStream
 				{
 					notifyOutput();
 					return rlen;
-				}
-				else {
-					remaining = getBuffer.remaining();
-					if (remaining == 0) {
-						throw new IOException("Read timeout");
-					}
 				}
 			}
 		}
@@ -425,9 +414,5 @@ public class PipedInputStream extends InputStream
 	protected void trace(String msg)
 	{
 		log.trace(name + ": " + msg);
-	}
-
-	public void setWaitTimeout(long waitTimeout) {
-		this.waitTimeout = waitTimeout;
 	}
 }
