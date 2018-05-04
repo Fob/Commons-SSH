@@ -20,9 +20,9 @@ public class PipedInputStream extends InputStream
 
 	private static final int DEFAULT_PIPE_SIZE = 1024;
 
-	private static AtomicLong counter = new AtomicLong();
+	protected static AtomicLong counter = new AtomicLong();
 
-	final long id;
+	protected final long id;
 
 	protected final String name;
 
@@ -32,23 +32,20 @@ public class PipedInputStream extends InputStream
 
 	boolean connected = false;
 
-	private ByteBuffer getBuffer;
-	private ByteBuffer putBuffer;
+	protected ByteBuffer getBuffer;
+	protected ByteBuffer putBuffer;
 	ByteBuffer initialBuffer;
-	private LinkedList<ByteBuffer> putBuffers;
+	protected LinkedList<ByteBuffer> putBuffers;
 
 
-	private int initialSize = DEFAULT_PIPE_SIZE;
-	private int maximumSize = DEFAULT_PIPE_SIZE;
-	private int stepSize = DEFAULT_PIPE_SIZE;
-    private int modifier = 2;
+	protected int initialSize = DEFAULT_PIPE_SIZE;
+	protected int maximumSize = DEFAULT_PIPE_SIZE;
+	protected int stepSize = DEFAULT_PIPE_SIZE;
+	protected int modifier = 2;
 	protected boolean direct;
-	private int currentSize;
-    private BufferAllocator allocator;
-    protected int available = 0;
-
-
-
+	protected int currentSize;
+	protected BufferAllocator allocator;
+	protected int available = 0;
 
 	public int getInitialSize()
 	{
@@ -68,11 +65,11 @@ public class PipedInputStream extends InputStream
 	public PipedInputStream(int initialSize, int maximumSize, int stepSize, int modifier, BufferAllocator allocator)
 	{
 		super();
-        this.allocator = allocator;
+		this.allocator = allocator;
 		this.initialSize = initialSize;
 		this.maximumSize = maximumSize;
 		this.stepSize = stepSize;
-        this.modifier = modifier;
+		this.modifier = modifier;
 		id = counter.incrementAndGet();
 		name = "pIS-" + id;
 		if ((maximumSize < initialSize && maximumSize > 0) || initialSize < 0 || maximumSize < 0 || stepSize < 0)
@@ -123,20 +120,16 @@ public class PipedInputStream extends InputStream
 				{
 					return -1;
 				}
-				remaining = getBuffer.remaining();
-				if (remaining == 0){
-					throw new IOException("Read timeout");
-				}
 			}
 			else
 			{
 				ret = getBuffer.get() & 0xFF;
-                available--;
+				available--;
 				if (putBuffers.getFirst() == putBuffers.getLast())
 					if (putBuffer.limit() < getBuffer.position())
 						putBuffer.limit(getBuffer.position());
 				this.notifyAll();
-                return ret;
+				return ret;
 			}
 		}
 	}
@@ -148,13 +141,13 @@ public class PipedInputStream extends InputStream
 			if (putBuffers.getFirst() != putBuffers.getLast())
 				currentSize -= getBuffer.capacity();
 
-            if(putBuffers.getFirst() == putBuffers.getLast() || putBuffers.getFirst() == initialBuffer)
-                putBuffers.removeFirst();
-            else
-            {
-                allocator.dispose(putBuffers.removeFirst());
-                stepSize/=modifier;
-            }
+			if(putBuffers.getFirst() == putBuffers.getLast() || putBuffers.getFirst() == initialBuffer)
+				putBuffers.removeFirst();
+			else
+			{
+				allocator.dispose(putBuffers.removeFirst());
+				stepSize/=modifier;
+			}
 
 			getBuffer = putBuffers.getFirst().duplicate();
 			getBuffer.position(0);
@@ -180,7 +173,7 @@ public class PipedInputStream extends InputStream
 		}
 		catch (InterruptedException e)
 		{
-            throw new IOException("interrupt read waiting");
+			throw new IOException("interrupt read waiting");
 		}
 	}
 
@@ -209,7 +202,7 @@ public class PipedInputStream extends InputStream
 			{
 				int clen = Math.min(remaining, len);
 				getBuffer.get(b, off, clen);
-                available-=clen;
+				available-=clen;
 				off += clen;
 				len -= clen;
 				rlen += clen;
@@ -228,17 +221,10 @@ public class PipedInputStream extends InputStream
 					notifyOutput();
 					return rlen;
 				}
-
 				if (getBuffer.remaining() == 0 & rlen > 0)
 				{
 					notifyOutput();
 					return rlen;
-				}
-				else {
-					remaining = getBuffer.remaining();
-					if (remaining == 0) {
-						throw new IOException("Read timeout");
-					}
 				}
 			}
 		}
@@ -271,12 +257,12 @@ public class PipedInputStream extends InputStream
 			else
 			{
 				putBuffer.put((byte) (b & 0xFF));
-                available++;
-                if (putBuffers.getFirst() == putBuffers.getLast() && getBuffer.limit() < putBuffer.position())
-                {
-                    getBuffer.limit(putBuffer.position());
-                }
-                this.notifyAll();
+				available++;
+				if (putBuffers.getFirst() == putBuffers.getLast() && getBuffer.limit() < putBuffer.position())
+				{
+					getBuffer.limit(putBuffer.position());
+				}
+				this.notifyAll();
 				LogUtils.trace(log, "{2} byte received getBuffer:{0} putBuffer:{1}", getBuffer, putBuffer, name);
 				return;
 			}
@@ -302,20 +288,20 @@ public class PipedInputStream extends InputStream
 					putBuffer.put(b, off, remaining);
 					off += remaining;
 					len -= remaining;
-                    available+=remaining;
+					available+=remaining;
 				}
 				else
 				{
 					putBuffer.put(b, off, len);
-                    available += len;
+					available += len;
 					len = 0;
 				}
 
-                if (putBuffers.getFirst() == putBuffers.getLast() && getBuffer.limit() < putBuffer.position())
-                {
-                    getBuffer.limit(putBuffer.position());
-                }
-                this.notifyAll();
+				if (putBuffers.getFirst() == putBuffers.getLast() && getBuffer.limit() < putBuffer.position())
+				{
+					getBuffer.limit(putBuffer.position());
+				}
+				this.notifyAll();
 				LogUtils.trace(log, "{2} byte received getBuffer:{0} putBuffer:{1}", getBuffer, putBuffer, name);
 				if (len == 0)
 					return;
@@ -359,7 +345,7 @@ public class PipedInputStream extends InputStream
 		{
 			LogUtils.trace(log, "{0} create new buffer", name);
 			ByteBuffer newBuffer = allocator.allocate(Math.min(maximumSize - currentSize, stepSize));
-            stepSize*=modifier;
+			stepSize*=modifier;
 			putBuffers.addLast(newBuffer);
 			putBuffer = newBuffer.duplicate();
 			currentSize += putBuffer.capacity();
@@ -375,14 +361,14 @@ public class PipedInputStream extends InputStream
 	}
 
 	private void checkStateForReceive() throws IOException {
-        if (!connected)
-            throw new IOException("Pipe not connected");
-        else if (closedByWriter || closedByReader) {
-            if (closedByWriter && closedByReader)
-                throw new IOException("Pipe closed by writer and reader");
-            throw new IOException("Pipe closed by " + (closedByWriter ? "writer" : "reader"));
-        }
-    }
+		if (!connected)
+			throw new IOException("Pipe not connected");
+		else if (closedByWriter || closedByReader) {
+			if (closedByWriter && closedByReader)
+				throw new IOException("Pipe closed by writer and reader");
+			throw new IOException("Pipe closed by " + (closedByWriter ? "writer" : "reader"));
+		}
+	}
 
 	public synchronized void receivedLast()
 	{
@@ -401,7 +387,7 @@ public class PipedInputStream extends InputStream
 	@Override
 	public synchronized int available() throws IOException
 	{
-        LogUtils.trace(log,"available()::state - {0} / available {1}",this,available);
+		LogUtils.trace(log,"available()::state - {0} / available {1}",this,available);
 		if (closedByReader)
 			return -1;
 		if(available ==0 && closedByWriter)
