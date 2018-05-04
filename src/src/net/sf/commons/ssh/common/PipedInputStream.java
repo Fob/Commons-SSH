@@ -32,8 +32,6 @@ public class PipedInputStream extends InputStream
 
 	boolean connected = false;
 
-	private long waitTimeout = 0;
-
 	private ByteBuffer getBuffer;
 	private ByteBuffer putBuffer;
 	ByteBuffer initialBuffer;
@@ -176,7 +174,7 @@ public class PipedInputStream extends InputStream
 			if (wait)
 			{
 				LogUtils.trace(log, "{0} wait new data", name);
-				this.wait(waitTimeout);
+				this.wait();
 			}
 			return true;
 		}
@@ -421,9 +419,5 @@ public class PipedInputStream extends InputStream
 	protected void trace(String msg)
 	{
 		log.trace(name + ": " + msg);
-	}
-
-	public void setWaitTimeout(long waitTimeout) {
-		this.waitTimeout = waitTimeout;
 	}
 }

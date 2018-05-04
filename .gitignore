@@ -8,3 +8,5 @@ ${env.OUTPUT_DIR}/classes/net/sf/commons/ssh/directory/directory.xml
 *.xml
 ${env.OUTPUT_DIR}/maven-archiver/pom.properties
 ${env.OUTPUT_DIR}/MANIFEST.MF
+**/null/**
+**/null/**
