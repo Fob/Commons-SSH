@@ -4,7 +4,6 @@ import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSchException;
 import net.sf.commons.ssh.common.*;
-import net.sf.commons.ssh.connection.ConnectionPropertiesBuilder;
 import net.sf.commons.ssh.event.AbstractEventProcessor;
 import net.sf.commons.ssh.event.events.OpennedEvent;
 import net.sf.commons.ssh.event.events.ReadAvailableEvent;
@@ -55,10 +54,7 @@ public class JSCHShellSession extends JSCHSession implements ShellSession
         out = new PipedOutputStream(outPipe);
 		session.setInputStream(outPipe);
 
-		PipedInputStream inputsStream = new PipedInputStream(initialSize, maximumSize, stepSize, modifier, allocator);
-		Long soTimeout = ConnectionPropertiesBuilder.getInstance().getSoTimeout(properties);
-		inputsStream.setWaitTimeout(soTimeout == null? 0: soTimeout);
-		in = inputsStream;
+		in = new PipedInputStream(initialSize, maximumSize, stepSize, modifier, allocator);
 		libraryOut = new PipedOutputStream((PipedInputStream) in);
 
 		//fire events

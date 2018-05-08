@@ -56,8 +56,6 @@ public class SSHDShellSync extends AbstractSession implements ShellSession
         channel.setIn(stdInPipe);
 
         stdOut = new PipedInputStream(initialSize,maximumSize,stepSize,modifier,allocator);
-        Long soTimeout = ConnectionPropertiesBuilder.getInstance().getSoTimeout(properties);
-        stdOut.setWaitTimeout(soTimeout == null? 0: soTimeout);
         stdErr = new PipedInputStream(initialSize,maximumSize,stepSize,modifier,allocator);
 
         final SSHDShellSync shell = this;
