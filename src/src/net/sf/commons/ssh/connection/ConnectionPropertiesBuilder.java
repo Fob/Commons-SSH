@@ -2,9 +2,10 @@ package net.sf.commons.ssh.connection;
 
 
 import net.sf.commons.ssh.auth.AuthenticationMethod;
-import net.sf.commons.ssh.options.*;
-
-import java.net.Proxy;
+import net.sf.commons.ssh.options.Configurable;
+import net.sf.commons.ssh.options.Properties;
+import net.sf.commons.ssh.options.PropertiesBuilder;
+import net.sf.commons.ssh.options.PropertyType;
 
 
 public class ConnectionPropertiesBuilder extends PropertiesBuilder
@@ -38,13 +39,16 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
     public static final String KEY_NEED_AUTHENTICATION = "net.sf.commons.ssh.auth.needAuthentication";
     @PropertyType(Long.class)
     public static final String KEY_AUTHENTICATE_TIMEOUT = "net.sf.commons.ssh.options.ConnectionOptionsBuilder.authTimeout";
+    @PropertyType(Integer.class)
+    public static final String SERVER_ALIVE_COUNT_MAX = "net.sf.commons.ssh.options.serverAliveCountMax";
 
     public ConnectionPropertiesBuilder()
     {
-        defaultProperties.put(KEY_PORT, Integer.valueOf(22));
+        defaultProperties.put(KEY_PORT, 22);
         defaultProperties.put(KEY_HOST,"127.0.0.1");
         defaultProperties.put(KEY_NEED_AUTHENTICATION, true);
         defaultProperties.put(KEY_AUTHENTICATION_METHOD, AuthenticationMethod.PASSWORD);
+        defaultProperties.put(SERVER_ALIVE_COUNT_MAX, 0);
     }
 
     public synchronized static ConnectionPropertiesBuilder getInstance()
@@ -186,6 +190,11 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
         Object result =  getProperty(opt, KEY_NEED_AUTHENTICATION);
         return result == null ? true: (Boolean) result;
     }
+
+    public int getServerAliveCountMax(Properties config) {
+        return (Integer) getProperty(config, SERVER_ALIVE_COUNT_MAX);
+    }
+
 
 
     

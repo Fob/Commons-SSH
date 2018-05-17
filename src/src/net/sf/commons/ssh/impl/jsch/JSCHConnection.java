@@ -241,19 +241,20 @@ public class JSCHConnection extends AbstractConnection
  
 	private void setupCommonConnectionParameters() throws JSchException
 	{
-		Long soTimeout = ConnectionPropertiesBuilder.getInstance().getSoTimeout(this);
+		final ConnectionPropertiesBuilder builder = ConnectionPropertiesBuilder.getInstance();
+		Long soTimeout = builder.getSoTimeout(this);
 		if (soTimeout != null)
 			connection.setTimeout(soTimeout.intValue());
 
-		Long connectTimeout = ConnectionPropertiesBuilder.getInstance().getConnectTimeout(this);
+		Long connectTimeout = builder.getConnectTimeout(this);
 		if (connectTimeout != null)
 			connection.setSocketFactory(new JschSocketFactory(connectTimeout.intValue(), soTimeout == null ? 0
 					: soTimeout.intValue()));
 
-		int port = ConnectionPropertiesBuilder.getInstance().getPort(this);
+		int port = builder.getPort(this);
 		connection.setPort(port);
 		//due to prevent connection processing after Socket Timeout Exception
-		connection.setServerAliveCountMax(0);
+		connection.setServerAliveCountMax(builder.getServerAliveCountMax(this));
 		initProxy();
 
 		Set<String> libraryOptions = InitialPropertiesBuilder.getInstance().getLibraryOptions(this);
