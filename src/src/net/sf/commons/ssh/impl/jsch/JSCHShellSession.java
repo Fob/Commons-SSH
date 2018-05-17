@@ -22,6 +22,9 @@ import java.io.OutputStream;
  */
 public class JSCHShellSession extends JSCHSession implements ShellSession
 {
+
+	private final static String CLOSED_BY_READER_ERROR_MESSAGE = "Connection was closed by jsch, because of socket exception. " +
+			"Try to increase socket timeout ";
 	/**
 	 * @param properties
 	 */
@@ -51,6 +54,7 @@ public class JSCHShellSession extends JSCHSession implements ShellSession
         final BufferAllocator allocator= PipePropertiesBuilder.getInstance().getAllocator(this);
 
         PipedInputStream outPipe = new PipedInputStream(initialSize,maximumSize,stepSize,modifier,allocator);
+		outPipe.setClosedByReaderMessage(CLOSED_BY_READER_ERROR_MESSAGE);
         out = new PipedOutputStream(outPipe);
 		session.setInputStream(outPipe);
 
