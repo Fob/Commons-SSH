@@ -179,7 +179,7 @@ public class ConnectionPropertiesBuilder extends PropertiesBuilder
 
     public void setAuthenticateTimeout(Configurable opt, Long value)
     {
-        setProperty(opt, SERVER_ALIVE_COUNT_MAX, value);
+        setProperty(opt,KEY_AUTHENTICATE_TIMEOUT, value);
     }
 
     public void setNeedAuthentication(Configurable opt, Boolean needAuthentication) {
