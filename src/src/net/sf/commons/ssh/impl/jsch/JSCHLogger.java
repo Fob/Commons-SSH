@@ -17,8 +17,6 @@ import com.jcraft.jsch.Logger;
  */
 public class JSCHLogger implements Logger
 {
-	//private Log log = LogFactory.getLog(JSch.class);
-
 	private Log log = LogFactory.getLog(JSch.class);
 
 	
