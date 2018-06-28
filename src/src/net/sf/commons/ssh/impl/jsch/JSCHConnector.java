@@ -48,7 +48,7 @@ public class JSCHConnector extends AbstractConnector {
         JSch.setLogger(JSCHLogger.getInstance());
         jsch = new JSch();
         setupVerification();
-        this.addListener(
+        final EventHandler setVerificationHandler = this.addListener(
                 new EventListener() {
 
                     @Override
@@ -81,6 +81,7 @@ public class JSCHConnector extends AbstractConnector {
                         .orFilterBy(new EventTypeFilter(EventType.UPDATE_CONFIGURABLE))
                         .orFilterBy(new EventTypeFilter(EventType.INCLUDE_DEFAULT))
                         .andFilterBy(new ProducerTypeFilter(ProducerType.CONNECTOR)));
+        this.addEventHandler(setVerificationHandler);
         setContainerStatus(Status.INPROGRESS);
     }
 
