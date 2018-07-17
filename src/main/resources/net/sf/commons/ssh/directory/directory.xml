@@ -35,7 +35,7 @@
         <priority>5</priority>
     </factory>
     <factory>
-        <class-name>net.sf.commons.ssh.impl.sshj.SshjConnector</class-name>
+        <class-name>net.sf.commons.ssh.impl.sshj.SSHJConnector</class-name>
         <name>SSHv2 library for Java</name>
         <license>Apache 2.0 Style License</license>
         <url>https://github.com/hierynomus/sshj</url>

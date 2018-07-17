@@ -20,7 +20,7 @@
         <compat-class-name>net.sf.commons.ssh.ussh.UnixSshConnectionFactory</compat-class-name>
     </factory>
     <factory>
-        <class-name>net.sf.commons.ssh.impl.sshj.SshjConnector</class-name>
-        <compat-class-name>net.sf.commons.ssh.sshj.SshjConnectionFactory</compat-class-name>
+        <class-name>net.sf.commons.ssh.impl.sshj.SSHJConnector</class-name>
+        <compat-class-name>net.sf.commons.ssh.sshj.SSHJConnectionFactory</compat-class-name>
     </factory>
 </factories>
