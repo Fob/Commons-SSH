@@ -24,7 +24,7 @@ import java.util.HashMap;
  */
 public class SSHJShellSession extends AbstractSession implements ShellSession {
     protected Session session;
-    Session.Shell shell;
+    private Session.Shell shell;
 
     public SSHJShellSession(Properties properties, SSHClient sshClient) throws ConnectionException, TransportException {
         super(properties);
@@ -71,7 +71,6 @@ public class SSHJShellSession extends AbstractSession implements ShellSession {
 
     @Override
     public InputStream getInputStream() throws IOException {
-        System.out.println("shell: " + shell);
         return shell.getInputStream();
     }
 

@@ -1,7 +1,6 @@
 package net.sf.commons.ssh.impl.sshj;
 
 import net.schmizz.keepalive.KeepAliveProvider;
-import net.schmizz.sshj.DefaultConfig;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.userauth.method.AuthNone;
@@ -21,7 +20,8 @@ import java.io.IOException;
 import java.security.PublicKey;
 
 public class SSHJConnection extends AbstractConnection {
-    protected SSHClient sshClient = new SSHClient();
+    private SSHJDefaultConfig defaultConfig = new SSHJDefaultConfig();
+    private SSHClient sshClient = new SSHClient(defaultConfig);
 
     /**
      * Constructor that allows specifying a {@code config} to be used.
@@ -34,8 +34,8 @@ public class SSHJConnection extends AbstractConnection {
     @Override
     protected void connectImpl(boolean authenticate) throws ConnectionException, AuthenticationException, HostCheckingException {
         if (!authenticate) {
-            Error error = new Error("SSHJ library doesn't support connect without authenticate", this, ErrorLevel.WARN,
-                    null, "connect()", log);
+            Error error = new Error("SSHJ library doesn't support connect without authenticate", this,
+                                     ErrorLevel.WARN, null, "connect()", log);
             pushError(error);
         }
 
@@ -43,7 +43,6 @@ public class SSHJConnection extends AbstractConnection {
         PasswordPropertiesBuilder ppb = PasswordPropertiesBuilder.getInstance();
         PublicKeyPropertiesBuilder pkpb = PublicKeyPropertiesBuilder.getInstance();
 
-        DefaultConfig defaultConfig = new DefaultConfig();
         defaultConfig.setKeepAliveProvider(KeepAliveProvider.KEEP_ALIVE);
         this.sshClient = new SSHClient(defaultConfig);
 
@@ -110,7 +109,6 @@ public class SSHJConnection extends AbstractConnection {
         SSHJShellSession shellSession = null;
         try {
             shellSession = new SSHJShellSession(this, sshClient);
-            shellSession.openImpl();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
