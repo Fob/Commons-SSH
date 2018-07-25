@@ -14,6 +14,7 @@ import net.sf.commons.ssh.connection.ConnectionException;
 import net.sf.commons.ssh.connection.ConnectionPropertiesBuilder;
 import net.sf.commons.ssh.connection.HostCheckingException;
 import net.sf.commons.ssh.connector.Connector;
+import net.sf.commons.ssh.directory.Directory;
 import net.sf.commons.ssh.impl.SSHPasswordAuthTestServer;
 import net.sf.commons.ssh.options.impl.MapConfigurable;
 import net.sf.commons.ssh.session.SFTPFile;
@@ -97,7 +98,7 @@ public class SSHJTest {
         configureConnectionParameters(connection, server.getHost(), server.getPort())
                 .setAuthenticationMethod(connection, AuthenticationMethod.PUBLICKEY);
         PublicKeyPropertiesBuilder.getInstance().setLogin(connection, "login");
-        PublicKeyPropertiesBuilder.getInstance().setKey(connection, "src\\test\\resources\\sshj\\hostkey.pem");
+        PublicKeyPropertiesBuilder.getInstance().setKey(connection, SSHJTest.class.getResource("/sshj/hostkey.pem").getFile());
 
         connection.connect(true);
         assertEquals("net.sf.commons.ssh.impl.sshj.SSHJConnection", connection.getClass().getName());

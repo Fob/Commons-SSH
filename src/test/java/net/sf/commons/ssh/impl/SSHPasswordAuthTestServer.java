@@ -1,5 +1,6 @@
 package net.sf.commons.ssh.impl;
 
+import net.sf.commons.ssh.directory.Directory;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.server.*;
 import org.apache.sshd.server.auth.UserAuth;
@@ -15,6 +16,7 @@ import org.apache.sshd.server.shell.ProcessShellFactory;
 import org.apache.sshd.server.subsystem.sftp.SftpSubsystemFactory;
 import org.junit.rules.ExternalResource;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -41,7 +43,8 @@ public class SSHPasswordAuthTestServer  extends ExternalResource {
 
         //for PK
         sshServer.setPublickeyAuthenticator(AcceptAllPublickeyAuthenticator.INSTANCE);
-        sshServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(Paths.get(hostkey)));
+        sshServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(
+                new File(SSHPasswordAuthTestServer.class.getResource("/sshj/hostkey.pem").getFile())));
 
         //for Password
         sshServer.setPasswordAuthenticator(new PasswordAuthenticator() {

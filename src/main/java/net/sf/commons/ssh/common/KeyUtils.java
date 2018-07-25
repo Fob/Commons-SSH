@@ -34,9 +34,11 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
-import org.bouncycastle.openssl.PEMReader;
-import org.bouncycastle.openssl.PEMWriter;
-import org.bouncycastle.openssl.PasswordFinder;
+import org.bouncycastle.openssl.*;
+//import org.bouncycastle.openssl.PEMReader;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
+import org.bouncycastle.openssl.jcajce.JcePEMEncryptorBuilder;
 
 /**
  * @author fob
@@ -171,20 +173,41 @@ public class KeyUtils
 
 	public static KeyPair getPrivateKeyFromStream(InputStream stream, final String passphrase) throws IOException
 	{
-		PEMReader reader;
-		if (passphrase == null)
-			reader = new PEMReader(new InputStreamReader(stream));
-		else
-			reader = new PEMReader(new InputStreamReader(stream), new PasswordFinder()
-				{
+		JcaPEMKeyConverter  converter = new JcaPEMKeyConverter();
 
-					@Override
-					public char[] getPassword()
-					{
-						return passphrase.toCharArray();
-					}
-				});
-		return (KeyPair) reader.readObject();
+		Reader fRd = new BufferedReader(new InputStreamReader(stream));
+		PEMParser pemParser = new PEMParser(fRd);
+		Object o = pemParser.readObject();
+		System.out.println(o);
+
+		KeyPair kp;
+		if(passphrase == null)
+			kp = converter.getKeyPair((PEMKeyPair)o);
+		else
+			kp = converter.getKeyPair(((PEMEncryptedKeyPair)o)
+					.decryptKeyPair(new JcePEMDecryptorProviderBuilder().build(passphrase.toCharArray())));
+
+
+//		KeyPair kp = (o instanceof PEMEncryptedKeyPair) ?
+//				converter.getKeyPair(((PEMEncryptedKeyPair)o).decryptKeyPair(pemDecryptorProvider))
+//				: converter.getKeyPair((PEMKeyPair)o);
+		return kp;
+
+
+//		PEMReader reader;
+//		if (passphrase == null)
+//			reader = new PEMReader(new InputStreamReader(stream));
+//		else
+//			reader = new PEMReader(new InputStreamReader(stream), new PasswordFinder()
+//				{
+//
+//					@Override
+//					public char[] getPassword()
+//					{
+//						return passphrase.toCharArray();
+//					}
+//				});
+//		return (KeyPair) reader.readObject();
 	}
 
 	public static KeyPair getPrivateKeyFromBytes(byte[] bytes, String passphrase) throws IOException
@@ -238,7 +261,9 @@ public class KeyUtils
 	public static void serializePrivateKey(PrivateKey key, Writer writer,char[] password,String alg) throws IOException
 	{
 		PEMWriter pemWriter = new PEMWriter(writer);
-		pemWriter.writeObject(key,alg,password,new SecureRandom());
+		pemWriter.writeObject(key,
+				new JcePEMEncryptorBuilder(alg).setSecureRandom(new SecureRandom()).build(password));
+		//pemWriter.writeObject(key,alg,password,new SecureRandom());
 		pemWriter.flush();
 	}
 }
