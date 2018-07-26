@@ -23,7 +23,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
@@ -35,7 +34,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.VFS;
 import org.bouncycastle.openssl.*;
-//import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 import org.bouncycastle.openssl.jcajce.JcePEMEncryptorBuilder;
@@ -186,28 +184,7 @@ public class KeyUtils
 		else
 			kp = converter.getKeyPair(((PEMEncryptedKeyPair)o)
 					.decryptKeyPair(new JcePEMDecryptorProviderBuilder().build(passphrase.toCharArray())));
-
-
-//		KeyPair kp = (o instanceof PEMEncryptedKeyPair) ?
-//				converter.getKeyPair(((PEMEncryptedKeyPair)o).decryptKeyPair(pemDecryptorProvider))
-//				: converter.getKeyPair((PEMKeyPair)o);
 		return kp;
-
-
-//		PEMReader reader;
-//		if (passphrase == null)
-//			reader = new PEMReader(new InputStreamReader(stream));
-//		else
-//			reader = new PEMReader(new InputStreamReader(stream), new PasswordFinder()
-//				{
-//
-//					@Override
-//					public char[] getPassword()
-//					{
-//						return passphrase.toCharArray();
-//					}
-//				});
-//		return (KeyPair) reader.readObject();
 	}
 
 	public static KeyPair getPrivateKeyFromBytes(byte[] bytes, String passphrase) throws IOException
@@ -263,7 +240,6 @@ public class KeyUtils
 		PEMWriter pemWriter = new PEMWriter(writer);
 		pemWriter.writeObject(key,
 				new JcePEMEncryptorBuilder(alg).setSecureRandom(new SecureRandom()).build(password));
-		//pemWriter.writeObject(key,alg,password,new SecureRandom());
 		pemWriter.flush();
 	}
 }

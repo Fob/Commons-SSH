@@ -1,6 +1,5 @@
 package net.sf.commons.ssh.impl;
 
-import net.sf.commons.ssh.directory.Directory;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.server.*;
 import org.apache.sshd.server.auth.UserAuth;
@@ -18,14 +17,12 @@ import org.junit.rules.ExternalResource;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SSHPasswordAuthTestServer  extends ExternalResource {
-    public static final String hostkey = "sshj/hostkey.pem";
     private SshServer server = defaultSshServer();
     private AtomicBoolean started = new AtomicBoolean(false);
 

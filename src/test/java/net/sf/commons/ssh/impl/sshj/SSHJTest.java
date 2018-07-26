@@ -40,6 +40,21 @@ import static org.junit.Assert.assertNotNull;
 public class SSHJTest {
     final Log log = LogFactory.getLog(SSHJTest.class);
     SSHPasswordAuthTestServer server;
+    public static final String hostkey = "-----BEGIN RSA PRIVATE KEY-----\n" +
+            "MIICXAIBAAKBgQDdfIWeSV4o68dRrKSzFd/Bk51E65UTmmSrmW0O1ohtzi6HzsDP\n" +
+            "jXgCtlTt3FqTcfFfI92IlTr4JWqC9UK1QT1ZTeng0MkPQmv68hDANHbt5CpETZHj\n" +
+            "W5q4OOgWhVvj5IyOC2NZHtKlJBkdsMAa15ouOOJLzBvAvbqOR/yUROsEiQIDAQAB\n" +
+            "AoGBANG3JDW6NoP8rF/zXoeLgLCj+tfVUPSczhGFVrQkAk4mWfyRkhN0WlwHFOec\n" +
+            "K89MpkV1ij/XPVzU4MNbQ2yod1KiDylzvweYv+EaEhASCmYNs6LS03punml42SL9\n" +
+            "97tOmWfVJXxlQoLiY6jHPU97vTc65k8gL+gmmrpchsW0aqmZAkEA/c8zfmKvY37T\n" +
+            "cxcLLwzwsqqH7g2KZGTf9aRmx2ebdW+QKviJJhbdluDgl1TNNFj5vCLznFDRHiqJ\n" +
+            "wq0wkZ39cwJBAN9l5v3kdXj21UrurNPdlV0n2GZBt2vblooQC37XHF97r2zM7Ou+\n" +
+            "Lg6MyfJClyguhWL9dxnGbf3btQ0l3KDstxMCQCRaiEqjAfIjWVATzeNIXDWLHXso\n" +
+            "b1kf5cA+cwY+vdKdTy4IeUR+Y/DXdvPWDqpf0C11aCVMohdLCn5a5ikFUycCQDhV\n" +
+            "K/BuAallJNfmY7JxN87r00fF3ojWMJnT/fIYMFFrkQrwifXQWTDWE76BSDibsosJ\n" +
+            "u1TGksnm8zrDh2UVC/0CQFrHTiSl/3DHvWAbOJawGKg46cnlDcAhSyV8Frs8/dlP\n" +
+            "7YGG3eqkw++lsghqmFO6mRUTKsBmiiB2wgLGhL5pyYY=\n" +
+            "-----END RSA PRIVATE KEY-----";
 
     @Before
     public void startTestServer() throws IOException {
@@ -98,7 +113,7 @@ public class SSHJTest {
         configureConnectionParameters(connection, server.getHost(), server.getPort())
                 .setAuthenticationMethod(connection, AuthenticationMethod.PUBLICKEY);
         PublicKeyPropertiesBuilder.getInstance().setLogin(connection, "login");
-        PublicKeyPropertiesBuilder.getInstance().setKey(connection, SSHJTest.class.getResource("/sshj/hostkey.pem").getFile());
+        PublicKeyPropertiesBuilder.getInstance().setKey(connection, hostkey.getBytes());
 
         connection.connect(true);
         assertEquals("net.sf.commons.ssh.impl.sshj.SSHJConnection", connection.getClass().getName());
