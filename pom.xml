@@ -4,7 +4,7 @@
 
     <groupId>fob</groupId>
     <artifactId>commons-ssh</artifactId>
-    <version>2.2.6</version>
+    <version>2.2.7</version>
     <packaging>jar</packaging>
 
     <name>commons-ssh-${version}</name>
@@ -64,9 +64,8 @@
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk16</artifactId>
-            <version>1.46</version>
-            <scope>compile</scope>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.54</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
@@ -91,6 +90,16 @@
             <version>9.0.4</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.hierynomus</groupId>
+            <artifactId>sshj</artifactId>
+            <version>0.24.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.i2p.crypto</groupId>
+            <artifactId>eddsa</artifactId>
+            <version>0.1.0</version>
+        </dependency>
         <!--test dependencies -->
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -113,25 +122,15 @@
     </dependencies>
 
     <build>
-        <sourceDirectory>src/src</sourceDirectory>
-        <directory>${env.OUTPUT_DIR}</directory>
-        <outputDirectory>${build.directory}/classes</outputDirectory>
-        <testOutputDirectory>${build.directory}/tests</testOutputDirectory>
-        <testSourceDirectory>src/test</testSourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/resources</directory>
-            </resource>
-        </resources>
         <finalName>${artifactId}-${version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.0.2</version>
+                <version>3.2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>

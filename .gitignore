@@ -4,9 +4,12 @@ null/commons-ssh-2.0.3.jar
 *.iml
 ${env.OUTPUT_DIR}/classes/META-INF/LICENSE
 ${env.OUTPUT_DIR}/classes/net/sf/commons/ssh/directory/directory.xml
-.idea/.name
-*.xml
+.idea/*
 !pom.xml
 ${env.OUTPUT_DIR}/maven-archiver/pom.properties
 ${env.OUTPUT_DIR}/MANIFEST.MF
+<<<<<<< HEAD
 **/null/
+=======
+target/*
+>>>>>>> 8c99ab3e7b4dea5fd9f2990cf491729dceadcd16
