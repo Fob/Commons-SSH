@@ -23,87 +23,6 @@ import java.util.List;
 public class J2SSHSftpSession extends AbstractSession implements SFTPSession {
     private final Log log = LogFactory.getLog(this.getClass());
     private SftpClient sftpClient;
-
-    static SFTPFileAttributes convertFileAttributes(
-            final com.sshtools.j2ssh.sftp.FileAttributes a) {
-        return new SFTPFileAttributes() {
-            public long getAccessedTime() {
-                return a.getAccessedTime().longValue();
-            }
-
-            public long getGID() {
-                return a.getGID().longValue();
-            }
-
-            public long getModifiedTime() {
-                return a.getModifiedTime().longValue();
-            }
-
-            public long getPermissions() {
-                return a.getPermissions().longValue();
-            }
-
-            public long getSize() {
-                return a.getSize().longValue();
-            }
-
-            public long getUID() {
-                return a.getUID().longValue();
-            }
-
-            public boolean isBlock() {
-                return a.isBlock();
-            }
-
-            public boolean isCharacter() {
-                return a.isCharacter();
-            }
-
-            public boolean isDirectory() {
-                return a.isDirectory();
-            }
-
-            public boolean isFifo() {
-                return a.isFifo();
-            }
-
-            public boolean isFile() {
-                return a.isFile();
-            }
-
-            public boolean isLink() {
-                return a.isLink();
-            }
-
-            public boolean isSocket() {
-                return a.isSocket();
-            }
-        };
-    }
-
-    private static List<SFTPFile> convertFileList(List files) {
-        ArrayList out = new ArrayList(files.size());
-        for (Iterator it = files.iterator(); it.hasNext(); ) {
-            final com.sshtools.j2ssh.sftp.SftpFile f = (com.sshtools.j2ssh.sftp.SftpFile) it
-                    .next();
-            out.add(new SFTPFile() {
-                public String getAbsolutePath() {
-                    return f.getAbsolutePath();
-                }
-
-                public SFTPFileAttributes getAttributes() {
-                    return convertFileAttributes(f.getAttributes());
-                }
-
-                public String getName() {
-                    return f.getFilename();
-                }
-
-            });
-        }
-        return out;
-    }
-
     public J2SSHSftpSession(Properties properties, SshClient connection) {
         super(properties);
         try {
@@ -123,6 +42,36 @@ public class J2SSHSftpSession extends AbstractSession implements SFTPSession {
         }
         setContainerStatus(Status.CREATED);
     }
+
+
+
+    private static List<SFTPFile> convertFileList(List files) {
+        List<SFTPFile> out = new ArrayList<>(files.size());
+        for (Iterator it = files.iterator(); it.hasNext(); ) {
+            final com.sshtools.j2ssh.sftp.SftpFile f = (com.sshtools.j2ssh.sftp.SftpFile) it
+                    .next();
+            // skip current and previous directory
+            if (f.getFilename().equals(".")) continue;
+            if (f.getFilename().equals("..")) continue;
+            out.add(new SFTPFile() {
+                public String getAbsolutePath() {
+                    return f.getAbsolutePath();
+                }
+
+                public SFTPFileAttributes getAttributes() {
+                    return convertFileAttributes(f.getAttributes());
+                }
+
+                public String getName() {
+                    return f.getFilename();
+                }
+
+            });
+        }
+        return out;
+    }
+
+
 
     @Override
     protected void openImpl() throws IOException {
@@ -255,5 +204,62 @@ public class J2SSHSftpSession extends AbstractSession implements SFTPSession {
     @Override
     public boolean isClosed() {
         return sftpClient.isClosed();
+    }
+
+    static SFTPFileAttributes convertFileAttributes(
+            final com.sshtools.j2ssh.sftp.FileAttributes a) {
+        return new SFTPFileAttributes() {
+            public long getAccessedTime() {
+                return a.getAccessedTime().longValue();
+            }
+
+            public long getGID() {
+                return a.getGID().longValue();
+            }
+
+            public long getModifiedTime() {
+                return a.getModifiedTime().longValue();
+            }
+
+            public long getPermissions() {
+                return a.getPermissions().longValue();
+            }
+
+            public long getSize() {
+                return a.getSize().longValue();
+            }
+
+            public long getUID() {
+                return a.getUID().longValue();
+            }
+
+            public boolean isBlock() {
+                return a.isBlock();
+            }
+
+            public boolean isCharacter() {
+                return a.isCharacter();
+            }
+
+            public boolean isDirectory() {
+                return a.isDirectory();
+            }
+
+            public boolean isFifo() {
+                return a.isFifo();
+            }
+
+            public boolean isFile() {
+                return a.isFile();
+            }
+
+            public boolean isLink() {
+                return a.isLink();
+            }
+
+            public boolean isSocket() {
+                return a.isSocket();
+            }
+        };
     }
 }

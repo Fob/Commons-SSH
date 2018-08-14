@@ -6,7 +6,7 @@ ${env.OUTPUT_DIR}/classes/META-INF/LICENSE
 ${env.OUTPUT_DIR}/classes/net/sf/commons/ssh/directory/directory.xml
 .idea/*
 !pom.xml
-${env.OUTPUT_DIR}/maven-archiver/pom.properties
+${env.OUTPUT_DIR}/**
 ${env.OUTPUT_DIR}/MANIFEST.MF
 <<<<<<< HEAD
 **/null/

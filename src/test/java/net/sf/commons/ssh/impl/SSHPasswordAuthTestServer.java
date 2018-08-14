@@ -41,7 +41,7 @@ public class SSHPasswordAuthTestServer  extends ExternalResource {
         //for PK
         sshServer.setPublickeyAuthenticator(AcceptAllPublickeyAuthenticator.INSTANCE);
         sshServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(
-                new File(SSHPasswordAuthTestServer.class.getResource("/sshj/hostkey.pem").getFile())));
+                new File(SSHPasswordAuthTestServer.class.getResource("/providers/hostkey.pem").getFile())));
 
         //for Password
         sshServer.setPasswordAuthenticator(new PasswordAuthenticator() {

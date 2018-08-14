@@ -179,18 +179,18 @@ public class J2SSHConnection extends AbstractConnection {
         setContainerStatus(Status.CLOSED);
         fire(new ClosedEvent(this));
     }
-	/**
-	 * @see Connection#createShellSession()
-	 */
+
+    /**
+     * @see Connection#createShellSession()
+     */
 
 
-	@Override
-	public SubsystemSession createSubsystemSession()
-	{
-		SubsystemSession session = new J2SSHSubsystemSession(this, connection);
-		registerChild(session);
-		return session;
-	}
+    @Override
+    public SubsystemSession createSubsystemSession() {
+        SubsystemSession session = new J2SSHSubsystemSession(this, connection);
+        registerChild(session);
+        return session;
+    }
 
     @Override
     public void authenticateImpl() throws AuthenticationException {
