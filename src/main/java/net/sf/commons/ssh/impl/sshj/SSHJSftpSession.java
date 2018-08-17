@@ -162,7 +162,7 @@ public class SSHJSftpSession extends AbstractSession implements SFTPSession {
     }
 
     private List<SFTPFile> convertFileList(List<RemoteResourceInfo> files) {
-        ArrayList out = new ArrayList(files.size());
+        List<SFTPFile> out = new ArrayList<>(files.size());
         for (final RemoteResourceInfo file : files ) {
             out.add(new SFTPFile() {
                 public String getAbsolutePath() {

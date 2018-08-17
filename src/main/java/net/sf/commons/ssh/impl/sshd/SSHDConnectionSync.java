@@ -1,16 +1,16 @@
 package net.sf.commons.ssh.impl.sshd;
 
-import net.sf.commons.ssh.common.*;
-import net.sf.commons.ssh.connection.AbstractConnection;
-import net.sf.commons.ssh.connection.Connection;
 import net.sf.commons.ssh.auth.AuthenticationMethod;
 import net.sf.commons.ssh.auth.PasswordPropertiesBuilder;
+import net.sf.commons.ssh.auth.PublicKeyPropertiesBuilder;
+import net.sf.commons.ssh.common.*;
 import net.sf.commons.ssh.connection.*;
 import net.sf.commons.ssh.errors.Error;
 import net.sf.commons.ssh.errors.ErrorLevel;
 import net.sf.commons.ssh.event.events.AuthenticatedEvent;
 import net.sf.commons.ssh.event.events.ClosedEvent;
 import net.sf.commons.ssh.event.events.ConnectedEvent;
+import net.sf.commons.ssh.options.IllegalPropertyException;
 import net.sf.commons.ssh.options.Properties;
 import net.sf.commons.ssh.session.*;
 import org.apache.sshd.client.SshClient;
@@ -144,27 +144,11 @@ public class SSHDConnectionSync extends AbstractConnection {
      * @see AbstractConnection#connectImpl(boolean)
      */
     @Override
-    protected void connectImpl(boolean authenticate) throws ConnectionException, AuthenticationException,
-            HostCheckingException {
+    protected void connectImpl(boolean authenticate) throws ConnectionException, AuthenticationException {
         ConnectionPropertiesBuilder cpb = ConnectionPropertiesBuilder.getInstance();
-        ConnectFuture cFuture;
         Long connectTimeout = cpb.getConnectTimeout(this);
-        try {
-            cFuture = connector.connect(PasswordPropertiesBuilder.getInstance().getLogin(this), cpb.getHost(this), cpb.getPort(this));
-            if (connectTimeout != null)
-                cFuture.await(connectTimeout);
-            else
-                cFuture.await();
-        } catch (Exception e) {
-            if (e instanceof RuntimeException)
-                throw (RuntimeException) e;
-            if (e instanceof ConnectionException)
-                throw (ConnectionException) e;
-            throw new ConnectionException(e.getMessage(), e);
-        }
-        if (!cFuture.isConnected())
-            throw new ConnectionException("Connection failed", cFuture.getException());
-        connection = (ClientSessionImpl) cFuture.getSession();
+        ConnectFuture connectionFuture = connect(cpb, connectTimeout);
+        connection = (ClientSessionImpl) connectionFuture.getSession();
         connection.waitFor(Collections.singleton(ClientSession.ClientSessionEvent.WAIT_AUTH), connectTimeout == null ?
                 SSHDPropertiesBuilder.Connection.getInstance().getSyncTimeout(this) : connectTimeout);
 
@@ -175,6 +159,26 @@ public class SSHDConnectionSync extends AbstractConnection {
         fire(new ConnectedEvent(this));
         if (authenticate)
             authenticate();
+    }
+
+
+    private ConnectFuture connect(ConnectionPropertiesBuilder cpb, Long connectTimeout) throws ConnectionException {
+        ConnectFuture cFuture;
+        try {
+            cFuture = connector.connect(PasswordPropertiesBuilder.getInstance().getLogin(this), cpb.getHost(this), cpb.getPort(this));
+            /*Wait infinite timeout if connection timeout is zero*/
+            if (isInfinite(connectTimeout))
+                cFuture.await();
+            else
+                cFuture.await(connectTimeout);
+        } catch (Exception e) {
+            if (e instanceof RuntimeException)
+                throw (RuntimeException) e;
+            throw new ConnectionException(e.getMessage(), e);
+        }
+        if (!cFuture.isConnected())
+            throw new ConnectionException("Connection failed", cFuture.getException());
+        return cFuture;
     }
 
     /**
@@ -214,36 +218,53 @@ public class SSHDConnectionSync extends AbstractConnection {
             default:
                 throw new AuthenticationException("Unsupported authentication method " + method);
         }
-        Long timeout = ConnectionPropertiesBuilder.getInstance().getAuthenticateTimeout(this);
+            Long timeout = ConnectionPropertiesBuilder.getInstance().getAuthenticateTimeout(this);
+            awaitAuthentication(auth, timeout);
+            if (auth.isFailure())
+                throw new AuthenticationException("Authentication failed", auth.getException());
+
+        setContainerStatus(Status.INPROGRESS);
+        fire(new AuthenticatedEvent(this));
+    }
+
+    private void awaitAuthentication(AuthFuture auth, Long timeout) {
         try {
-            if (timeout == null)
+            if (isInfinite(timeout))
                 auth.verify().await();
             else
                 auth.verify(timeout).await();
         } catch (IOException e) {
             throw new AuthenticationException(e.getMessage(), e);
         }
-        if (!auth.isSuccess())
-            throw new AuthenticationException("Authentication failed", auth.getException());
-        setContainerStatus(Status.INPROGRESS);
-        fire(new AuthenticatedEvent(this));
+    }
+
+    private boolean isInfinite(Long timeout) {
+        return timeout == null || timeout == 0;
     }
 
     private AuthFuture passwordAuth() {
         PasswordPropertiesBuilder.getInstance().verify(this);
+        connection.addPasswordIdentity(new String(PasswordPropertiesBuilder.getInstance().getPassword(this)));
+        return auth();
+    }
+
+
+
+    private AuthFuture publicKeyAuth() {
         try {
-            connection.addPasswordIdentity(new String(PasswordPropertiesBuilder.getInstance().getPassword(this)));
+            PublicKeyPropertiesBuilder.getInstance().verify(this);
+        } catch (IllegalPropertyException e) {
+            throw new AuthenticationException("check required parameters for public key authentication method ");
+        }
+        connection.addPublicKeyIdentity(PublicKeyPropertiesBuilder.getInstance().getKeyPair(this));
+        return auth();
+    }
+
+    private AuthFuture auth() {
+        try {
             return connection.auth();
         } catch (IOException e) {
             throw new AuthenticationException(e.getMessage(), e);
         }
-    }
-
-    private AuthFuture publicKeyAuth() {
-        return null;
-    }
-
-    private void setupConnectionProperties() {
-
     }
 }
