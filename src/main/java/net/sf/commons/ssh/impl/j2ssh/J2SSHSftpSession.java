@@ -203,7 +203,7 @@ public class J2SSHSftpSession extends AbstractSession implements SFTPSession {
 
     @Override
     public boolean isClosed() {
-        return sftpClient.isClosed();
+        return getContainerStatus() == Status.CLOSED;
     }
 
     static SFTPFileAttributes convertFileAttributes(
